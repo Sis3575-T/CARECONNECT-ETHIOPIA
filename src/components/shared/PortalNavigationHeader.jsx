@@ -9,7 +9,8 @@ import {
   Settings,
   Globe,
   Copy,
-  Check
+  Check,
+  ExternalLink
 } from 'lucide-react';
 
 export default function PortalNavigationHeader({
@@ -23,37 +24,37 @@ export default function PortalNavigationHeader({
   const navTabs = [
     {
       path: '/',
-      label: '4-Portal Collage View',
+      port: '3000',
+      label: 'Collage Overview',
       icon: Grid,
-      badge: 'Collage',
       color: 'bg-slate-800'
     },
     {
       path: '/health-centre',
-      label: 'Health Centre Portal',
+      port: '3001',
+      label: 'Health Centre',
       icon: Plus,
-      badge: 'Dr. Alemayehu',
       color: 'bg-[#0284c7]'
     },
     {
       path: '/hospital',
+      port: '3002',
       label: 'Hospital Portal',
       icon: Building2,
-      badge: 'Dr. Fitsum',
       color: 'bg-[#0f766e]'
     },
     {
       path: '/transport',
-      label: 'Transport Coordinator Portal',
+      port: '3003',
+      label: 'Transport Portal',
       icon: Truck,
-      badge: 'Abebe Kebede',
       color: 'bg-[#4338ca]'
     },
     {
       path: '/admin',
-      label: 'System Administrator Portal',
+      port: '3004',
+      label: 'Admin Portal',
       icon: Settings,
-      badge: 'Admin User',
       color: 'bg-[#1e3a8a]'
     }
   ];
@@ -87,36 +88,47 @@ export default function PortalNavigationHeader({
             </span>
             <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>AI System v1.0 Online</span>
+              <span>Multi-Port Service Ready</span>
             </span>
           </div>
         </div>
 
-        {/* Portal Switcher Buttons with Dedicated URLs */}
+        {/* Portal Switcher Buttons with Dedicated URLs & Direct Ports */}
         <div className="flex items-center gap-1.5 bg-slate-100/90 p-1 rounded-xl overflow-x-auto max-w-full">
           {navTabs.map((tab) => {
             const Icon = tab.icon;
             const active = isCurrent(tab.path);
 
             return (
-              <button
+              <div
                 key={tab.path}
-                onClick={() => navigate(tab.path)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
-                  active
-                    ? `${tab.color} text-white shadow-sm`
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                className={`flex items-center rounded-lg text-xs font-bold transition-all ${
+                  active ? `${tab.color} text-white shadow-sm` : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                 }`}
-                title={`Open ${tab.label} at ${tab.path}`}
               >
-                <Icon className="w-3.5 h-3.5 shrink-0" />
-                <span>{tab.label}</span>
-                <span className={`text-[10px] font-mono px-1 py-0.2 rounded ${
-                  active ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500'
-                }`}>
-                  {tab.path}
-                </span>
-              </button>
+                <button
+                  onClick={() => navigate(tab.path)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 whitespace-nowrap"
+                  title={`Open route ${tab.path}`}
+                >
+                  <Icon className="w-3.5 h-3.5 shrink-0" />
+                  <span>{tab.label}</span>
+                </button>
+
+                {/* Direct Port Button */}
+                <a
+                  href={`http://localhost:${tab.port}/`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`text-[10px] font-mono pr-2 py-1 flex items-center gap-0.5 opacity-75 hover:opacity-100 transition-opacity ${
+                    active ? 'text-white' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                  title={`Open standalone on port :${tab.port}`}
+                >
+                  <span>:{tab.port}</span>
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </a>
+              </div>
             );
           })}
         </div>
@@ -137,7 +149,7 @@ export default function PortalNavigationHeader({
             ) : (
               <>
                 <Copy className="w-3.5 h-3.5 text-slate-500" />
-                <span className="hidden sm:inline">Copy Portal URL</span>
+                <span className="hidden sm:inline">Copy Link</span>
               </>
             )}
           </button>

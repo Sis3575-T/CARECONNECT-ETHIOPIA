@@ -4,7 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 3000",
+    "dev:collage": "vite --port 3000",
+    "dev:health-centre": "vite --port 3001",
+    "dev:hospital": "vite --port 3002",
+    "dev:transport": "vite --port 3003",
+    "dev:admin": "vite --port 3004",
+    "dev:all": "concurrently -n \"COLLAGE:3000,HEALTH:3001,HOSPITAL:3002,TRANSPORT:3003,ADMIN:3004\" -c \"gray.bold,cyan.bold,green.bold,magenta.bold,blue.bold\" \"npm run dev:collage\" \"npm run dev:health-centre\" \"npm run dev:hospital\" \"npm run dev:transport\" \"npm run dev:admin\"",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -12,13 +18,14 @@
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.18.5"
+    "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
+    "concurrently": "^9.0.1",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
     "vite": "^5.4.6"
