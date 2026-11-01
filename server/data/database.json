@@ -1,0 +1,1074 @@
+{
+  "facilities": [
+    {
+      "id": "fac-01",
+      "name": "Tikur Anbessa Specialized Hospital (Black Lion)",
+      "type": "Comprehensive Specialized Hospital",
+      "region": "Addis Ababa",
+      "zone": "Lideta",
+      "woreda": "Woreda 08",
+      "beds": 800,
+      "availableBeds": 42,
+      "icuBeds": 24,
+      "availableIcuBeds": 3,
+      "ventilators": 18,
+      "availableVentilators": 2,
+      "oxygenLevel": "94% Adequate",
+      "bloodUnitsAvailable": 145,
+      "workloadLevel": "High (88%)",
+      "specialties": [
+        "Cardiology",
+        "Oncology",
+        "Neurosurgery",
+        "Pediatrics",
+        "ICU",
+        "Trauma"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 8.4,
+      "contactPhone": "+251 11 551 1211",
+      "lat": 9.0142,
+      "lng": 38.7523,
+      "lastCapacityUpdate": "Just now",
+      "ratingScore": 98
+    },
+    {
+      "id": "fac-02",
+      "name": "St. Paul's Hospital Millennium Medical College",
+      "type": "Specialized Referral Hospital",
+      "region": "Addis Ababa",
+      "zone": "Gulele",
+      "woreda": "Woreda 01",
+      "beds": 650,
+      "availableBeds": 28,
+      "icuBeds": 18,
+      "availableIcuBeds": 2,
+      "ventilators": 14,
+      "availableVentilators": 1,
+      "oxygenLevel": "88% Adequate",
+      "bloodUnitsAvailable": 110,
+      "workloadLevel": "Moderate (74%)",
+      "specialties": [
+        "Transplant Surgery",
+        "Obstetrics & Gynaecology",
+        "Cardiology",
+        "Emergency Trauma"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 12.1,
+      "contactPhone": "+251 11 275 0125",
+      "lat": 9.0526,
+      "lng": 38.7291,
+      "lastCapacityUpdate": "1 hour ago",
+      "ratingScore": 94
+    },
+    {
+      "id": "fac-03",
+      "name": "ALERT Trauma & Comprehensive Hospital",
+      "type": "Specialized Hospital",
+      "region": "Addis Ababa",
+      "zone": "Kolfe Keranio",
+      "woreda": "Woreda 05",
+      "beds": 450,
+      "availableBeds": 35,
+      "icuBeds": 12,
+      "availableIcuBeds": 4,
+      "ventilators": 10,
+      "availableVentilators": 3,
+      "oxygenLevel": "92% Adequate",
+      "bloodUnitsAvailable": 80,
+      "workloadLevel": "Moderate (65%)",
+      "specialties": [
+        "Trauma & Orthopedics",
+        "Dermatology",
+        "Reconstructive Surgery"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 14.5,
+      "contactPhone": "+251 11 321 1345",
+      "lat": 8.9856,
+      "lng": 38.7082,
+      "lastCapacityUpdate": "30 mins ago",
+      "ratingScore": 91
+    },
+    {
+      "id": "fac-04",
+      "name": "Yeka Health Centre",
+      "type": "Primary Health Centre",
+      "region": "Addis Ababa",
+      "zone": "Yeka",
+      "woreda": "Woreda 03",
+      "beds": 25,
+      "availableBeds": 6,
+      "icuBeds": 0,
+      "availableIcuBeds": 0,
+      "ventilators": 0,
+      "availableVentilators": 0,
+      "oxygenLevel": "75% Moderate",
+      "bloodUnitsAvailable": 0,
+      "workloadLevel": "Moderate",
+      "specialties": [
+        "Outpatient",
+        "Maternal Health (MCH)",
+        "Vaccination",
+        "Triage Referral"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 0,
+      "contactPhone": "+251 11 661 4590",
+      "lat": 9.0305,
+      "lng": 38.7952,
+      "lastCapacityUpdate": "20 mins ago",
+      "ratingScore": 95
+    },
+    {
+      "id": "fac-05",
+      "name": "Kazanchis Health Centre",
+      "type": "Primary Health Centre",
+      "region": "Addis Ababa",
+      "zone": "Kirkos",
+      "woreda": "Woreda 02",
+      "beds": 20,
+      "availableBeds": 5,
+      "icuBeds": 0,
+      "availableIcuBeds": 0,
+      "ventilators": 0,
+      "availableVentilators": 0,
+      "oxygenLevel": "80% Good",
+      "bloodUnitsAvailable": 0,
+      "workloadLevel": "Moderate",
+      "specialties": [
+        "Primary Care",
+        "Family Planning",
+        "Emergency Stabilization"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 4.2,
+      "contactPhone": "+251 11 552 4810",
+      "lat": 9.018,
+      "lng": 38.769,
+      "lastCapacityUpdate": "15 mins ago",
+      "ratingScore": 92
+    },
+    {
+      "id": "fac-06",
+      "name": "Wolkite Health Centre",
+      "type": "Primary Health Centre",
+      "region": "Central Ethiopia",
+      "zone": "Gurage",
+      "woreda": "Wolkite Town",
+      "beds": 30,
+      "availableBeds": 4,
+      "icuBeds": 0,
+      "availableIcuBeds": 0,
+      "ventilators": 0,
+      "availableVentilators": 0,
+      "oxygenLevel": "60% Low",
+      "bloodUnitsAvailable": 0,
+      "workloadLevel": "High",
+      "specialties": [
+        "Primary Care",
+        "Emergency First Aid",
+        "MCH"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 158,
+      "contactPhone": "+251 46 220 3341",
+      "lat": 8.2833,
+      "lng": 37.7833,
+      "lastCapacityUpdate": "2 hours ago",
+      "ratingScore": 89
+    },
+    {
+      "id": "fac-07",
+      "name": "Dilla Health Centre",
+      "type": "Health Centre",
+      "region": "South Ethiopia",
+      "zone": "Gedeo",
+      "woreda": "Dilla Town",
+      "beds": 28,
+      "availableBeds": 8,
+      "icuBeds": 0,
+      "availableIcuBeds": 0,
+      "ventilators": 0,
+      "availableVentilators": 0,
+      "oxygenLevel": "70%",
+      "bloodUnitsAvailable": 0,
+      "workloadLevel": "Normal",
+      "specialties": [
+        "Primary Care",
+        "TB/HIV",
+        "Antenatal Care"
+      ],
+      "operatingStatus": "Operational",
+      "distanceKmFromCenter": 360,
+      "contactPhone": "+251 46 331 2289",
+      "lat": 6.4167,
+      "lng": 38.3167,
+      "lastCapacityUpdate": "3 hours ago",
+      "ratingScore": 88
+    }
+  ],
+  "patients": [
+    {
+      "id": "PAT-ET-8401",
+      "nationalId": "ET-FIN-98213-AA",
+      "name": "Kebede Alemu",
+      "age": 54,
+      "gender": "Male",
+      "phone": "+251 91 144 2890",
+      "region": "Addis Ababa",
+      "zone": "Yeka",
+      "woreda": "Woreda 03",
+      "kebele": "Kebele 08",
+      "houseNo": "House 342",
+      "emergencyContact": "Almaz Alemu (Spouse) - +251 91 222 3344",
+      "bloodType": "O+",
+      "knownAllergies": "Penicillin",
+      "chronicConditions": "Hypertension, Type 2 Diabetes",
+      "registeredFacility": "Yeka Health Centre",
+      "registeredAt": "2025-01-14"
+    },
+    {
+      "id": "PAT-ET-8402",
+      "nationalId": "ET-FIN-77124-AA",
+      "name": "Hiwot Tadesse",
+      "age": 28,
+      "gender": "Female",
+      "phone": "+251 92 334 1188",
+      "region": "Addis Ababa",
+      "zone": "Bole",
+      "woreda": "Woreda 02",
+      "kebele": "Kebele 04",
+      "houseNo": "House 112",
+      "emergencyContact": "Tadesse Mengistu (Father) - +251 91 445 6677",
+      "bloodType": "A+",
+      "knownAllergies": "None",
+      "chronicConditions": "None (Primigravida 34 weeks gestation)",
+      "registeredFacility": "Yeka Health Centre",
+      "registeredAt": "2025-01-22"
+    },
+    {
+      "id": "PAT-ET-8403",
+      "nationalId": "ET-FIN-55612-OR",
+      "name": "Dawit Getachew",
+      "age": 63,
+      "gender": "Male",
+      "phone": "+251 93 456 7812",
+      "region": "Addis Ababa",
+      "zone": "Kirkos",
+      "woreda": "Woreda 04",
+      "kebele": "Kebele 12",
+      "houseNo": "House 89",
+      "emergencyContact": "Rahel Dawit (Daughter) - +251 92 110 9988",
+      "bloodType": "B+",
+      "knownAllergies": "Sulfonamides",
+      "chronicConditions": "Ischemic Heart Disease, Dyslipidemia",
+      "registeredFacility": "Yeka Health Centre",
+      "registeredAt": "2025-02-01"
+    },
+    {
+      "id": "PAT-ET-8404",
+      "nationalId": "ET-FIN-33901-AA",
+      "name": "Tigist Haile",
+      "age": 39,
+      "gender": "Female",
+      "phone": "+251 94 887 6523",
+      "region": "Addis Ababa",
+      "zone": "Arada",
+      "woreda": "Woreda 01",
+      "kebele": "Kebele 02",
+      "houseNo": "House 45",
+      "emergencyContact": "Yonas Haile (Brother) - +251 93 332 1144",
+      "bloodType": "AB+",
+      "knownAllergies": "NSAIDs (Aspirin)",
+      "chronicConditions": "Rheumatic Heart Disease",
+      "registeredFacility": "Yeka Health Centre",
+      "registeredAt": "2025-02-10"
+    },
+    {
+      "id": "PAT-ET-8405",
+      "nationalId": "ET-FIN-11234-AA",
+      "name": "Biniyam Girma",
+      "age": 22,
+      "gender": "Male",
+      "phone": "+251 95 678 9012",
+      "region": "Addis Ababa",
+      "zone": "Yeka",
+      "woreda": "Woreda 05",
+      "kebele": "Kebele 11",
+      "houseNo": "House 204",
+      "emergencyContact": "Girma Wondimu (Father) - +251 91 888 7766",
+      "bloodType": "O-",
+      "knownAllergies": "None",
+      "chronicConditions": "None",
+      "registeredFacility": "Yeka Health Centre",
+      "registeredAt": "2025-02-18"
+    }
+  ],
+  "referrals": [
+    {
+      "id": "REF-2025-8491",
+      "patientId": "PAT-ET-8401",
+      "patientName": "Kebede Alemu",
+      "age": 54,
+      "gender": "Male",
+      "referringFacility": "Yeka Health Centre",
+      "referringDoctor": "Dr. Alemayehu Bekele",
+      "referringPhone": "+251 91 144 2890",
+      "receivingFacility": "Tikur Anbessa Specialized Hospital (Black Lion)",
+      "service": "Cardiology",
+      "urgency": "Emergency",
+      "clinicalSummary": "Acute retrosternal chest pain radiating to left jaw and arm for >2 hrs. ECG reveals acute ST elevations in V1-V4 (Anterior STEMI). Vitals: BP 165/100, HR 98, SpO2 93%. Troponin T positive.",
+      "vitals": {
+        "bp": "165/100",
+        "hr": "98",
+        "temp": "36.8",
+        "rr": "22",
+        "spo2": "93%"
+      },
+      "status": "In Transit",
+      "date": "2025-02-28 09:15",
+      "completeness": "100% Complete",
+      "missingFields": [],
+      "aiScore": 98,
+      "transportRequired": true,
+      "transportStatus": "In Transit",
+      "assignedAmbulance": "AMB-AA-012",
+      "timeline": [
+        {
+          "step": "Created at Health Centre",
+          "timestamp": "09:15 AM",
+          "done": true,
+          "by": "Dr. Alemayehu Bekele"
+        },
+        {
+          "step": "Hospital Acknowledged",
+          "timestamp": "09:22 AM",
+          "done": true,
+          "by": "Triage Nurse Selam"
+        },
+        {
+          "step": "Hospital Accepted (ICU Allocated)",
+          "timestamp": "09:30 AM",
+          "done": true,
+          "by": "Dr. Daniel Worku"
+        },
+        {
+          "step": "Ambulance Dispatched",
+          "timestamp": "09:40 AM",
+          "done": true,
+          "by": "Dispatch Officer Yohannes"
+        },
+        {
+          "step": "Patient En-Route",
+          "timestamp": "09:55 AM",
+          "done": true,
+          "by": "Driver Kassahun"
+        },
+        {
+          "step": "Hospital Arrival & Admission",
+          "timestamp": "Pending",
+          "done": false
+        }
+      ],
+      "notes": "Transferred with oxygen face mask at 5L/min and continuous telemetry."
+    },
+    {
+      "id": "REF-2025-8492",
+      "patientId": "PAT-ET-8402",
+      "patientName": "Hiwot Tadesse",
+      "age": 28,
+      "gender": "Female",
+      "referringFacility": "Yeka Health Centre",
+      "referringDoctor": "Sr. Muluwork Desta",
+      "referringPhone": "+251 92 334 1188",
+      "receivingFacility": "St. Paul's Hospital Millennium Medical College",
+      "service": "Obstetrics & Gynaecology",
+      "urgency": "Emergency",
+      "clinicalSummary": "Gravida 1, 34 weeks gestation presenting with severe pre-eclampsia. Severe persistent headache, visual scotoma, BP 175/115 mmHg, 3+ proteinuria on dipstick. Fetal heart rate 146 bpm.",
+      "vitals": {
+        "bp": "175/115",
+        "hr": "88",
+        "temp": "37.1",
+        "rr": "20",
+        "spo2": "97%"
+      },
+      "status": "Accepted",
+      "date": "2025-02-28 10:00",
+      "completeness": "100% Complete",
+      "missingFields": [],
+      "aiScore": 96,
+      "transportRequired": true,
+      "transportStatus": "Dispatched",
+      "assignedAmbulance": "AMB-AA-004",
+      "timeline": [
+        {
+          "step": "Created at Health Centre",
+          "timestamp": "10:00 AM",
+          "done": true,
+          "by": "Sr. Muluwork Desta"
+        },
+        {
+          "step": "Hospital Acknowledged",
+          "timestamp": "10:08 AM",
+          "done": true,
+          "by": "Dr. Helina Getu"
+        },
+        {
+          "step": "Hospital Accepted",
+          "timestamp": "10:14 AM",
+          "done": true,
+          "by": "Dr. Helina Getu"
+        },
+        {
+          "step": "Ambulance Assigned",
+          "timestamp": "10:20 AM",
+          "done": true,
+          "by": "Dispatch Officer Yohannes"
+        },
+        {
+          "step": "Patient En-Route",
+          "timestamp": "Pending",
+          "done": false
+        },
+        {
+          "step": "Hospital Arrival",
+          "timestamp": "Pending",
+          "done": false
+        }
+      ],
+      "notes": "Loading dose of Magnesium Sulfate 4g IV + 10g IM administered prior to transfer."
+    },
+    {
+      "id": "REF-2025-8493",
+      "patientId": "PAT-ET-8403",
+      "patientName": "Dawit Getachew",
+      "age": 63,
+      "gender": "Male",
+      "referringFacility": "Yeka Health Centre",
+      "referringDoctor": "Dr. Alemayehu Bekele",
+      "referringPhone": "+251 93 456 7812",
+      "receivingFacility": "ALERT Trauma & Comprehensive Hospital",
+      "service": "Trauma & Orthopedics",
+      "urgency": "Urgent",
+      "clinicalSummary": "Pedestrian involved in road traffic accident. Closed deformity of right mid-shaft femur, neurovascular bundle intact distally. Severe localized pain, immobilized in Thomas splint.",
+      "vitals": {
+        "bp": "130/85",
+        "hr": "94",
+        "temp": "36.9",
+        "rr": "18",
+        "spo2": "98%"
+      },
+      "status": "Pending",
+      "date": "2025-02-28 11:20",
+      "completeness": "92% (Missing Pelvic X-ray)",
+      "missingFields": [
+        "Pelvic Radiograph"
+      ],
+      "aiScore": 91,
+      "transportRequired": true,
+      "transportStatus": "Requested",
+      "timeline": [
+        {
+          "step": "Created at Health Centre",
+          "timestamp": "11:20 AM",
+          "done": true,
+          "by": "Dr. Alemayehu Bekele"
+        },
+        {
+          "step": "Hospital Acknowledged",
+          "timestamp": "Pending",
+          "done": false
+        },
+        {
+          "step": "Hospital Accepted",
+          "timestamp": "Pending",
+          "done": false
+        },
+        {
+          "step": "Transport Dispatched",
+          "timestamp": "Pending",
+          "done": false
+        },
+        {
+          "step": "Hospital Arrival",
+          "timestamp": "Pending",
+          "done": false
+        }
+      ],
+      "notes": "Analgesia administered: Tramadol 50mg IV."
+    },
+    {
+      "id": "REF-2025-8494",
+      "patientId": "PAT-ET-8404",
+      "patientName": "Tigist Haile",
+      "age": 39,
+      "gender": "Female",
+      "referringFacility": "Yeka Health Centre",
+      "referringDoctor": "Dr. Alemayehu Bekele",
+      "referringPhone": "+251 94 887 6523",
+      "receivingFacility": "Tikur Anbessa Specialized Hospital (Black Lion)",
+      "service": "Cardiology",
+      "urgency": "Routine",
+      "clinicalSummary": "Established severe mitral stenosis secondary to RHD. Progressive NYHA Class III dyspnea on minimal exertion. Echocardiogram referral for percutaneous balloon mitral valvuloplasty evaluation.",
+      "vitals": {
+        "bp": "115/75",
+        "hr": "76",
+        "temp": "36.6",
+        "rr": "16",
+        "spo2": "97%"
+      },
+      "status": "Completed",
+      "date": "2025-02-27 14:00",
+      "completeness": "100% Complete",
+      "missingFields": [],
+      "aiScore": 95,
+      "transportRequired": false,
+      "transportStatus": "None",
+      "timeline": [
+        {
+          "step": "Created at Health Centre",
+          "timestamp": "14:00 PM",
+          "done": true
+        },
+        {
+          "step": "Hospital Acknowledged",
+          "timestamp": "14:30 PM",
+          "done": true
+        },
+        {
+          "step": "Hospital Accepted",
+          "timestamp": "15:15 PM",
+          "done": true
+        },
+        {
+          "step": "Outpatient Consult Completed",
+          "timestamp": "Yesterday 17:00 PM",
+          "done": true
+        }
+      ],
+      "notes": "Scheduled for elective catheterization on next available cycle."
+    },
+    {
+      "id": "REF-2025-8495",
+      "patientId": "PAT-ET-8405",
+      "patientName": "Biniyam Girma",
+      "age": 22,
+      "gender": "Male",
+      "referringFacility": "Yeka Health Centre",
+      "referringDoctor": "Dr. Alemayehu Bekele",
+      "referringPhone": "+251 95 678 9012",
+      "receivingFacility": "St. Paul's Hospital Millennium Medical College",
+      "service": "General Surgery",
+      "urgency": "Urgent",
+      "clinicalSummary": "24 hr history of migratory right lower quadrant abdominal pain with tenderness at McBurneys point, positive Rovsing and Psoas signs. Suspected acute appendicitis.",
+      "vitals": {
+        "bp": "120/80",
+        "hr": "90",
+        "temp": "38.2",
+        "rr": "18",
+        "spo2": "99%"
+      },
+      "status": "Rejected",
+      "date": "2025-02-28 08:30",
+      "completeness": "100% Complete",
+      "missingFields": [],
+      "aiScore": 93,
+      "transportRequired": true,
+      "transportStatus": "Cancelled",
+      "rejectionReason": "Emergency Operating Rooms currently at maximum emergency capacity due to multi-casualty incident. Recommended re-routing to Yekatit 12 Hospital.",
+      "timeline": [
+        {
+          "step": "Created at Health Centre",
+          "timestamp": "08:30 AM",
+          "done": true
+        },
+        {
+          "step": "Hospital Acknowledged",
+          "timestamp": "08:42 AM",
+          "done": true
+        },
+        {
+          "step": "Rejected (Capacity Shortage - FR-22)",
+          "timestamp": "08:50 AM",
+          "done": true,
+          "by": "CMO Dr. Berhanu"
+        }
+      ],
+      "notes": "FR-22 structured rejection justification provided with alternative facility re-routing."
+    }
+  ],
+  "transports": [
+    {
+      "id": "TR-ET-9101",
+      "referralId": "REF-2025-8491",
+      "patientId": "PAT-ET-8401",
+      "patientName": "Kebede Alemu",
+      "age": 54,
+      "urgency": "Emergency",
+      "origin": "Yeka Health Centre",
+      "originCoord": [
+        9.0305,
+        38.7952
+      ],
+      "destination": "Tikur Anbessa Specialized Hospital (Black Lion)",
+      "destCoord": [
+        9.0142,
+        38.7523
+      ],
+      "currentCoord": [
+        9.0225,
+        38.7735
+      ],
+      "vehicleType": "Advanced Life Support (ALS)",
+      "assignedVehicle": "AMB-AA-012",
+      "driver": "Kassahun Tadesse",
+      "driverPhone": "+251 91 190 2341",
+      "coordinator": "Yohannes Girma",
+      "coordinatorPhone": "+251 92 888 1234",
+      "scheduledDeparture": "09:40 AM",
+      "actualDeparture": "09:42 AM",
+      "etaMinutes": 12,
+      "speedKmH": 48,
+      "status": "In Transit",
+      "distanceKm": 8.4,
+      "oxygenRequired": true,
+      "ventilatorRequired": false,
+      "routeSector": "Megenagna - Kazanchis Corridor",
+      "notes": "Paramedic onboard monitoring continuous SpO2 and cardiac rhythm."
+    },
+    {
+      "id": "TR-ET-9102",
+      "referralId": "REF-2025-8492",
+      "patientId": "PAT-ET-8402",
+      "patientName": "Hiwot Tadesse",
+      "age": 28,
+      "urgency": "Emergency",
+      "origin": "Yeka Health Centre",
+      "originCoord": [
+        9.0305,
+        38.7952
+      ],
+      "destination": "St. Paul's Hospital Millennium Medical College",
+      "destCoord": [
+        9.0526,
+        38.7291
+      ],
+      "currentCoord": [
+        9.0305,
+        38.7952
+      ],
+      "vehicleType": "Basic Life Support (BLS)",
+      "assignedVehicle": "AMB-AA-004",
+      "driver": "Solomon Bekele",
+      "driverPhone": "+251 92 443 8910",
+      "coordinator": "Yohannes Girma",
+      "coordinatorPhone": "+251 92 888 1234",
+      "scheduledDeparture": "10:25 AM",
+      "etaMinutes": 24,
+      "speedKmH": 0,
+      "status": "Dispatched",
+      "distanceKm": 12.1,
+      "oxygenRequired": true,
+      "ventilatorRequired": false,
+      "routeSector": "Bole - Gulele Link",
+      "notes": "Ambulance arriving at Yeka Health Centre for patient pickup."
+    },
+    {
+      "id": "TR-ET-9103",
+      "referralId": "REF-2025-8493",
+      "patientId": "PAT-ET-8403",
+      "patientName": "Dawit Getachew",
+      "age": 63,
+      "urgency": "Urgent",
+      "origin": "Yeka Health Centre",
+      "originCoord": [
+        9.0305,
+        38.7952
+      ],
+      "destination": "ALERT Trauma & Comprehensive Hospital",
+      "destCoord": [
+        8.9856,
+        38.7082
+      ],
+      "currentCoord": [
+        9.0305,
+        38.7952
+      ],
+      "vehicleType": "Basic Life Support (BLS)",
+      "assignedVehicle": "Unassigned",
+      "driver": "Pending Assignment",
+      "driverPhone": "-",
+      "coordinator": "Yohannes Girma",
+      "coordinatorPhone": "+251 92 888 1234",
+      "scheduledDeparture": "Awaiting Assignment",
+      "etaMinutes": null,
+      "speedKmH": 0,
+      "status": "Pending Assignment",
+      "distanceKm": 14.5,
+      "oxygenRequired": false,
+      "ventilatorRequired": false,
+      "routeSector": "Ring Road South",
+      "notes": "Splinted fracture requiring stretcher transport."
+    }
+  ],
+  "resources": [
+    {
+      "id": "res-01",
+      "identifier": "AMB-AA-012",
+      "name": "Addis Ababa Unit 12 (ALS)",
+      "type": "Advanced Life Support (ALS)",
+      "status": "In Transit",
+      "baseFacility": "Yeka Ambulance Station",
+      "currentLocation": "Kazanchis Corridor",
+      "equipment": [
+        "Cardiac Monitor",
+        "Defibrillator",
+        "Oxygen 2x40L",
+        "Portable Suction"
+      ],
+      "assignedDriver": "Kassahun Tadesse",
+      "driverPhone": "+251 91 190 2341",
+      "lastServiceDate": "2025-01-28",
+      "fuelLevel": "78%"
+    },
+    {
+      "id": "res-02",
+      "identifier": "AMB-AA-004",
+      "name": "Addis Ababa Unit 04 (BLS)",
+      "type": "Basic Life Support (BLS)",
+      "status": "Dispatched",
+      "baseFacility": "Bole Sub-city Depot",
+      "currentLocation": "En route to Yeka Health Centre",
+      "equipment": [
+        "Stretcher",
+        "Oxygen 1x40L",
+        "First Aid Kit",
+        "Automated External Defibrillator"
+      ],
+      "assignedDriver": "Solomon Bekele",
+      "driverPhone": "+251 92 443 8910",
+      "lastServiceDate": "2025-02-10",
+      "fuelLevel": "85%"
+    },
+    {
+      "id": "res-03",
+      "identifier": "AMB-AA-009",
+      "name": "Addis Ababa Unit 09 (BLS)",
+      "type": "Basic Life Support (BLS)",
+      "status": "Available",
+      "baseFacility": "Lideta Central Depot",
+      "currentLocation": "Stationary (Lideta)",
+      "equipment": [
+        "Stretcher",
+        "Oxygen 1x40L",
+        "First Aid Kit"
+      ],
+      "assignedDriver": "Getnet Melaku",
+      "driverPhone": "+251 93 112 5566",
+      "lastServiceDate": "2025-02-15",
+      "fuelLevel": "92%"
+    },
+    {
+      "id": "res-04",
+      "identifier": "AMB-NICU-001",
+      "name": "Neonatal Critical Transfer 01",
+      "type": "Neonatal Intensive Care (NICU)",
+      "status": "Available",
+      "baseFacility": "St. Paul's Hospital Station",
+      "currentLocation": "Stationary (Gulele)",
+      "equipment": [
+        "Transport Incubator",
+        "Neonatal Ventilator",
+        "Infusion Pumps",
+        "Medical Air"
+      ],
+      "assignedDriver": "Fikadu Wolde",
+      "driverPhone": "+251 94 556 7788",
+      "lastServiceDate": "2025-02-05",
+      "fuelLevel": "95%"
+    }
+  ],
+  "users": [
+    {
+      "id": "usr-001",
+      "name": "Dr. Alemayehu Bekele",
+      "email": "alemayehu.bekele@moh.gov.et",
+      "role": "Health Centre Staff",
+      "facility": "Yeka Health Centre",
+      "phone": "+251 91 144 2890",
+      "status": "Active",
+      "lastLogin": "Today, 08:30 AM",
+      "permissions": [
+        "create_referral",
+        "view_patients",
+        "access_ai_assistant",
+        "view_recommendations"
+      ]
+    },
+    {
+      "id": "usr-002",
+      "name": "Dr. Daniel Worku",
+      "email": "daniel.worku@tikuranbessa.edu.et",
+      "role": "Hospital Staff",
+      "facility": "Tikur Anbessa Specialized Hospital",
+      "phone": "+251 91 332 5544",
+      "status": "Active",
+      "lastLogin": "Today, 09:12 AM",
+      "permissions": [
+        "triage_referrals",
+        "accept_reject_referrals",
+        "manage_capacity",
+        "send_feedback"
+      ]
+    },
+    {
+      "id": "usr-003",
+      "name": "Yohannes Girma",
+      "email": "yohannes.dispatch@transport.moh.gov.et",
+      "role": "Transport Coordinator",
+      "facility": "Central Medical Dispatch Hub",
+      "phone": "+251 92 888 1234",
+      "status": "Active",
+      "lastLogin": "Today, 07:45 AM",
+      "permissions": [
+        "assign_ambulance",
+        "update_transit_status",
+        "fleet_tracking",
+        "view_routes"
+      ]
+    },
+    {
+      "id": "usr-004",
+      "name": "Tsegaye Hailu",
+      "email": "tsegaye.admin@moh.gov.et",
+      "role": "System Administrator",
+      "facility": "Federal Ministry of Health (MoH)",
+      "phone": "+251 91 555 0101",
+      "status": "Active",
+      "lastLogin": "Today, 09:40 AM",
+      "permissions": [
+        "user_management",
+        "facility_management",
+        "ai_subsystems_control",
+        "audit_logs_view",
+        "system_config"
+      ]
+    }
+  ],
+  "aiSubsystems": [
+    {
+      "id": "AI-01",
+      "name": "Referral Document OCR & Digitization",
+      "model": "CareConnect-Tesseract-Hybrid v2.4",
+      "status": "Active",
+      "enabled": true,
+      "description": "Extracts handwritten and printed clinical text from scanned paper referral slips with Amharic and English tokenization.",
+      "accuracy": "96.4%",
+      "latencyMs": 840,
+      "lastProcessed": "4 mins ago",
+      "processedCount": 1420
+    },
+    {
+      "id": "AI-02",
+      "name": "Referral Completeness & Clinical Validation",
+      "model": "BioBERT-Ethiopia-Clinical v1.8",
+      "status": "Active",
+      "enabled": true,
+      "description": "Scans referral fields for required vital signs, preliminary diagnoses, and contraindications before hospital transmission.",
+      "accuracy": "98.1%",
+      "latencyMs": 310,
+      "lastProcessed": "2 mins ago",
+      "processedCount": 2180
+    },
+    {
+      "id": "AI-03",
+      "name": "Priority & Urgency Triage Classifier",
+      "model": "Ensemble-GradientTriage v3.1",
+      "status": "Active",
+      "enabled": true,
+      "description": "Classifies clinical urgency into Emergency (Immediate), Urgent (<24h), or Routine based on syndromic severity scores.",
+      "accuracy": "95.8%",
+      "latencyMs": 190,
+      "lastProcessed": "10 mins ago",
+      "processedCount": 3840
+    },
+    {
+      "id": "AI-04",
+      "name": "Hospital Matching & Recommendation Engine",
+      "model": "MultiCriteria-FacilityRanker v4.0",
+      "status": "Active",
+      "enabled": true,
+      "description": "Ranks tertiary and general hospitals by clinical specialty capability, distance, reported bed availability, and road accessibility.",
+      "accuracy": "94.2%",
+      "latencyMs": 250,
+      "lastProcessed": "15 mins ago",
+      "processedCount": 1920
+    },
+    {
+      "id": "AI-05",
+      "name": "Duplicate Referral Detector",
+      "model": "Cosine-Similarity-Embeddings v1.2",
+      "status": "Active",
+      "enabled": true,
+      "description": "Prevents multiple submissions for the same acute episode across neighbouring health centres within a 72-hour window.",
+      "accuracy": "99.0%",
+      "latencyMs": 120,
+      "lastProcessed": "1 hour ago",
+      "processedCount": 520
+    },
+    {
+      "id": "AI-06",
+      "name": "Transport Delay & Route Predictor",
+      "model": "GeoSpatial-TrafficPredictor v2.0",
+      "status": "Active",
+      "enabled": true,
+      "description": "Forecasts transit delays along Addis Ababa arterials and regional trunk roads using historic corridor travel velocities.",
+      "accuracy": "89.6%",
+      "latencyMs": 420,
+      "lastProcessed": "35 mins ago",
+      "processedCount": 890
+    },
+    {
+      "id": "AI-07",
+      "name": "Clinical NLP Summarizer",
+      "model": "Clinical-LLaMA-3-Medical v1.0",
+      "status": "Active",
+      "enabled": true,
+      "description": "Synthesizes lengthy clinical notes and lab reports into concise bulleted triage handovers for receiving emergency physicians.",
+      "accuracy": "93.7%",
+      "latencyMs": 1100,
+      "lastProcessed": "12 mins ago",
+      "processedCount": 1650
+    },
+    {
+      "id": "AI-08",
+      "name": "Bilingual Clinical Assistant (Amharic & English)",
+      "model": "EthioMed-Chat-Mistral v2.2",
+      "status": "Active",
+      "enabled": true,
+      "description": "Interactive natural language assistant guiding primary care clinicians through MoH standard clinical referral criteria.",
+      "accuracy": "91.8%",
+      "latencyMs": 950,
+      "lastProcessed": "Just now",
+      "processedCount": 4210
+    },
+    {
+      "id": "AI-09",
+      "name": "Regional Bed Capacity & Surge Forecaster",
+      "model": "Prophet-HospitalSurge v1.5",
+      "status": "Active",
+      "enabled": true,
+      "description": "Projects 48-hour bed and ICU occupancy rates for tertiary hospitals to preemptively divert non-critical transfers.",
+      "accuracy": "88.3%",
+      "latencyMs": 1600,
+      "lastProcessed": "3 hours ago",
+      "processedCount": 310
+    }
+  ],
+  "aiBenchmarks": [
+    {
+      "metric": "Precision (Emergency Triage)",
+      "value": "96.2%",
+      "baseline": "88.0%",
+      "status": "Surpassed Target"
+    },
+    {
+      "metric": "Recall (Critical Cardiac/Maternal)",
+      "value": "98.5%",
+      "baseline": "92.0%",
+      "status": "Surpassed Target"
+    },
+    {
+      "metric": "OCR Accuracy on Mobile Scans",
+      "value": "94.7%",
+      "baseline": "85.0%",
+      "status": "Within Bounds"
+    },
+    {
+      "metric": "Average Inference Latency",
+      "value": "412 ms",
+      "baseline": "< 800 ms",
+      "status": "Optimal"
+    },
+    {
+      "metric": "Hospital Match Satisfaction (Clinician Feedback)",
+      "value": "92.4%",
+      "baseline": "80.0%",
+      "status": "Surpassed Target"
+    },
+    {
+      "metric": "Cross-Centre Duplicate Detection Rate",
+      "value": "99.1%",
+      "baseline": "95.0%",
+      "status": "Optimal"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "LOG-8812",
+      "timestamp": "2025-02-28 09:15:22",
+      "user": "Dr. Alemayehu Bekele",
+      "role": "Health Centre Staff",
+      "facility": "Yeka Health Centre",
+      "action": "CREATE_REFERRAL",
+      "entity": "REF-2025-8491 (Kebede Alemu)",
+      "details": "Submitted Emergency Cardiology referral to Tikur Anbessa Hospital"
+    },
+    {
+      "id": "LOG-8813",
+      "timestamp": "2025-02-28 09:22:04",
+      "user": "Nurse Selamawit T.",
+      "role": "Hospital Staff",
+      "facility": "Tikur Anbessa Hospital",
+      "action": "ACKNOWLEDGE_REFERRAL",
+      "entity": "REF-2025-8491",
+      "details": "Acknowledged receipt of referral note within 7 minutes"
+    },
+    {
+      "id": "LOG-8814",
+      "timestamp": "2025-02-28 09:30:18",
+      "user": "Dr. Daniel Worku",
+      "role": "Hospital Staff",
+      "facility": "Tikur Anbessa Hospital",
+      "action": "ACCEPT_REFERRAL",
+      "entity": "REF-2025-8491",
+      "details": "Accepted patient; allocated Bed ICU-03"
+    },
+    {
+      "id": "LOG-8815",
+      "timestamp": "2025-02-28 09:40:05",
+      "user": "Yohannes Girma",
+      "role": "Transport Coordinator",
+      "facility": "Central Dispatch Hub",
+      "action": "DISPATCH_AMBULANCE",
+      "entity": "AMB-AA-012",
+      "details": "Dispatched ALS unit with driver Kassahun Tadesse for REF-2025-8491"
+    },
+    {
+      "id": "LOG-8816",
+      "timestamp": "2025-02-28 08:50:33",
+      "user": "Dr. Berhanu Mengistu",
+      "role": "Hospital Staff",
+      "facility": "St. Paul's Hospital",
+      "action": "REJECT_REFERRAL_FR22",
+      "entity": "REF-2025-8495",
+      "details": "FR-22 structured rejection: Operating theatre surge capacity exceeded. Re-routed to Yekatit 12."
+    }
+  ],
+  "feedback": [
+    {
+      "id": "FDB-001",
+      "referralId": "REF-2025-8494",
+      "patientName": "Tigist Haile",
+      "referringFacility": "Yeka Health Centre",
+      "receivingFacility": "Tikur Anbessa Specialized Hospital",
+      "attendingPhysician": "Dr. Daniel Worku (Cardiologist)",
+      "outcome": "Admitted & Elective Valvuloplasty Scheduled",
+      "dischargeSummary": "Patient evaluated in Cardiology Outpatient. Echocardiography confirmed severe MS (MVA 0.8 cm2). Admitted to Cardiology Ward 4. Scheduled for percutaneous balloon mitral valvuloplasty.",
+      "recommendationsToHealthCentre": "Continue Penicillin V 250mg PO BID secondary prophylaxis. Monthly monitoring of INR if anticoagulated.",
+      "submittedDate": "2025-02-27 18:30"
+    }
+  ]
+}

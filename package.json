@@ -4,21 +4,30 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3000",
-    "dev:collage": "vite --port 3000",
-    "dev:health-centre": "vite --port 3001",
-    "dev:hospital": "vite --port 3002",
-    "dev:transport": "vite --port 3003",
-    "dev:admin": "vite --port 3004",
-    "dev:all": "concurrently -n \"COLLAGE:3000,HEALTH:3001,HOSPITAL:3002,TRANSPORT:3003,ADMIN:3004\" -c \"gray.bold,cyan.bold,green.bold,magenta.bold,blue.bold\" \"npm run dev:collage\" \"npm run dev:health-centre\" \"npm run dev:hospital\" \"npm run dev:transport\" \"npm run dev:admin\"",
-    "build": "vite build",
-    "preview": "vite preview"
+    "server": "node server/server.js",
+    "dev:health": "vite --config portals/health-centre/vite.config.js portals/health-centre",
+    "dev:hospital": "vite --config portals/hospital/vite.config.js portals/hospital",
+    "dev:transport": "vite --config portals/transport/vite.config.js portals/transport",
+    "dev:admin": "vite --config portals/administrator/vite.config.js portals/administrator",
+    "dev:all": "concurrently -n \"SERVER:5000,HEALTH:5173,HOSPITAL:5174,TRANSPORT:5175,ADMIN:5176\" -c \"yellow.bold,cyan.bold,green.bold,magenta.bold,blue.bold\" \"npm run server\" \"npm run dev:health\" \"npm run dev:hospital\" \"npm run dev:transport\" \"npm run dev:admin\"",
+    "build:health": "vite build portals/health-centre --config portals/health-centre/vite.config.js",
+    "build:hospital": "vite build portals/hospital --config portals/hospital/vite.config.js",
+    "build:transport": "vite build portals/transport --config portals/transport/vite.config.js",
+    "build:admin": "vite build portals/administrator --config portals/administrator/vite.config.js",
+    "build:all": "npm run build:health && npm run build:hospital && npm run build:transport && npm run build:admin"
   },
   "dependencies": {
+    "axios": "^1.7.7",
+    "framer-motion": "^11.11.11",
+    "leaflet": "^1.9.4",
     "lucide-react": "^1.16.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2"
+    "react-hook-form": "^7.53.1",
+    "react-is": "^19.3.1",
+    "react-leaflet": "^4.2.1",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7"
   },
   "devDependencies": {
     "@types/react": "^18.3.5",
