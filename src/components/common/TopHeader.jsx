@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Menu, ChevronDown, Bell, Globe, User, LogOut, CheckCircle2 } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Menu, ChevronDown, Bell, Globe, User, LogOut, CheckCircle2, LayoutGrid, Building2, Truck, Plus, ShieldCheck } from 'lucide-react';
 
 export default function TopHeader({
   userName = 'Dr. Alemayehu',
@@ -11,10 +12,20 @@ export default function TopHeader({
   notificationCount = 0
 }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const portalsList = [
+    { label: 'Health Centre Portal', path: '/health-centre', icon: Plus, color: 'text-sky-600' },
+    { label: 'Hospital Portal', path: '/hospital', icon: Building2, color: 'text-emerald-600' },
+    { label: 'Transport Portal', path: '/transport', icon: Truck, color: 'text-violet-600' },
+    { label: 'System Admin Portal', path: '/admin', icon: ShieldCheck, color: 'text-blue-700' },
+    { label: '4-Portal Collage View', path: '/', icon: LayoutGrid, color: 'text-slate-700' }
+  ];
 
   return (
     <header className="h-14 bg-white border-b border-slate-100 px-4 sm:px-6 flex items-center justify-between z-20">
-      {/* Left: Hamburger menu toggle */}
+      {/* Left: Hamburger menu toggle & current route badge */}
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleSidebar}
@@ -23,6 +34,12 @@ export default function TopHeader({
         >
           <Menu className="w-5 h-5" />
         </button>
+
+        {/* Current URL indicator pill */}
+        <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-md text-[11px] font-mono text-slate-600">
+          <span className="text-slate-400">URL:</span>
+          <span className="font-bold text-slate-800">{location.pathname}</span>
+        </div>
       </div>
 
       {/* Right: Quick actions and user profile */}
@@ -69,9 +86,9 @@ export default function TopHeader({
             <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
-          {/* Dropdown Menu */}
+          {/* Dropdown Menu with Direct Portal Switching */}
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="absolute right-0 mt-2 w-60 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="px-3.5 py-2 border-b border-slate-100">
                 <p className="text-xs font-semibold text-slate-800">{userName}</p>
                 <p className="text-[11px] text-slate-500">{userSubtitle}</p>
@@ -81,23 +98,47 @@ export default function TopHeader({
                 </div>
               </div>
 
-              <button
-                onClick={() => setDropdownOpen(false)}
-                className="w-full text-left px-3.5 py-2 text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-              >
-                <User className="w-3.5 h-3.5 text-slate-400" />
-                <span>My Profile & Facility</span>
-              </button>
+              {/* Quick portal navigation */}
+              <div className="py-1 border-b border-slate-100">
+                <span className="px-3.5 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  Switch Portal URL
+                </span>
+                <div className="mt-1 space-y-0.5">
+                  {portalsList.map((p) => {
+                    const Icon = p.icon;
+                    const isSelected = location.pathname === p.path;
+                    return (
+                      <button
+                        key={p.path}
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          navigate(p.path);
+                        }}
+                        className={`w-full text-left px-3.5 py-1.5 text-xs flex items-center justify-between hover:bg-slate-50 transition-colors ${
+                          isSelected ? 'font-bold bg-slate-50 text-slate-900' : 'text-slate-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon className={`w-3.5 h-3.5 ${p.color}`} />
+                          <span>{p.label}</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-400">{p.path}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               <button
                 onClick={() => {
                   setDropdownOpen(false);
                   if (onLogout) onLogout();
+                  else navigate('/');
                 }}
                 className="w-full text-left px-3.5 py-2 text-xs text-red-600 hover:bg-red-50 flex items-center gap-2"
               >
                 <LogOut className="w-3.5 h-3.5 text-red-500" />
-                <span>Sign Out</span>
+                <span>Sign Out to Overview</span>
               </button>
             </div>
           )}
