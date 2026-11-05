@@ -111,8 +111,8 @@
     "id": 13,
     "title": "db: create roles and permissions tables",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "41accfd",
     "testsPerformed": "Verified 002_create_roles_and_permissions.sql with roles, permissions, role_permissions join table, and foundational seed data",
     "remainingIssues": "None"
   },
@@ -120,9 +120,9 @@
     "id": 14,
     "title": "db: create users table",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 003_create_users.sql with authentication fields, role relations, facility tenancy identifiers, and index constraints",
     "remainingIssues": "None"
   },
   "15": {
