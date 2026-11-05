@@ -21,8 +21,8 @@
     "id": 3,
     "title": "docs: add software requirements specification",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "7e18c43",
     "testsPerformed": "Validated SDS document structure, functional requirements FR1-FR8, non-functional requirements NFR1-NFR6, state machine, and data flow in docs/SDS.md",
     "remainingIssues": "None"
   },
@@ -30,9 +30,9 @@
     "id": 4,
     "title": "docs: add system architecture documentation",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Validated system architecture documentation, port specifications, dual-service communication pattern, and sequence workflows in docs/ARCHITECTURE.md",
     "remainingIssues": "None"
   },
   "5": {
