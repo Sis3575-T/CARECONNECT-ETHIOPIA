@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 11 / 220 (5.0%)  
+**Committed:** 12 / 220 (5.5%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:29:16.704Z  
+**Last Updated:** 2026-11-05T19:30:05.448Z  
 
 ---
 
@@ -12,7 +12,7 @@
 | Phase | Title | Range | Committed | Status |
 |---|---|---|---|---|
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
-| Phase 2 | Database Foundation | 11–20 | 1/10 | 🔄 IN PROGRESS |
+| Phase 2 | Database Foundation | 11–20 | 2/10 | 🔄 IN PROGRESS |
 | Phase 3 | Database Completion | 21–30 | 0/10 | ⏳ PENDING |
 | Phase 4 | Backend Foundation | 31–40 | 0/10 | ⏳ PENDING |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
@@ -51,8 +51,8 @@
 | 9 | 1 | chore: configure code formatting and linting | ✅ COMMITTED | `3aa9bfc` | Verified .prettierrc.json, .prettierignore, eslint.config.js, and ai-service/pyproject.toml syntax and schema validity | None |
 | 10 | 1 | docs: add initial installation and setup guide | ✅ COMMITTED | `402a206` | Validated installation and setup guide across Node.js, Python, PostgreSQL, and port map in docs/SETUP.md | None |
 | 11 | 2 | db: configure PostgreSQL connection | ✅ COMMITTED | `a0db24b` | Verified PostgreSQL connection pool, query execution wrapper, and testConnection health check in database/connection.js and backend/src/config/database.js | None |
-| 12 | 2 | db: create initial migration structure | 🧪 TESTED | - | Verified database/migrate.js runner with schema_migrations table, status listing, and 001_initial_migration_tracker.sql | None |
-| 13 | 2 | db: create roles and permissions tables | ⏳ NOT STARTED | - | None | None |
+| 12 | 2 | db: create initial migration structure | ✅ COMMITTED | `664739a` | Verified database/migrate.js runner with schema_migrations table, status listing, and 001_initial_migration_tracker.sql | None |
+| 13 | 2 | db: create roles and permissions tables | 🧪 TESTED | - | Verified 002_create_roles_and_permissions.sql with roles, permissions, role_permissions join table, and foundational seed data | None |
 | 14 | 2 | db: create users table | ⏳ NOT STARTED | - | None | None |
 | 15 | 2 | db: create healthcare facilities table | ⏳ NOT STARTED | - | None | None |
 | 16 | 2 | db: create facility services table | ⏳ NOT STARTED | - | None | None |
