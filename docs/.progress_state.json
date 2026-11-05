@@ -75,8 +75,8 @@
     "id": 9,
     "title": "chore: configure code formatting and linting",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "3aa9bfc",
     "testsPerformed": "Verified .prettierrc.json, .prettierignore, eslint.config.js, and ai-service/pyproject.toml syntax and schema validity",
     "remainingIssues": "None"
   },
@@ -84,9 +84,9 @@
     "id": 10,
     "title": "docs: add initial installation and setup guide",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Validated installation and setup guide across Node.js, Python, PostgreSQL, and port map in docs/SETUP.md",
     "remainingIssues": "None"
   },
   "11": {
