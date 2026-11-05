@@ -138,8 +138,8 @@
     "id": 16,
     "title": "db: create facility services table",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "3327454",
     "testsPerformed": "Verified 005_create_facility_services.sql with clinical_services catalog, facility capability mapping, specialist on duty flags, and unique constraints",
     "remainingIssues": "None"
   },
@@ -147,9 +147,9 @@
     "id": 17,
     "title": "db: create facility capacity table",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 006_create_facility_capacity.sql with time-stamped capacity reports, ventilator/ICU counts, compound indexes, and latest-capacity view v_facility_current_capacity",
     "remainingIssues": "None"
   },
   "18": {
