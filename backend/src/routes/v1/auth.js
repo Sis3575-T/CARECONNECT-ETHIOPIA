@@ -32,6 +32,9 @@ router.post('/login', validate(loginSchema), AuthController.login);
 // Refresh Token route
 router.post('/refresh', validate({ refreshToken: { required: true } }), AuthController.refresh);
 
+// Logout and token revocation
+router.post('/logout', AuthController.logout);
+
 // Current User Profile
 router.get('/me', authenticate, AuthController.getProfile);
 

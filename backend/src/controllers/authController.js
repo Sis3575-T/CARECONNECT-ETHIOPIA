@@ -145,6 +145,30 @@ export class AuthController {
   }
 
   /**
+   * Terminate session and revoke tokens
+   */
+  static async logout(req, res, next) {
+    try {
+      const { refreshToken } = req.body;
+      if (refreshToken) {
+        await TokenModel.revokeToken(refreshToken);
+      }
+
+      // If user is authenticated, revoke all user tokens
+      if (req.user && req.user.userId) {
+        await TokenModel.revokeAllUserTokens(req.user.userId);
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Session terminated successfully and tokens revoked'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
    * Get authenticated user profile
    */
   static async getProfile(req, res, next) {
