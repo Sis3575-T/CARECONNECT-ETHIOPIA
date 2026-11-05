@@ -201,8 +201,8 @@
     "id": 23,
     "title": "db: create transport records table",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "6ea55c1",
     "testsPerformed": "Verified 012_create_transport_records.sql with transport_resources fleet registry, trip coordination, distance/delay tracking, and route endpoints",
     "remainingIssues": "None"
   },
@@ -210,9 +210,9 @@
     "id": 24,
     "title": "db: create referral feedback table",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 013_create_referral_feedback.sql with clinical outcome categories, Likert rating constraints (1-5), and bidirectional audit links",
     "remainingIssues": "None"
   },
   "25": {
