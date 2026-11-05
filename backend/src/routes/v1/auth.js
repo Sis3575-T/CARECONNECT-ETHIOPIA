@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import AuthController from '../../controllers/authController.js';
 import { validate } from '../../middleware/validate.js';
+import { authenticate } from '../../middleware/auth.js';
 
 const router = Router();
 
@@ -27,5 +28,8 @@ const loginSchema = {
 };
 
 router.post('/login', validate(loginSchema), AuthController.login);
+
+// Current User Profile
+router.get('/me', authenticate, AuthController.getProfile);
 
 export default router;
