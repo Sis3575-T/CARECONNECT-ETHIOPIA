@@ -165,8 +165,8 @@
     "id": 19,
     "title": "db: create referrals table",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "c8123c5",
     "testsPerformed": "Verified 008_create_referrals.sql with status state machine, clinical triage priorities, vital signs, and origin/destination facility foreign keys",
     "remainingIssues": "None"
   },
@@ -174,9 +174,9 @@
     "id": 20,
     "title": "db: add initial database constraints and indexes",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 009_create_constraints_and_indexes.sql with cross-table foreign key constraints, priority/status/gender/tier check constraints, and composite indexes",
     "remainingIssues": "None"
   },
   "21": {

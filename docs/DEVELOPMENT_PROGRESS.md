@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 18 / 220 (8.2%)  
+**Committed:** 19 / 220 (8.6%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:33:49.058Z  
+**Last Updated:** 2026-11-05T19:34:26.246Z  
 
 ---
 
@@ -12,7 +12,7 @@
 | Phase | Title | Range | Committed | Status |
 |---|---|---|---|---|
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
-| Phase 2 | Database Foundation | 11–20 | 8/10 | 🔄 IN PROGRESS |
+| Phase 2 | Database Foundation | 11–20 | 9/10 | 🔄 IN PROGRESS |
 | Phase 3 | Database Completion | 21–30 | 0/10 | ⏳ PENDING |
 | Phase 4 | Backend Foundation | 31–40 | 0/10 | ⏳ PENDING |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
@@ -58,8 +58,8 @@
 | 16 | 2 | db: create facility services table | ✅ COMMITTED | `3327454` | Verified 005_create_facility_services.sql with clinical_services catalog, facility capability mapping, specialist on duty flags, and unique constraints | None |
 | 17 | 2 | db: create facility capacity table | ✅ COMMITTED | `39667d3` | Verified 006_create_facility_capacity.sql with time-stamped capacity reports, ventilator/ICU counts, compound indexes, and latest-capacity view v_facility_current_capacity | None |
 | 18 | 2 | db: create patients table | ✅ COMMITTED | `efcb742` | Verified 007_create_patients.sql with patronymic naming structure, Fayda national ID, Kebele metadata, and allergies/chronic history fields | None |
-| 19 | 2 | db: create referrals table | 🧪 TESTED | - | Verified 008_create_referrals.sql with status state machine, clinical triage priorities, vital signs, and origin/destination facility foreign keys | None |
-| 20 | 2 | db: add initial database constraints and indexes | ⏳ NOT STARTED | - | None | None |
+| 19 | 2 | db: create referrals table | ✅ COMMITTED | `c8123c5` | Verified 008_create_referrals.sql with status state machine, clinical triage priorities, vital signs, and origin/destination facility foreign keys | None |
+| 20 | 2 | db: add initial database constraints and indexes | 🧪 TESTED | - | Verified 009_create_constraints_and_indexes.sql with cross-table foreign key constraints, priority/status/gender/tier check constraints, and composite indexes | None |
 | 21 | 3 | db: create referral documents table | ⏳ NOT STARTED | - | None | None |
 | 22 | 3 | db: create referral events table | ⏳ NOT STARTED | - | None | None |
 | 23 | 3 | db: create transport records table | ⏳ NOT STARTED | - | None | None |
