@@ -192,8 +192,8 @@
     "id": 22,
     "title": "db: create referral events table",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "f5bc648",
     "testsPerformed": "Verified 011_create_referral_events.sql with status machine transitions, actor metadata, and JSONB event payload auditing",
     "remainingIssues": "None"
   },
@@ -201,9 +201,9 @@
     "id": 23,
     "title": "db: create transport records table",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 012_create_transport_records.sql with transport_resources fleet registry, trip coordination, distance/delay tracking, and route endpoints",
     "remainingIssues": "None"
   },
   "24": {
