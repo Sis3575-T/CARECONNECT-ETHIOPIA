@@ -291,8 +291,8 @@
     "id": 33,
     "title": "backend: configure PostgreSQL database client",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "a5b25bc",
     "testsPerformed": "Ran backend/tests/dbService.test.js (3/3 tests passed) verifying DbService methods query, queryOne, queryMany, transaction, and healthCheck",
     "remainingIssues": "None"
   },
@@ -300,9 +300,9 @@
     "id": 34,
     "title": "backend: add centralized error handling",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/errorHandler.test.js (3/3 tests passed) verifying AppError, ValidationError, NotFoundError, centralized JSON schema, and 404 handler",
     "remainingIssues": "None"
   },
   "35": {

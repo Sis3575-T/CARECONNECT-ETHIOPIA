@@ -8,6 +8,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +37,10 @@ app.get('/', (req, res) => {
     health: '/api/v1/health'
   });
 });
+
+// Centralized error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 /**
  * Start HTTP server listening
