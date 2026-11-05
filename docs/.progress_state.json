@@ -372,8 +372,8 @@
     "id": 42,
     "title": "backend: implement secure password hashing",
     "phase": 5,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "9331986",
     "testsPerformed": "Ran backend/tests/password.test.js (3/3 tests passed) verifying bcrypt salting rounds, hash non-reversibility, comparison matching, and strength complexity rules",
     "remainingIssues": "None"
   },
@@ -381,9 +381,9 @@
     "id": 43,
     "title": "backend: implement user login",
     "phase": 5,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/login.test.js (4/4 tests passed) verifying login credential authentication, password verification, active status checking, and 401 rejection for invalid/non-existent credentials",
     "remainingIssues": "None"
   },
   "44": {

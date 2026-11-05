@@ -20,4 +20,12 @@ const registerSchema = {
 
 router.post('/register', validate(registerSchema), AuthController.register);
 
+// Login validation schema
+const loginSchema = {
+  email: { required: true, type: 'email' },
+  password: { required: true, minLength: 1 }
+};
+
+router.post('/login', validate(loginSchema), AuthController.login);
+
 export default router;

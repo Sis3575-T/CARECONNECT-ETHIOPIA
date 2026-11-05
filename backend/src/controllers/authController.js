@@ -3,7 +3,7 @@
  */
 
 import UserModel from '../models/userModel.js';
-import { hashPassword, validatePasswordStrength } from '../utils/password.js';
+import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password.js';
 import { ConflictError, ValidationError, UnauthorizedError } from '../utils/errors.js';
 
 export class AuthController {
@@ -45,6 +45,51 @@ export class AuthController {
         success: true,
         message: 'User registered successfully',
         data: { user: newUser }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Authenticate user with email and password
+   */
+  static async login(req, res, next) {
+    try {
+      const { email, password } = req.body;
+
+      const user = await UserModel.findByEmail(email);
+      if (!user) {
+        throw new UnauthorizedError('Invalid email or password credentials');
+      }
+
+      if (!user.is_active) {
+        throw new UnauthorizedError('User account is deactivated. Contact system administrator.');
+      }
+
+      const isMatch = await comparePassword(password, user.password_hash);
+      if (!isMatch) {
+        throw new UnauthorizedError('Invalid email or password credentials');
+      }
+
+      // Safe user payload without password hash
+      const safeUser = {
+        id: user.id,
+        email: user.email,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        roleId: user.role_id,
+        facilityId: user.facility_id,
+        department: user.department,
+        jobTitle: user.job_title
+      };
+
+      res.status(200).json({
+        success: true,
+        message: 'Authentication successful',
+        data: {
+          user: safeUser
+        }
       });
     } catch (err) {
       next(err);
