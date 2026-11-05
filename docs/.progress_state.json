@@ -219,8 +219,8 @@
     "id": 25,
     "title": "db: create notifications table",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "69603b9",
     "testsPerformed": "Verified 014_create_notifications.sql with user/facility multi-target recipients, priority escalations, read tracking, and entity foreign references",
     "remainingIssues": "None"
   },
@@ -228,9 +228,9 @@
     "id": 26,
     "title": "db: create audit logs table",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 015_create_audit_logs.sql with security severity categorization, IP/UserAgent tracing, JSONB payload context, and resource type indexes",
     "remainingIssues": "None"
   },
   "27": {
