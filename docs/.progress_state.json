@@ -246,8 +246,8 @@
     "id": 28,
     "title": "db: create AI predictions table",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "d83d288",
     "testsPerformed": "Verified 017_create_ai_predictions.sql with prediction types, confidence scores, features audit JSONB, model provenance, and clinician review verification fields",
     "remainingIssues": "None"
   },
@@ -255,9 +255,9 @@
     "id": 29,
     "title": "db: create AI model versions and feedback tables",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 018_create_ai_models_and_feedback.sql with model version registry, accuracy metrics, feedback collection schema, and baseline model seeds",
     "remainingIssues": "None"
   },
   "30": {
