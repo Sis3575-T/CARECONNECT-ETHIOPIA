@@ -174,8 +174,8 @@
     "id": 20,
     "title": "db: add initial database constraints and indexes",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "62ffede",
     "testsPerformed": "Verified 009_create_constraints_and_indexes.sql with cross-table foreign key constraints, priority/status/gender/tier check constraints, and composite indexes",
     "remainingIssues": "None"
   },
@@ -183,9 +183,9 @@
     "id": 21,
     "title": "db: create referral documents table",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 010_create_referral_documents.sql with document types, mime validation metadata, OCR status transitions, and referral foreign key cascade",
     "remainingIssues": "None"
   },
   "22": {

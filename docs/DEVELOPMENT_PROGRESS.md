@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 19 / 220 (8.6%)  
+**Committed:** 20 / 220 (9.1%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:34:26.246Z  
+**Last Updated:** 2026-11-05T19:35:20.647Z  
 
 ---
 
@@ -12,7 +12,7 @@
 | Phase | Title | Range | Committed | Status |
 |---|---|---|---|---|
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
-| Phase 2 | Database Foundation | 11–20 | 9/10 | 🔄 IN PROGRESS |
+| Phase 2 | Database Foundation | 11–20 | 10/10 | ✅ COMPLETED |
 | Phase 3 | Database Completion | 21–30 | 0/10 | ⏳ PENDING |
 | Phase 4 | Backend Foundation | 31–40 | 0/10 | ⏳ PENDING |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
@@ -59,8 +59,8 @@
 | 17 | 2 | db: create facility capacity table | ✅ COMMITTED | `39667d3` | Verified 006_create_facility_capacity.sql with time-stamped capacity reports, ventilator/ICU counts, compound indexes, and latest-capacity view v_facility_current_capacity | None |
 | 18 | 2 | db: create patients table | ✅ COMMITTED | `efcb742` | Verified 007_create_patients.sql with patronymic naming structure, Fayda national ID, Kebele metadata, and allergies/chronic history fields | None |
 | 19 | 2 | db: create referrals table | ✅ COMMITTED | `c8123c5` | Verified 008_create_referrals.sql with status state machine, clinical triage priorities, vital signs, and origin/destination facility foreign keys | None |
-| 20 | 2 | db: add initial database constraints and indexes | 🧪 TESTED | - | Verified 009_create_constraints_and_indexes.sql with cross-table foreign key constraints, priority/status/gender/tier check constraints, and composite indexes | None |
-| 21 | 3 | db: create referral documents table | ⏳ NOT STARTED | - | None | None |
+| 20 | 2 | db: add initial database constraints and indexes | ✅ COMMITTED | `62ffede` | Verified 009_create_constraints_and_indexes.sql with cross-table foreign key constraints, priority/status/gender/tier check constraints, and composite indexes | None |
+| 21 | 3 | db: create referral documents table | 🧪 TESTED | - | Verified 010_create_referral_documents.sql with document types, mime validation metadata, OCR status transitions, and referral foreign key cascade | None |
 | 22 | 3 | db: create referral events table | ⏳ NOT STARTED | - | None | None |
 | 23 | 3 | db: create transport records table | ⏳ NOT STARTED | - | None | None |
 | 24 | 3 | db: create referral feedback table | ⏳ NOT STARTED | - | None | None |
