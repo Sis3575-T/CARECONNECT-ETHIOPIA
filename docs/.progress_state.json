@@ -273,8 +273,8 @@
     "id": 31,
     "title": "backend: initialize Express application",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "ece026b",
     "testsPerformed": "Ran backend/tests/app.test.js (3/3 tests passed) verifying Express application instance, middleware, and welcome route in backend/src/app.js",
     "remainingIssues": "None"
   },
@@ -282,9 +282,9 @@
     "id": 32,
     "title": "backend: configure environment and application settings",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/config.test.js (5/5 tests passed) verifying safe environment parsing, CORS origin parsing, JWT windows, and production security audits in backend/src/config/env.js",
     "remainingIssues": "None"
   },
   "33": {
