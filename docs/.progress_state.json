@@ -93,8 +93,8 @@
     "id": 11,
     "title": "db: configure PostgreSQL connection",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "a0db24b",
     "testsPerformed": "Verified PostgreSQL connection pool, query execution wrapper, and testConnection health check in database/connection.js and backend/src/config/database.js",
     "remainingIssues": "None"
   },
@@ -102,9 +102,9 @@
     "id": 12,
     "title": "db: create initial migration structure",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified database/migrate.js runner with schema_migrations table, status listing, and 001_initial_migration_tracker.sql",
     "remainingIssues": "None"
   },
   "13": {

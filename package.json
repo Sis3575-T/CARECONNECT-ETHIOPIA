@@ -13,6 +13,8 @@
   "scripts": {
     "server": "node server/server.js",
     "backend": "node backend/src/app.js",
+    "db:migrate": "node database/migrate.js",
+    "db:status": "node database/migrate.js --status",
     "dev:backend": "node --watch backend/src/app.js",
     "dev:ai": "python -m uvicorn app.main:app --app-dir ai-service --port 8000 --reload",
     "dev:health": "vite --config portals/health-centre/vite.config.js portals/health-centre",
