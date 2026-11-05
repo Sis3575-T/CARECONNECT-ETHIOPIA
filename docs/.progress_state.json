@@ -147,8 +147,8 @@
     "id": 17,
     "title": "db: create facility capacity table",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "39667d3",
     "testsPerformed": "Verified 006_create_facility_capacity.sql with time-stamped capacity reports, ventilator/ICU counts, compound indexes, and latest-capacity view v_facility_current_capacity",
     "remainingIssues": "None"
   },
@@ -156,9 +156,9 @@
     "id": 18,
     "title": "db: create patients table",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 007_create_patients.sql with patronymic naming structure, Fayda national ID, Kebele metadata, and allergies/chronic history fields",
     "remainingIssues": "None"
   },
   "19": {
