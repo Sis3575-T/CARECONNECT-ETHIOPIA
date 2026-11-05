@@ -1,0 +1,116 @@
+# CareConnect Ethiopia — API Documentation (v1)
+
+## Base URL
+```text
+http://localhost:5000/api/v1
+```
+
+All requests must use `application/json` content-type unless transmitting multipart file uploads.
+
+---
+
+## 1. Authentication & Security Headers
+
+### Bearer Token
+Protected endpoints require an `Authorization` header containing an active JWT token:
+```http
+Authorization: Bearer <JWT_ACCESS_TOKEN>
+```
+
+### Request Tracing
+Clients may provide an `X-Request-Id` header for end-to-end tracing:
+```http
+X-Request-Id: req-98f2b7a14e9102c3
+```
+
+---
+
+## 2. Standard Response Envelope
+
+### Success Response
+```json
+{
+  "success": true,
+  "data": { ... },
+  "message": "Optional human-readable confirmation"
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed for incoming payload",
+    "details": [
+      { "field": "email", "message": "email is required" }
+    ],
+    "timestamp": "2026-11-05T20:00:00.000Z"
+  }
+}
+```
+
+---
+
+## 3. Core Endpoint Catalog
+
+### 3.1 Authentication (`/auth`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/auth/register` | Register new user account | Admin |
+| `POST` | `/auth/login` | Authenticate email/password, return access & refresh tokens | Public |
+| `POST` | `/auth/refresh` | Renew expired access token using refresh token | Public |
+| `POST` | `/auth/logout` | Invalidate refresh token and revoke session | Authenticated |
+| `GET` | `/auth/me` | Retrieve profile and permissions of authenticated user | Authenticated |
+
+### 3.2 Facilities & Capacity (`/facilities`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/facilities` | List healthcare facilities with filters (region, tier, type) | Public / Auth |
+| `GET` | `/facilities/:id` | Get facility details, coordinates, and services catalog | Public / Auth |
+| `POST` | `/facilities` | Register new healthcare facility | Admin |
+| `PUT` | `/facilities/:id` | Update facility details | Admin |
+| `GET` | `/facilities/:id/capacity` | Get latest live capacity (beds, ICU, ventilators) | Authenticated |
+| `POST` | `/facilities/:id/capacity` | Submit time-stamped capacity report | Hospital Staff |
+
+### 3.3 Patient Management (`/patients`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/patients` | Search and paginate patient records | Health Centre / Hospital |
+| `POST` | `/patients` | Register new patient record | Health Centre Staff |
+| `GET` | `/patients/:id` | Retrieve patient demographics and medical summary | Authorized Staff |
+| `PUT` | `/patients/:id` | Update permitted patient information | Authorized Staff |
+| `GET` | `/patients/:id/referrals` | Retrieve patient referral history | Authorized Staff |
+
+### 3.4 Electronic Referrals (`/referrals`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/referrals` | Create new referral draft | Health Centre Staff |
+| `GET` | `/referrals/:id` | Get comprehensive authorized referral details | Referring / Receiving Facility |
+| `PUT` | `/referrals/:id` | Update draft referral clinical information | Referring Staff |
+| `POST` | `/referrals/:id/submit` | Formally submit referral to destination hospital | Referring Staff |
+| `GET` | `/referrals/incoming` | Retrieve incoming referrals queue for hospital | Hospital Triage |
+| `POST` | `/referrals/:id/acknowledge`| Mark incoming referral as acknowledged by hospital | Hospital Triage |
+| `POST` | `/referrals/:id/accept` | Accept referral and confirm bed reservation | Hospital Triage |
+| `POST` | `/referrals/:id/reject` | Decline referral with structured clinical reason | Hospital Triage |
+| `POST` | `/referrals/:id/request-info`| Request additional laboratory or clinical information | Hospital Triage |
+| `GET` | `/referrals/:id/timeline` | Retrieve chronological referral event history | Authorized Staff |
+| `POST` | `/referrals/:id/feedback`| Record post-admission hospital clinical feedback | Hospital Staff |
+
+### 3.5 Transportation & Fleet (`/transport`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/transport/requests` | List transport requests requiring ambulance dispatch | Transport Dispatcher |
+| `POST` | `/transport/requests` | Create transport request for accepted emergency referral| Clinician |
+| `POST` | `/transport/assign` | Assign ambulance vehicle and driver to request | Transport Dispatcher |
+| `GET` | `/transport/resources` | List ambulance fleet status and GPS coordinates | Transport Dispatcher |
+| `POST` | `/transport/:id/status` | Update transit milestone (departed, delayed, arrived) | Driver / Dispatcher |
+
+### 3.6 AI Services Gateway (`/ai`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/ai/ocr/extract` | Upload paper referral slip and extract OCR text | Health Centre Staff |
+| `POST` | `/ai/recommend` | Calculate ranked hospital recommendations & weights | Health Centre Staff |
+| `POST` | `/ai/predict/delay` | Estimate predicted triage and transit delay risk | Health Centre / Hospital |
+| `POST` | `/ai/assistant` | Query grounded clinical knowledge base & guidelines | Authenticated |

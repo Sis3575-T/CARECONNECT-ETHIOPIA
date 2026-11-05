@@ -345,8 +345,8 @@
     "id": 39,
     "title": "backend: add health check endpoint",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "0ebc50c",
     "testsPerformed": "Ran backend/tests/health.test.js (3/3 tests passed) verifying diagnostics, database connection probes, memory telemetry, and liveness endpoints",
     "remainingIssues": "None"
   },
@@ -354,9 +354,9 @@
     "id": 40,
     "title": "backend: add API documentation foundation",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/docs.test.js (2/2 tests passed) verifying OpenAPI 3.0 documentation route /api/v1/docs and authored comprehensive docs/API.md specification",
     "remainingIssues": "None"
   },
   "41": {
