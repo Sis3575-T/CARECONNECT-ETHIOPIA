@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 20 / 220 (9.1%)  
+**Committed:** 21 / 220 (9.5%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:35:20.647Z  
+**Last Updated:** 2026-11-05T19:35:49.547Z  
 
 ---
 
@@ -13,7 +13,7 @@
 |---|---|---|---|---|
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
 | Phase 2 | Database Foundation | 11–20 | 10/10 | ✅ COMPLETED |
-| Phase 3 | Database Completion | 21–30 | 0/10 | ⏳ PENDING |
+| Phase 3 | Database Completion | 21–30 | 1/10 | 🔄 IN PROGRESS |
 | Phase 4 | Backend Foundation | 31–40 | 0/10 | ⏳ PENDING |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
 | Phase 6 | User and Facility Management | 51–60 | 0/10 | ⏳ PENDING |
@@ -60,8 +60,8 @@
 | 18 | 2 | db: create patients table | ✅ COMMITTED | `efcb742` | Verified 007_create_patients.sql with patronymic naming structure, Fayda national ID, Kebele metadata, and allergies/chronic history fields | None |
 | 19 | 2 | db: create referrals table | ✅ COMMITTED | `c8123c5` | Verified 008_create_referrals.sql with status state machine, clinical triage priorities, vital signs, and origin/destination facility foreign keys | None |
 | 20 | 2 | db: add initial database constraints and indexes | ✅ COMMITTED | `62ffede` | Verified 009_create_constraints_and_indexes.sql with cross-table foreign key constraints, priority/status/gender/tier check constraints, and composite indexes | None |
-| 21 | 3 | db: create referral documents table | 🧪 TESTED | - | Verified 010_create_referral_documents.sql with document types, mime validation metadata, OCR status transitions, and referral foreign key cascade | None |
-| 22 | 3 | db: create referral events table | ⏳ NOT STARTED | - | None | None |
+| 21 | 3 | db: create referral documents table | ✅ COMMITTED | `fbb977e` | Verified 010_create_referral_documents.sql with document types, mime validation metadata, OCR status transitions, and referral foreign key cascade | None |
+| 22 | 3 | db: create referral events table | 🧪 TESTED | - | Verified 011_create_referral_events.sql with status machine transitions, actor metadata, and JSONB event payload auditing | None |
 | 23 | 3 | db: create transport records table | ⏳ NOT STARTED | - | None | None |
 | 24 | 3 | db: create referral feedback table | ⏳ NOT STARTED | - | None | None |
 | 25 | 3 | db: create notifications table | ⏳ NOT STARTED | - | None | None |
