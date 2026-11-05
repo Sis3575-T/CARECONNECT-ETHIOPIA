@@ -408,8 +408,8 @@
     "id": 46,
     "title": "backend: implement logout and token revocation",
     "phase": 5,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "e82fa39",
     "testsPerformed": "Ran backend/tests/logout.test.js (2/2 tests passed) verifying POST /api/v1/auth/logout, refresh token revocation, and prevention of revoked token replay",
     "remainingIssues": "None"
   },
@@ -417,9 +417,9 @@
     "id": 47,
     "title": "backend: implement role-based authorization",
     "phase": 5,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/rbac.test.js (5/5 tests passed) verifying requireRole, requirePortal, cross-portal separation, and administrator access",
     "remainingIssues": "None"
   },
   "48": {
