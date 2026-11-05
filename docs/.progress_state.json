@@ -1,0 +1,1982 @@
+{
+  "1": {
+    "id": 1,
+    "title": "chore: initialize CareConnect Ethiopia repository",
+    "phase": 1,
+    "status": "TESTED",
+    "commitHash": "",
+    "testsPerformed": "Verified root project structure and directory layout matches Part 1.3 specification",
+    "remainingIssues": "None"
+  },
+  "2": {
+    "id": 2,
+    "title": "docs: add project overview and objectives",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "3": {
+    "id": 3,
+    "title": "docs: add software requirements specification",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "4": {
+    "id": 4,
+    "title": "docs: add system architecture documentation",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "5": {
+    "id": 5,
+    "title": "chore: configure root npm workspace",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "6": {
+    "id": 6,
+    "title": "chore: configure shared development scripts",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "7": {
+    "id": 7,
+    "title": "chore: configure environment variable templates",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "8": {
+    "id": 8,
+    "title": "chore: configure gitignore and repository hygiene",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "9": {
+    "id": 9,
+    "title": "chore: configure code formatting and linting",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "10": {
+    "id": 10,
+    "title": "docs: add initial installation and setup guide",
+    "phase": 1,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "11": {
+    "id": 11,
+    "title": "db: configure PostgreSQL connection",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "12": {
+    "id": 12,
+    "title": "db: create initial migration structure",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "13": {
+    "id": 13,
+    "title": "db: create roles and permissions tables",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "14": {
+    "id": 14,
+    "title": "db: create users table",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "15": {
+    "id": 15,
+    "title": "db: create healthcare facilities table",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "16": {
+    "id": 16,
+    "title": "db: create facility services table",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "17": {
+    "id": 17,
+    "title": "db: create facility capacity table",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "18": {
+    "id": 18,
+    "title": "db: create patients table",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "19": {
+    "id": 19,
+    "title": "db: create referrals table",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "20": {
+    "id": 20,
+    "title": "db: add initial database constraints and indexes",
+    "phase": 2,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "21": {
+    "id": 21,
+    "title": "db: create referral documents table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "22": {
+    "id": 22,
+    "title": "db: create referral events table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "23": {
+    "id": 23,
+    "title": "db: create transport records table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "24": {
+    "id": 24,
+    "title": "db: create referral feedback table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "25": {
+    "id": 25,
+    "title": "db: create notifications table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "26": {
+    "id": 26,
+    "title": "db: create audit logs table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "27": {
+    "id": 27,
+    "title": "db: create AI recommendations table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "28": {
+    "id": 28,
+    "title": "db: create AI predictions table",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "29": {
+    "id": 29,
+    "title": "db: create AI model versions and feedback tables",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "30": {
+    "id": 30,
+    "title": "db: implement database seeds and relationship tests",
+    "phase": 3,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "31": {
+    "id": 31,
+    "title": "backend: initialize Express application",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "32": {
+    "id": 32,
+    "title": "backend: configure environment and application settings",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "33": {
+    "id": 33,
+    "title": "backend: configure PostgreSQL database client",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "34": {
+    "id": 34,
+    "title": "backend: add centralized error handling",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "35": {
+    "id": 35,
+    "title": "backend: add request validation middleware",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "36": {
+    "id": 36,
+    "title": "backend: configure CORS and security headers",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "37": {
+    "id": 37,
+    "title": "backend: add request logging",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "38": {
+    "id": 38,
+    "title": "backend: add API versioning",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "39": {
+    "id": 39,
+    "title": "backend: add health check endpoint",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "40": {
+    "id": 40,
+    "title": "backend: add API documentation foundation",
+    "phase": 4,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "41": {
+    "id": 41,
+    "title": "backend: implement user registration",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "42": {
+    "id": 42,
+    "title": "backend: implement secure password hashing",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "43": {
+    "id": 43,
+    "title": "backend: implement user login",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "44": {
+    "id": 44,
+    "title": "backend: implement access token management",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "45": {
+    "id": 45,
+    "title": "backend: implement refresh token management",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "46": {
+    "id": 46,
+    "title": "backend: implement logout and token revocation",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "47": {
+    "id": 47,
+    "title": "backend: implement role-based authorization",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "48": {
+    "id": 48,
+    "title": "backend: implement facility-based access restrictions",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "49": {
+    "id": 49,
+    "title": "backend: implement account activation and deactivation",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "50": {
+    "id": 50,
+    "title": "backend: add authentication and authorization tests",
+    "phase": 5,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "51": {
+    "id": 51,
+    "title": "backend: implement user management APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "52": {
+    "id": 52,
+    "title": "backend: implement user profile APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "53": {
+    "id": 53,
+    "title": "backend: implement role management APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "54": {
+    "id": 54,
+    "title": "backend: implement facility registration APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "55": {
+    "id": 55,
+    "title": "backend: implement facility update APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "56": {
+    "id": 56,
+    "title": "backend: implement facility search and filtering",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "57": {
+    "id": 57,
+    "title": "backend: implement facility services APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "58": {
+    "id": 58,
+    "title": "backend: implement facility capacity reporting APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "59": {
+    "id": 59,
+    "title": "backend: implement facility location APIs",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "60": {
+    "id": 60,
+    "title": "backend: test user and facility management",
+    "phase": 6,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "61": {
+    "id": 61,
+    "title": "backend: implement patient registration",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "62": {
+    "id": 62,
+    "title": "backend: implement patient information updates",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "63": {
+    "id": 63,
+    "title": "backend: implement patient search",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "64": {
+    "id": 64,
+    "title": "backend: implement patient details endpoint",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "65": {
+    "id": 65,
+    "title": "backend: implement patient referral history",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "66": {
+    "id": 66,
+    "title": "backend: implement patient access restrictions",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "67": {
+    "id": 67,
+    "title": "backend: implement patient input validation",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "68": {
+    "id": 68,
+    "title": "backend: implement patient record audit events",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "69": {
+    "id": 69,
+    "title": "backend: add patient pagination and filtering",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "70": {
+    "id": 70,
+    "title": "backend: test patient management workflows",
+    "phase": 7,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "71": {
+    "id": 71,
+    "title": "backend: implement referral creation",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "72": {
+    "id": 72,
+    "title": "backend: implement unique referral number generation",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "73": {
+    "id": 73,
+    "title": "backend: implement referral information validation",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "74": {
+    "id": 74,
+    "title": "backend: implement referral update",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "75": {
+    "id": 75,
+    "title": "backend: implement referral submission",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "76": {
+    "id": 76,
+    "title": "backend: implement incoming referral retrieval",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "77": {
+    "id": 77,
+    "title": "backend: implement referral details endpoint",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "78": {
+    "id": 78,
+    "title": "backend: implement referral acknowledgement",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "79": {
+    "id": 79,
+    "title": "backend: implement referral acceptance and rejection",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "80": {
+    "id": 80,
+    "title": "backend: implement additional information requests",
+    "phase": 8,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "81": {
+    "id": 81,
+    "title": "backend: implement referral status transition rules",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "82": {
+    "id": 82,
+    "title": "backend: implement referral event history",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "83": {
+    "id": 83,
+    "title": "backend: implement referral cancellation",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "84": {
+    "id": 84,
+    "title": "backend: implement referral assignment and reassignment rules",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "85": {
+    "id": 85,
+    "title": "backend: implement referral filtering and pagination",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "86": {
+    "id": 86,
+    "title": "backend: implement referral timeline API",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "87": {
+    "id": 87,
+    "title": "backend: implement referral feedback API",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "88": {
+    "id": 88,
+    "title": "backend: implement referral outcome management",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "89": {
+    "id": 89,
+    "title": "backend: implement referral closure rules",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "90": {
+    "id": 90,
+    "title": "backend: test complete referral lifecycle",
+    "phase": 9,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "91": {
+    "id": 91,
+    "title": "backend: configure secure file upload",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "92": {
+    "id": 92,
+    "title": "backend: implement document type validation",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "93": {
+    "id": 93,
+    "title": "backend: implement document size validation",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "94": {
+    "id": 94,
+    "title": "backend: implement referral document storage",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "95": {
+    "id": 95,
+    "title": "backend: implement document retrieval authorization",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "96": {
+    "id": 96,
+    "title": "backend: implement document deletion rules",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "97": {
+    "id": 97,
+    "title": "backend: implement document processing status",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "98": {
+    "id": 98,
+    "title": "backend: implement document audit events",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "99": {
+    "id": 99,
+    "title": "backend: implement document upload tests",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "100": {
+    "id": 100,
+    "title": "docs: document secure document management",
+    "phase": 10,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "101": {
+    "id": 101,
+    "title": "backend: implement transport request creation",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "102": {
+    "id": 102,
+    "title": "backend: implement transport request listing",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "103": {
+    "id": 103,
+    "title": "backend: implement transport assignment",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "104": {
+    "id": 104,
+    "title": "backend: implement transport resource management",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "105": {
+    "id": 105,
+    "title": "backend: implement transport status transitions",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "106": {
+    "id": 106,
+    "title": "backend: implement transport departure updates",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "107": {
+    "id": 107,
+    "title": "backend: implement transport arrival updates",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "108": {
+    "id": 108,
+    "title": "backend: implement transport delay reporting",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "109": {
+    "id": 109,
+    "title": "backend: implement transport history",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "110": {
+    "id": 110,
+    "title": "backend: test transportation workflows",
+    "phase": 11,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "111": {
+    "id": 111,
+    "title": "backend: implement notification creation service",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "112": {
+    "id": 112,
+    "title": "backend: implement notification retrieval",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "113": {
+    "id": 113,
+    "title": "backend: implement notification read status",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "114": {
+    "id": 114,
+    "title": "backend: implement referral event notifications",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "115": {
+    "id": 115,
+    "title": "backend: implement transport notifications",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "116": {
+    "id": 116,
+    "title": "backend: implement administrative delay alerts",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "117": {
+    "id": 117,
+    "title": "backend: implement health centre dashboard statistics",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "118": {
+    "id": 118,
+    "title": "backend: implement hospital dashboard statistics",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "119": {
+    "id": 119,
+    "title": "backend: implement transport dashboard statistics",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "120": {
+    "id": 120,
+    "title": "backend: implement administrator analytics APIs",
+    "phase": 12,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "121": {
+    "id": 121,
+    "title": "ai: initialize Python AI service",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "122": {
+    "id": 122,
+    "title": "ai: configure FastAPI application",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "123": {
+    "id": 123,
+    "title": "ai: configure Python dependencies",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "124": {
+    "id": 124,
+    "title": "ai: implement AI service health checks",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "125": {
+    "id": 125,
+    "title": "ai: implement AI request validation",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "126": {
+    "id": 126,
+    "title": "ai: implement AI error handling",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "127": {
+    "id": 127,
+    "title": "ai: implement AI logging",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "128": {
+    "id": 128,
+    "title": "ai: configure model and dataset directories",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "129": {
+    "id": 129,
+    "title": "ai: implement model version management",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "130": {
+    "id": 130,
+    "title": "ai: add AI service tests",
+    "phase": 13,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "131": {
+    "id": 131,
+    "title": "ai: configure Tesseract OCR",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "132": {
+    "id": 132,
+    "title": "ai: implement document image preprocessing",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "133": {
+    "id": 133,
+    "title": "ai: implement OCR extraction endpoint",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "134": {
+    "id": 134,
+    "title": "ai: implement OCR extraction result validation",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "135": {
+    "id": 135,
+    "title": "ai: implement referral information extraction",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "136": {
+    "id": 136,
+    "title": "ai: implement referral text normalization",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "137": {
+    "id": 137,
+    "title": "ai: implement referral summarization",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "138": {
+    "id": 138,
+    "title": "ai: implement referral completeness checking",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "139": {
+    "id": 139,
+    "title": "ai: implement English and Amharic text handling",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "140": {
+    "id": 140,
+    "title": "ai: test OCR and NLP processing",
+    "phase": 14,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "141": {
+    "id": 141,
+    "title": "ai: prepare referral classification dataset",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "142": {
+    "id": 142,
+    "title": "ai: implement referral category preprocessing",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "143": {
+    "id": 143,
+    "title": "ai: train initial referral classification model",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "144": {
+    "id": 144,
+    "title": "ai: evaluate referral classification model",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "145": {
+    "id": 145,
+    "title": "ai: implement referral classification API",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "146": {
+    "id": 146,
+    "title": "ai: implement hospital service matching",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "147": {
+    "id": 147,
+    "title": "ai: implement facility distance calculation",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "148": {
+    "id": 148,
+    "title": "ai: implement hospital recommendation ranking",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "149": {
+    "id": 149,
+    "title": "ai: implement recommendation explanations",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "150": {
+    "id": 150,
+    "title": "ai: test hospital recommendation results",
+    "phase": 15,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "151": {
+    "id": 151,
+    "title": "ai: implement approved referral review flags",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "152": {
+    "id": 152,
+    "title": "ai: implement historical referral delay dataset preparation",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "153": {
+    "id": 153,
+    "title": "ai: implement baseline delay estimation",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "154": {
+    "id": 154,
+    "title": "ai: train referral delay prediction model",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "155": {
+    "id": 155,
+    "title": "ai: evaluate delay prediction performance",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "156": {
+    "id": 156,
+    "title": "ai: implement potential duplicate referral detection",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "157": {
+    "id": 157,
+    "title": "ai: implement hospital workload analysis",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "158": {
+    "id": 158,
+    "title": "ai: implement referral anomaly detection",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "159": {
+    "id": 159,
+    "title": "ai: implement referral pattern analytics",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "160": {
+    "id": 160,
+    "title": "ai: add AI model performance reporting",
+    "phase": 16,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "161": {
+    "id": 161,
+    "title": "ai: implement system knowledge base",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "162": {
+    "id": 162,
+    "title": "ai: implement grounded system assistant",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "163": {
+    "id": 163,
+    "title": "ai: implement administrative translation service",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "164": {
+    "id": 164,
+    "title": "ai: implement referral status explanation",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "165": {
+    "id": 165,
+    "title": "ai: implement AI feedback collection",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "166": {
+    "id": 166,
+    "title": "backend: configure AI service client",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "167": {
+    "id": 167,
+    "title": "backend: implement secure AI request forwarding",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "168": {
+    "id": 168,
+    "title": "backend: implement AI processing result storage",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "169": {
+    "id": 169,
+    "title": "backend: implement AI processing status management",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "170": {
+    "id": 170,
+    "title": "integration: test backend and AI communication",
+    "phase": 17,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "171": {
+    "id": 171,
+    "title": "frontend(health): initialize independent Vite application",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "172": {
+    "id": 172,
+    "title": "frontend(health): implement branding and design system",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "173": {
+    "id": 173,
+    "title": "frontend(health): implement authentication pages",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "174": {
+    "id": 174,
+    "title": "frontend(health): implement dashboard",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "175": {
+    "id": 175,
+    "title": "frontend(health): implement patient management",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "176": {
+    "id": 176,
+    "title": "frontend(health): implement referral creation",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "177": {
+    "id": 177,
+    "title": "frontend(health): implement document upload and AI review",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "178": {
+    "id": 178,
+    "title": "frontend(health): implement hospital recommendation interface",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "179": {
+    "id": 179,
+    "title": "frontend(health): implement referral tracking and timeline",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "180": {
+    "id": 180,
+    "title": "frontend(health): implement reports and responsive navigation",
+    "phase": 18,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "181": {
+    "id": 181,
+    "title": "frontend(hospital): initialize independent Vite application",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "182": {
+    "id": 182,
+    "title": "frontend(hospital): implement branding and design system",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "183": {
+    "id": 183,
+    "title": "frontend(hospital): implement authentication pages",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "184": {
+    "id": 184,
+    "title": "frontend(hospital): implement hospital dashboard",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "185": {
+    "id": 185,
+    "title": "frontend(hospital): implement incoming referral management",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "186": {
+    "id": 186,
+    "title": "frontend(hospital): implement referral details and review",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "187": {
+    "id": 187,
+    "title": "frontend(hospital): implement acknowledgement and response actions",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "188": {
+    "id": 188,
+    "title": "frontend(hospital): implement patient arrival management",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "189": {
+    "id": 189,
+    "title": "frontend(hospital): implement facility services and capacity management",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "190": {
+    "id": 190,
+    "title": "frontend(hospital): implement feedback and reporting",
+    "phase": 19,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "191": {
+    "id": 191,
+    "title": "frontend(transport): initialize independent Vite application",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "192": {
+    "id": 192,
+    "title": "frontend(transport): implement branding and design system",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "193": {
+    "id": 193,
+    "title": "frontend(transport): implement authentication pages",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "194": {
+    "id": 194,
+    "title": "frontend(transport): implement transport dashboard",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "195": {
+    "id": 195,
+    "title": "frontend(transport): implement transport request management",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "196": {
+    "id": 196,
+    "title": "frontend(transport): implement transport assignment forms",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "197": {
+    "id": 197,
+    "title": "frontend(transport): implement in-transit management",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "198": {
+    "id": 198,
+    "title": "frontend(transport): implement facility map and route visualization",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "199": {
+    "id": 199,
+    "title": "frontend(transport): implement transport resource management",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "200": {
+    "id": 200,
+    "title": "frontend(transport): implement transport reports and responsive UI",
+    "phase": 20,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "201": {
+    "id": 201,
+    "title": "frontend(admin): initialize independent Vite application",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "202": {
+    "id": 202,
+    "title": "frontend(admin): implement branding and design system",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "203": {
+    "id": 203,
+    "title": "frontend(admin): implement administrator authentication",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "204": {
+    "id": 204,
+    "title": "frontend(admin): implement system overview dashboard",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "205": {
+    "id": 205,
+    "title": "frontend(admin): implement user and role management",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "206": {
+    "id": 206,
+    "title": "frontend(admin): implement healthcare facility management",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "207": {
+    "id": 207,
+    "title": "frontend(admin): implement referral monitoring",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "208": {
+    "id": 208,
+    "title": "frontend(admin): implement AI management interface",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "209": {
+    "id": 209,
+    "title": "frontend(admin): implement analytics and audit logs",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "210": {
+    "id": 210,
+    "title": "frontend(admin): implement settings and responsive navigation",
+    "phase": 21,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "211": {
+    "id": 211,
+    "title": "integration: connect health centre portal to backend APIs",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "212": {
+    "id": 212,
+    "title": "integration: connect hospital portal to backend APIs",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "213": {
+    "id": 213,
+    "title": "integration: connect transport portal to backend APIs",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "214": {
+    "id": 214,
+    "title": "integration: connect administrator portal to backend APIs",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "215": {
+    "id": 215,
+    "title": "security: implement cross-portal access verification",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "216": {
+    "id": 216,
+    "title": "test: add complete referral lifecycle integration tests",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "217": {
+    "id": 217,
+    "title": "test: add cross-service and AI integration tests",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "218": {
+    "id": 218,
+    "title": "test: perform responsive, performance, and security verification",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "219": {
+    "id": 219,
+    "title": "deploy: configure independent portal and service deployments",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  },
+  "220": {
+    "id": 220,
+    "title": "docs: finalize installation, deployment, API, and user documentation",
+    "phase": 22,
+    "status": "NOT STARTED",
+    "commitHash": "",
+    "testsPerformed": "None",
+    "remainingIssues": "None"
+  }
+}
