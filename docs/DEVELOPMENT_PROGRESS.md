@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 14 / 220 (6.4%)  
+**Committed:** 15 / 220 (6.8%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:31:12.747Z  
+**Last Updated:** 2026-11-05T19:31:47.337Z  
 
 ---
 
@@ -12,7 +12,7 @@
 | Phase | Title | Range | Committed | Status |
 |---|---|---|---|---|
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
-| Phase 2 | Database Foundation | 11–20 | 4/10 | 🔄 IN PROGRESS |
+| Phase 2 | Database Foundation | 11–20 | 5/10 | 🔄 IN PROGRESS |
 | Phase 3 | Database Completion | 21–30 | 0/10 | ⏳ PENDING |
 | Phase 4 | Backend Foundation | 31–40 | 0/10 | ⏳ PENDING |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
@@ -54,8 +54,8 @@
 | 12 | 2 | db: create initial migration structure | ✅ COMMITTED | `664739a` | Verified database/migrate.js runner with schema_migrations table, status listing, and 001_initial_migration_tracker.sql | None |
 | 13 | 2 | db: create roles and permissions tables | ✅ COMMITTED | `41accfd` | Verified 002_create_roles_and_permissions.sql with roles, permissions, role_permissions join table, and foundational seed data | None |
 | 14 | 2 | db: create users table | ✅ COMMITTED | `c0bbc51` | Verified 003_create_users.sql with authentication fields, role relations, facility tenancy identifiers, and index constraints | None |
-| 15 | 2 | db: create healthcare facilities table | 🧪 TESTED | - | Verified 004_create_healthcare_facilities.sql with facility classification tiers, geographic coordinates, capacity metrics, and diagnostic equipment flags | None |
-| 16 | 2 | db: create facility services table | ⏳ NOT STARTED | - | None | None |
+| 15 | 2 | db: create healthcare facilities table | ✅ COMMITTED | `171c004` | Verified 004_create_healthcare_facilities.sql with facility classification tiers, geographic coordinates, capacity metrics, and diagnostic equipment flags | None |
+| 16 | 2 | db: create facility services table | 🧪 TESTED | - | Verified 005_create_facility_services.sql with clinical_services catalog, facility capability mapping, specialist on duty flags, and unique constraints | None |
 | 17 | 2 | db: create facility capacity table | ⏳ NOT STARTED | - | None | None |
 | 18 | 2 | db: create patients table | ⏳ NOT STARTED | - | None | None |
 | 19 | 2 | db: create referrals table | ⏳ NOT STARTED | - | None | None |

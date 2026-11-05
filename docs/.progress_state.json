@@ -129,8 +129,8 @@
     "id": 15,
     "title": "db: create healthcare facilities table",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "171c004",
     "testsPerformed": "Verified 004_create_healthcare_facilities.sql with facility classification tiers, geographic coordinates, capacity metrics, and diagnostic equipment flags",
     "remainingIssues": "None"
   },
@@ -138,9 +138,9 @@
     "id": 16,
     "title": "db: create facility services table",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 005_create_facility_services.sql with clinical_services catalog, facility capability mapping, specialist on duty flags, and unique constraints",
     "remainingIssues": "None"
   },
   "17": {
