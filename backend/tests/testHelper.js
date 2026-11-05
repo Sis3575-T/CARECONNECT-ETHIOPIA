@@ -23,9 +23,13 @@ function executeRequest(app, method, url, body = null, options = {}) {
     req.headers = {
       host: 'localhost',
       'user-agent': 'careconnect-test-agent',
-      ...(body ? { 'content-type': 'application/json' } : {}),
-      ...(options.headers || {})
+      ...(body ? { 'content-type': 'application/json' } : {})
     };
+    if (options.headers) {
+      for (const [k, v] of Object.entries(options.headers)) {
+        req.headers[k.toLowerCase()] = v;
+      }
+    }
     if (body && typeof body === 'object') {
       req.body = JSON.parse(JSON.stringify(body));
     }

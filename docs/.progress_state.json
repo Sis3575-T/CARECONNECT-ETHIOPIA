@@ -309,8 +309,8 @@
     "id": 35,
     "title": "backend: add request validation middleware",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "324ec8e",
     "testsPerformed": "Ran backend/tests/validate.test.js (3/3 tests passed) verifying schema validation, required fields, data type sanitation, enum guards, and 400 error reporting",
     "remainingIssues": "None"
   },
@@ -318,9 +318,9 @@
     "id": 36,
     "title": "backend: configure CORS and security headers",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/security.test.js (3/3 tests passed) verifying Helmet HTTP security headers and CORS allowed-origin validation across portal origins",
     "remainingIssues": "None"
   },
   "37": {
