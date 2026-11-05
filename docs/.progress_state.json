@@ -264,8 +264,8 @@
     "id": 30,
     "title": "db: implement database seeds and relationship tests",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "960ee08",
     "testsPerformed": "Ran database/tests/relationship.test.js (4/4 tests passed) and database/seed.js validation covering all 18 migration scripts and fictional Ethiopian demo records",
     "remainingIssues": "None"
   },
@@ -273,9 +273,9 @@
     "id": 31,
     "title": "backend: initialize Express application",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/app.test.js (3/3 tests passed) verifying Express application instance, middleware, and welcome route in backend/src/app.js",
     "remainingIssues": "None"
   },
   "32": {
