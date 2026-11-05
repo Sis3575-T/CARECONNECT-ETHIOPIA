@@ -3,6 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "workspaces": [
+    "portals/health-centre",
+    "portals/hospital",
+    "portals/transport",
+    "portals/administrator",
+    "backend"
+  ],
   "scripts": {
     "server": "node server/server.js",
     "dev:health": "vite --config portals/health-centre/vite.config.js portals/health-centre",

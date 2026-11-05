@@ -30,8 +30,8 @@
     "id": 4,
     "title": "docs: add system architecture documentation",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "803938d",
     "testsPerformed": "Validated system architecture documentation, port specifications, dual-service communication pattern, and sequence workflows in docs/ARCHITECTURE.md",
     "remainingIssues": "None"
   },
@@ -39,9 +39,9 @@
     "id": 5,
     "title": "chore: configure root npm workspace",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified npm workspace configuration across 4 portals and backend in root package.json and backend/package.json",
     "remainingIssues": "None"
   },
   "6": {
