@@ -6,12 +6,14 @@
 import { Router } from 'express';
 import healthRouter from './health.js';
 import docsRouter from './docs.js';
+import authRouter from './auth.js';
 
 const router = Router();
 
 // Sub-routers
 router.use('/health', healthRouter);
 router.use('/docs', docsRouter);
+router.use('/auth', authRouter);
 
 // v1 Root Information
 router.get('/', (req, res) => {

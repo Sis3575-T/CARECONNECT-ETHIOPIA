@@ -354,8 +354,8 @@
     "id": 40,
     "title": "backend: add API documentation foundation",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "d6ff891",
     "testsPerformed": "Ran backend/tests/docs.test.js (2/2 tests passed) verifying OpenAPI 3.0 documentation route /api/v1/docs and authored comprehensive docs/API.md specification",
     "remainingIssues": "None"
   },
@@ -363,9 +363,9 @@
     "id": 41,
     "title": "backend: implement user registration",
     "phase": 5,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/register.test.js (3/3 tests passed) verifying user registration, duplicate prevention, and response sanitization",
     "remainingIssues": "None"
   },
   "42": {
