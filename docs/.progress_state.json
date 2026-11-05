@@ -48,8 +48,8 @@
     "id": 6,
     "title": "chore: configure shared development scripts",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "26376f9",
     "testsPerformed": "Verified root npm scripts (dev:backend, dev:ai, test:backend) and dev-orchestrator.js port scanner across all 6 service ports",
     "remainingIssues": "None"
   },
@@ -57,9 +57,9 @@
     "id": 7,
     "title": "chore: configure environment variable templates",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 7 environment variable templates across root, backend, ai-service, and 4 portals with safe defaults and zero exposed secrets",
     "remainingIssues": "None"
   },
   "8": {
