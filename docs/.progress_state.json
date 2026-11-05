@@ -336,8 +336,8 @@
     "id": 38,
     "title": "backend: add API versioning",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "10807f0",
     "testsPerformed": "Ran backend/tests/versioning.test.js (2/2 tests passed) verifying /api/v1 master router, v1 metadata, and service directory mappings in backend/src/routes/v1/index.js",
     "remainingIssues": "None"
   },
@@ -345,9 +345,9 @@
     "id": 39,
     "title": "backend: add health check endpoint",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/health.test.js (3/3 tests passed) verifying diagnostics, database connection probes, memory telemetry, and liveness endpoints",
     "remainingIssues": "None"
   },
   "40": {

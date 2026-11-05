@@ -4,8 +4,12 @@
  */
 
 import { Router } from 'express';
+import healthRouter from './health.js';
 
 const router = Router();
+
+// Sub-routers
+router.use('/health', healthRouter);
 
 // v1 Root Information
 router.get('/', (req, res) => {
