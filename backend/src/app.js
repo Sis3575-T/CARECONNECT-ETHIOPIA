@@ -11,6 +11,7 @@ import { fileURLToPath } from 'url';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { configureSecurity } from './middleware/security.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import v1Router from './routes/v1/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,6 +46,9 @@ app.get('/', (req, res) => {
     health: '/api/v1/health'
   });
 });
+
+// Mount Versioned API Routes
+app.use('/api/v1', v1Router);
 
 // Centralized error handling
 app.use(notFoundHandler);
