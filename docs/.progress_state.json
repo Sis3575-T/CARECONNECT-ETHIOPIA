@@ -39,8 +39,8 @@
     "id": 5,
     "title": "chore: configure root npm workspace",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "a7796e2",
     "testsPerformed": "Verified npm workspace configuration across 4 portals and backend in root package.json and backend/package.json",
     "remainingIssues": "None"
   },
@@ -48,9 +48,9 @@
     "id": 6,
     "title": "chore: configure shared development scripts",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified root npm scripts (dev:backend, dev:ai, test:backend) and dev-orchestrator.js port scanner across all 6 service ports",
     "remainingIssues": "None"
   },
   "7": {

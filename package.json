@@ -12,6 +12,9 @@
   ],
   "scripts": {
     "server": "node server/server.js",
+    "backend": "node backend/src/app.js",
+    "dev:backend": "node --watch backend/src/app.js",
+    "dev:ai": "python -m uvicorn app.main:app --app-dir ai-service --port 8000 --reload",
     "dev:health": "vite --config portals/health-centre/vite.config.js portals/health-centre",
     "dev:hospital": "vite --config portals/hospital/vite.config.js portals/hospital",
     "dev:transport": "vite --config portals/transport/vite.config.js portals/transport",
@@ -21,7 +24,10 @@
     "build:hospital": "vite build portals/hospital --config portals/hospital/vite.config.js",
     "build:transport": "vite build portals/transport --config portals/transport/vite.config.js",
     "build:admin": "vite build portals/administrator --config portals/administrator/vite.config.js",
-    "build:all": "npm run build:health && npm run build:hospital && npm run build:transport && npm run build:admin"
+    "build:all": "npm run build:health && npm run build:hospital && npm run build:transport && npm run build:admin",
+    "test:backend": "node --test backend/tests/**/*.test.js",
+    "test:ai": "python -m pytest ai-service/tests",
+    "test:all": "npm run test:backend"
   },
   "dependencies": {
     "axios": "^1.7.7",
