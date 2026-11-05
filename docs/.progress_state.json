@@ -120,8 +120,8 @@
     "id": 14,
     "title": "db: create users table",
     "phase": 2,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "c0bbc51",
     "testsPerformed": "Verified 003_create_users.sql with authentication fields, role relations, facility tenancy identifiers, and index constraints",
     "remainingIssues": "None"
   },
@@ -129,9 +129,9 @@
     "id": 15,
     "title": "db: create healthcare facilities table",
     "phase": 2,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 004_create_healthcare_facilities.sql with facility classification tiers, geographic coordinates, capacity metrics, and diagnostic equipment flags",
     "remainingIssues": "None"
   },
   "16": {
