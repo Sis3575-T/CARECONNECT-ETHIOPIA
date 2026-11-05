@@ -363,8 +363,8 @@
     "id": 41,
     "title": "backend: implement user registration",
     "phase": 5,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "ca360e1",
     "testsPerformed": "Ran backend/tests/register.test.js (3/3 tests passed) verifying user registration, duplicate prevention, and response sanitization",
     "remainingIssues": "None"
   },
@@ -372,9 +372,9 @@
     "id": 42,
     "title": "backend: implement secure password hashing",
     "phase": 5,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/password.test.js (3/3 tests passed) verifying bcrypt salting rounds, hash non-reversibility, comparison matching, and strength complexity rules",
     "remainingIssues": "None"
   },
   "43": {
