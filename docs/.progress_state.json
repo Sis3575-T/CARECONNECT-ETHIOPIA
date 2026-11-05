@@ -210,8 +210,8 @@
     "id": 24,
     "title": "db: create referral feedback table",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "522f70b",
     "testsPerformed": "Verified 013_create_referral_feedback.sql with clinical outcome categories, Likert rating constraints (1-5), and bidirectional audit links",
     "remainingIssues": "None"
   },
@@ -219,9 +219,9 @@
     "id": 25,
     "title": "db: create notifications table",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 014_create_notifications.sql with user/facility multi-target recipients, priority escalations, read tracking, and entity foreign references",
     "remainingIssues": "None"
   },
   "26": {
