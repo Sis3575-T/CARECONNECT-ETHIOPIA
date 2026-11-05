@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 17 / 220 (7.7%)  
+**Committed:** 18 / 220 (8.2%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:32:59.433Z  
+**Last Updated:** 2026-11-05T19:33:49.058Z  
 
 ---
 
@@ -12,7 +12,7 @@
 | Phase | Title | Range | Committed | Status |
 |---|---|---|---|---|
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
-| Phase 2 | Database Foundation | 11–20 | 7/10 | 🔄 IN PROGRESS |
+| Phase 2 | Database Foundation | 11–20 | 8/10 | 🔄 IN PROGRESS |
 | Phase 3 | Database Completion | 21–30 | 0/10 | ⏳ PENDING |
 | Phase 4 | Backend Foundation | 31–40 | 0/10 | ⏳ PENDING |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
@@ -57,8 +57,8 @@
 | 15 | 2 | db: create healthcare facilities table | ✅ COMMITTED | `171c004` | Verified 004_create_healthcare_facilities.sql with facility classification tiers, geographic coordinates, capacity metrics, and diagnostic equipment flags | None |
 | 16 | 2 | db: create facility services table | ✅ COMMITTED | `3327454` | Verified 005_create_facility_services.sql with clinical_services catalog, facility capability mapping, specialist on duty flags, and unique constraints | None |
 | 17 | 2 | db: create facility capacity table | ✅ COMMITTED | `39667d3` | Verified 006_create_facility_capacity.sql with time-stamped capacity reports, ventilator/ICU counts, compound indexes, and latest-capacity view v_facility_current_capacity | None |
-| 18 | 2 | db: create patients table | 🧪 TESTED | - | Verified 007_create_patients.sql with patronymic naming structure, Fayda national ID, Kebele metadata, and allergies/chronic history fields | None |
-| 19 | 2 | db: create referrals table | ⏳ NOT STARTED | - | None | None |
+| 18 | 2 | db: create patients table | ✅ COMMITTED | `efcb742` | Verified 007_create_patients.sql with patronymic naming structure, Fayda national ID, Kebele metadata, and allergies/chronic history fields | None |
+| 19 | 2 | db: create referrals table | 🧪 TESTED | - | Verified 008_create_referrals.sql with status state machine, clinical triage priorities, vital signs, and origin/destination facility foreign keys | None |
 | 20 | 2 | db: add initial database constraints and indexes | ⏳ NOT STARTED | - | None | None |
 | 21 | 3 | db: create referral documents table | ⏳ NOT STARTED | - | None | None |
 | 22 | 3 | db: create referral events table | ⏳ NOT STARTED | - | None | None |
