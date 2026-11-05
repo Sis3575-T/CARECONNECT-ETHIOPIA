@@ -3,8 +3,8 @@
     "id": 1,
     "title": "chore: initialize CareConnect Ethiopia repository",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "29c1aa2",
     "testsPerformed": "Verified root project structure and directory layout matches Part 1.3 specification",
     "remainingIssues": "None"
   },
@@ -12,9 +12,9 @@
     "id": 2,
     "title": "docs: add project overview and objectives",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Validated comprehensive project overview, objectives, stakeholder matrix, and problem statement in docs/OVERVIEW.md",
     "remainingIssues": "None"
   },
   "3": {
