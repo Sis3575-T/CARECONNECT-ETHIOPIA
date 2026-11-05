@@ -12,8 +12,8 @@
     "id": 2,
     "title": "docs: add project overview and objectives",
     "phase": 1,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "3c2ad28",
     "testsPerformed": "Validated comprehensive project overview, objectives, stakeholder matrix, and problem statement in docs/OVERVIEW.md",
     "remainingIssues": "None"
   },
@@ -21,9 +21,9 @@
     "id": 3,
     "title": "docs: add software requirements specification",
     "phase": 1,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Validated SDS document structure, functional requirements FR1-FR8, non-functional requirements NFR1-NFR6, state machine, and data flow in docs/SDS.md",
     "remainingIssues": "None"
   },
   "4": {
