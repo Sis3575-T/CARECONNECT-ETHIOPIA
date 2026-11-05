@@ -36,4 +36,32 @@ export function verifyAccessToken(token) {
   }
 }
 
-export default { generateAccessToken, verifyAccessToken };
+/**
+ * Generate long-lived JWT Refresh Token
+ */
+export function generateRefreshToken(payload) {
+  return jwt.sign(
+    {
+      userId: payload.id || payload.userId,
+      tokenType: 'refresh'
+    },
+    config.jwt.refreshSecret,
+    { expiresIn: config.jwt.refreshExpiresIn }
+  );
+}
+
+/**
+ * Verify JWT Refresh Token
+ */
+export function verifyRefreshToken(token) {
+  try {
+    return jwt.verify(token, config.jwt.refreshSecret);
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      throw new UnauthorizedError('Refresh token has expired. Please sign in again.');
+    }
+    throw new UnauthorizedError('Invalid or corrupted refresh token.');
+  }
+}
+
+export default { generateAccessToken, verifyAccessToken, generateRefreshToken, verifyRefreshToken };

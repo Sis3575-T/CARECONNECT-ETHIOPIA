@@ -29,6 +29,9 @@ const loginSchema = {
 
 router.post('/login', validate(loginSchema), AuthController.login);
 
+// Refresh Token route
+router.post('/refresh', validate({ refreshToken: { required: true } }), AuthController.refresh);
+
 // Current User Profile
 router.get('/me', authenticate, AuthController.getProfile);
 

@@ -3,8 +3,9 @@
  */
 
 import UserModel from '../models/userModel.js';
+import TokenModel from '../models/tokenModel.js';
 import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password.js';
-import { generateAccessToken } from '../utils/token.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/token.js';
 import { ConflictError, ValidationError, UnauthorizedError, NotFoundError } from '../utils/errors.js';
 
 export class AuthController {
@@ -73,8 +74,10 @@ export class AuthController {
         throw new UnauthorizedError('Invalid email or password credentials');
       }
 
-      // Generate JWT Access Token
+      // Generate JWT Access & Refresh Tokens
       const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken(user);
+      await TokenModel.saveRefreshToken(user.id, refreshToken);
 
       // Safe user payload without password hash
       const safeUser = {
@@ -93,7 +96,47 @@ export class AuthController {
         message: 'Authentication successful',
         data: {
           user: safeUser,
-          accessToken
+          accessToken,
+          refreshToken
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Refresh expired access token using valid refresh token
+   */
+  static async refresh(req, res, next) {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        throw new UnauthorizedError('Refresh token is required');
+      }
+
+      // Verify cryptographic signature and expiration
+      const decoded = verifyRefreshToken(refreshToken);
+
+      // Verify token hasn't been revoked
+      const isValid = await TokenModel.isTokenValid(refreshToken);
+      if (!isValid) {
+        throw new UnauthorizedError('Refresh token has been revoked or expired');
+      }
+
+      const user = await UserModel.findById(decoded.userId);
+      if (!user || !user.is_active) {
+        throw new UnauthorizedError('User account not found or deactivated');
+      }
+
+      // Generate new access token
+      const newAccessToken = generateAccessToken(user);
+
+      res.status(200).json({
+        success: true,
+        message: 'Access token renewed successfully',
+        data: {
+          accessToken: newAccessToken
         }
       });
     } catch (err) {

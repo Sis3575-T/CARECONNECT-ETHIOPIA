@@ -390,8 +390,8 @@
     "id": 44,
     "title": "backend: implement access token management",
     "phase": 5,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "4adb1f3",
     "testsPerformed": "Ran backend/tests/token.test.js (4/4 tests passed) verifying JWT access token generation, Bearer header authentication middleware, and GET /api/v1/auth/me profile protection",
     "remainingIssues": "None"
   },
@@ -399,9 +399,9 @@
     "id": 45,
     "title": "backend: implement refresh token management",
     "phase": 5,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/refresh.test.js (4/4 tests passed) verifying dual token login (access + refresh), token renewal endpoint /api/v1/auth/refresh, and revocation handling in TokenModel",
     "remainingIssues": "None"
   },
   "46": {
