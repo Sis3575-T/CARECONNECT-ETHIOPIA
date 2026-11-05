@@ -255,8 +255,8 @@
     "id": 29,
     "title": "db: create AI model versions and feedback tables",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "55e236d",
     "testsPerformed": "Verified 018_create_ai_models_and_feedback.sql with model version registry, accuracy metrics, feedback collection schema, and baseline model seeds",
     "remainingIssues": "None"
   },
@@ -264,9 +264,9 @@
     "id": 30,
     "title": "db: implement database seeds and relationship tests",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran database/tests/relationship.test.js (4/4 tests passed) and database/seed.js validation covering all 18 migration scripts and fictional Ethiopian demo records",
     "remainingIssues": "None"
   },
   "31": {
