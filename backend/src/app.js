@@ -10,6 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { configureSecurity } from './middleware/security.js';
+import { requestLogger } from './middleware/requestLogger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,6 +24,9 @@ const server = http.createServer(app);
 
 // Apply Security Headers & CORS
 configureSecurity(app);
+
+// Request Correlation ID & HTTP Logging
+app.use(requestLogger);
 
 const PORT = parseInt(process.env.PORT || process.env.BACKEND_PORT || '5000', 10);
 const HOST = process.env.HOST || '0.0.0.0';

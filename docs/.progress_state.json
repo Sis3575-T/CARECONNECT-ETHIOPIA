@@ -318,8 +318,8 @@
     "id": 36,
     "title": "backend: configure CORS and security headers",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "19a88d1",
     "testsPerformed": "Ran backend/tests/security.test.js (3/3 tests passed) verifying Helmet HTTP security headers and CORS allowed-origin validation across portal origins",
     "remainingIssues": "None"
   },
@@ -327,9 +327,9 @@
     "id": 37,
     "title": "backend: add request logging",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/logger.test.js (3/3 tests passed) verifying X-Request-Id correlation generation, distributed header preservation, and structured logging",
     "remainingIssues": "None"
   },
   "38": {

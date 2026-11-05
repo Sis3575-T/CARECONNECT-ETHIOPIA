@@ -1,9 +1,9 @@
 # CARECONNECT ETHIOPIA — DEVELOPMENT PROGRESS TRACKER
 
 **Total Tasks / Commits Planned:** 220  
-**Committed:** 35 / 220 (15.9%)  
+**Committed:** 36 / 220 (16.4%)  
 **Tested / Implemented / In Progress:** 1 / 0 / 0  
-**Last Updated:** 2026-11-05T19:57:40.389Z  
+**Last Updated:** 2026-11-05T19:58:41.462Z  
 
 ---
 
@@ -14,7 +14,7 @@
 | Phase 1 | Project Foundation | 1–10 | 10/10 | ✅ COMPLETED |
 | Phase 2 | Database Foundation | 11–20 | 10/10 | ✅ COMPLETED |
 | Phase 3 | Database Completion | 21–30 | 10/10 | ✅ COMPLETED |
-| Phase 4 | Backend Foundation | 31–40 | 5/10 | 🔄 IN PROGRESS |
+| Phase 4 | Backend Foundation | 31–40 | 6/10 | 🔄 IN PROGRESS |
 | Phase 5 | Authentication and Authorization | 41–50 | 0/10 | ⏳ PENDING |
 | Phase 6 | User and Facility Management | 51–60 | 0/10 | ⏳ PENDING |
 | Phase 7 | Patient Management | 61–70 | 0/10 | ⏳ PENDING |
@@ -75,8 +75,8 @@
 | 33 | 4 | backend: configure PostgreSQL database client | ✅ COMMITTED | `a5b25bc` | Ran backend/tests/dbService.test.js (3/3 tests passed) verifying DbService methods query, queryOne, queryMany, transaction, and healthCheck | None |
 | 34 | 4 | backend: add centralized error handling | ✅ COMMITTED | `e21c4e5` | Ran backend/tests/errorHandler.test.js (3/3 tests passed) verifying AppError, ValidationError, NotFoundError, centralized JSON schema, and 404 handler | None |
 | 35 | 4 | backend: add request validation middleware | ✅ COMMITTED | `324ec8e` | Ran backend/tests/validate.test.js (3/3 tests passed) verifying schema validation, required fields, data type sanitation, enum guards, and 400 error reporting | None |
-| 36 | 4 | backend: configure CORS and security headers | 🧪 TESTED | - | Ran backend/tests/security.test.js (3/3 tests passed) verifying Helmet HTTP security headers and CORS allowed-origin validation across portal origins | None |
-| 37 | 4 | backend: add request logging | ⏳ NOT STARTED | - | None | None |
+| 36 | 4 | backend: configure CORS and security headers | ✅ COMMITTED | `19a88d1` | Ran backend/tests/security.test.js (3/3 tests passed) verifying Helmet HTTP security headers and CORS allowed-origin validation across portal origins | None |
+| 37 | 4 | backend: add request logging | 🧪 TESTED | - | Ran backend/tests/logger.test.js (3/3 tests passed) verifying X-Request-Id correlation generation, distributed header preservation, and structured logging | None |
 | 38 | 4 | backend: add API versioning | ⏳ NOT STARTED | - | None | None |
 | 39 | 4 | backend: add health check endpoint | ⏳ NOT STARTED | - | None | None |
 | 40 | 4 | backend: add API documentation foundation | ⏳ NOT STARTED | - | None | None |
