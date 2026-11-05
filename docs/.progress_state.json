@@ -282,8 +282,8 @@
     "id": 32,
     "title": "backend: configure environment and application settings",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "2570622",
     "testsPerformed": "Ran backend/tests/config.test.js (5/5 tests passed) verifying safe environment parsing, CORS origin parsing, JWT windows, and production security audits in backend/src/config/env.js",
     "remainingIssues": "None"
   },
@@ -291,9 +291,9 @@
     "id": 33,
     "title": "backend: configure PostgreSQL database client",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/dbService.test.js (3/3 tests passed) verifying DbService methods query, queryOne, queryMany, transaction, and healthCheck",
     "remainingIssues": "None"
   },
   "34": {
