@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-ssr/
+package-lock.json
+.progress_state.json
+*.min.js
+postgres_data/
+uploads/
+coverage/
+.pytest_cache/
