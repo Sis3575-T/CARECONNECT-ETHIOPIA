@@ -237,8 +237,8 @@
     "id": 27,
     "title": "db: create AI recommendations table",
     "phase": 3,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "3f2503e",
     "testsPerformed": "Verified 016_create_ai_recommendations.sql with ranking order, transparent factor breakdown scoring, transit calculation metrics, and clinician selection tracking",
     "remainingIssues": "None"
   },
@@ -246,9 +246,9 @@
     "id": 28,
     "title": "db: create AI predictions table",
     "phase": 3,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Verified 017_create_ai_predictions.sql with prediction types, confidence scores, features audit JSONB, model provenance, and clinician review verification fields",
     "remainingIssues": "None"
   },
   "29": {
