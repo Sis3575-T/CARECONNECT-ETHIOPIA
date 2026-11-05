@@ -26,6 +26,9 @@ function executeRequest(app, method, url, body = null, options = {}) {
       ...(body ? { 'content-type': 'application/json' } : {}),
       ...(options.headers || {})
     };
+    if (body && typeof body === 'object') {
+      req.body = JSON.parse(JSON.stringify(body));
+    }
 
     const res = new EventEmitter();
     res.statusCode = 200;

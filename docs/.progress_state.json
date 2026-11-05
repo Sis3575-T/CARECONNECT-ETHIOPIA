@@ -300,8 +300,8 @@
     "id": 34,
     "title": "backend: add centralized error handling",
     "phase": 4,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "e21c4e5",
     "testsPerformed": "Ran backend/tests/errorHandler.test.js (3/3 tests passed) verifying AppError, ValidationError, NotFoundError, centralized JSON schema, and 404 handler",
     "remainingIssues": "None"
   },
@@ -309,9 +309,9 @@
     "id": 35,
     "title": "backend: add request validation middleware",
     "phase": 4,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/validate.test.js (3/3 tests passed) verifying schema validation, required fields, data type sanitation, enum guards, and 400 error reporting",
     "remainingIssues": "None"
   },
   "36": {
