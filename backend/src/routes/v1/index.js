@@ -17,19 +17,6 @@ import coordinationRouter from './coordination.js';
 
 const router = Router();
 
-// Sub-routers
-router.use('/health', healthRouter);
-router.use('/docs', docsRouter);
-router.use('/auth', authRouter);
-router.use('/users', usersRouter);
-router.use('/facilities', facilitiesRouter);
-router.use('/roles', rolesRouter);
-router.use('/audit', auditRouter);
-router.use('/patients', patientsRouter);
-router.use('/referrals', referralsRouter);
-router.use('/coordination', coordinationRouter);
-router.use('/', coordinationRouter);
-
 // v1 Root Information
 router.get('/', (req, res) => {
   res.json({
@@ -51,5 +38,18 @@ router.get('/', (req, res) => {
     }
   });
 });
+
+// Sub-routers
+router.use('/health', healthRouter);
+router.use('/docs', docsRouter);
+router.use('/auth', authRouter);
+router.use('/users', usersRouter);
+router.use('/facilities', facilitiesRouter);
+router.use('/roles', rolesRouter);
+router.use('/audit', auditRouter);
+router.use('/patients', patientsRouter);
+router.use('/referrals', referralsRouter);
+router.use('/coordination', coordinationRouter);
+router.use('/', coordinationRouter);
 
 export default router;

@@ -878,16 +878,19 @@ export class CoordinationRepository extends BaseRepository {
    * List unresolved or filtered exceptions
    */
   async listExceptions(options = {}) {
-    const { isResolved, limit = 50, offset = 0 } = options;
+    const { limit = 50, offset = 0 } = options;
+    const parsedIsResolved = (options.isResolved !== undefined && options.isResolved !== null)
+      ? (typeof options.isResolved === 'boolean' ? options.isResolved : String(options.isResolved).toLowerCase() === 'true')
+      : undefined;
 
     try {
       const conditions = [];
       const params = [];
       let idx = 1;
 
-      if (isResolved !== undefined && isResolved !== null) {
+      if (parsedIsResolved !== undefined) {
         conditions.push(`ex.is_resolved = $${idx++}`);
-        params.push(Boolean(isResolved));
+        params.push(parsedIsResolved);
       }
 
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -907,8 +910,8 @@ export class CoordinationRepository extends BaseRepository {
     }
 
     let items = Array.from(inMemoryExceptions.values());
-    if (isResolved !== undefined && isResolved !== null) {
-      items = items.filter((e) => Boolean(e.is_resolved) === Boolean(isResolved));
+    if (parsedIsResolved !== undefined) {
+      items = items.filter((e) => Boolean(e.is_resolved) === parsedIsResolved);
     }
     return items.slice(offset, offset + limit);
   }

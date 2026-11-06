@@ -18,26 +18,23 @@ import {
 
 const router = Router();
 
-// All operational coordination endpoints require authentication
-router.use(authenticate);
-
 // 1. SLA Response Policies
-router.post('/policies', createPolicy);
-router.get('/policies', listPolicies);
-router.delete('/policies/:policyId', deactivatePolicy);
-router.post('/referral-policies', createPolicy);
-router.get('/referral-policies', listPolicies);
-router.delete('/referral-policies/:policyId', deactivatePolicy);
+router.post('/policies', authenticate, createPolicy);
+router.get('/policies', authenticate, listPolicies);
+router.delete('/policies/:policyId', authenticate, deactivatePolicy);
+router.post('/referral-policies', authenticate, createPolicy);
+router.get('/referral-policies', authenticate, listPolicies);
+router.delete('/referral-policies/:policyId', authenticate, deactivatePolicy);
 
 // 2. Operational Escalations
-router.get('/escalations', listEscalations);
-router.post('/escalations', createEscalation);
-router.post('/escalations/:escalationId/resolve', resolveEscalation);
+router.get('/escalations', authenticate, listEscalations);
+router.post('/escalations', authenticate, createEscalation);
+router.post('/escalations/:escalationId/resolve', authenticate, resolveEscalation);
 
 // 3. Operational Exceptions
-router.get('/exceptions', listExceptions);
-router.post('/exceptions/:exceptionId/resolve', resolveException);
-router.get('/referral-exceptions', listExceptions);
-router.post('/referral-exceptions/:exceptionId/resolve', resolveException);
+router.get('/exceptions', authenticate, listExceptions);
+router.post('/exceptions/:exceptionId/resolve', authenticate, resolveException);
+router.get('/referral-exceptions', authenticate, listExceptions);
+router.post('/referral-exceptions/:exceptionId/resolve', authenticate, resolveException);
 
 export default router;
