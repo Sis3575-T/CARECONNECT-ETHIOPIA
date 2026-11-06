@@ -84,6 +84,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 05 OF 50: USER MANAGEMENT, FACILITY MANAGEMENT AND ADMINISTRATIVE OPERATIONS
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 05 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-06T22:45:00.000Z  
+
+### Part 05 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **033** | `backend: establish user management domain` | ✅ COMMITTED | `dbff8fe` | UserRepository, UserService, userValidator, userController, mounted `/api/v1/users`, userDomain.test.js (9/9 pass). | None |
+| **034** | `backend: implement secure user account administration` | ✅ COMMITTED | `edfded8` | Admin user creation, duplicate email rejection (409 Conflict), account deactivation + session revocation, userAdministration.test.js (9/9 pass). | None |
+| **035** | `backend: implement facility registration and management` | ✅ COMMITTED | `36b72c9` | Migration 026 (optional coordinates), FacilityRepository, FacilityService, facilityValidator, facilityController, facilityManagement.test.js (9/9 pass). | None |
+| **036** | `backend: implement facility staff and role assignments` | ✅ COMMITTED | `50a580d` | AssignmentRepository, AssignmentService, AssignmentController, user facility & role assignments, rolesRouter (`/api/v1/roles`), facilityStaffAssignments.test.js (11/11 pass). | None |
+| **037** | `backend: implement facility services and departments` | ✅ COMMITTED | `896f500` | FacilityServiceRepository, ClinicalDepartmentService, ClinicalDepartmentController, `/facilities/:facilityId/services` and `/departments`, facilityServicesDepartments.test.js (11/11 pass). | None |
+| **038** | `backend: implement user and facility search` | ✅ COMMITTED | `6eac52c` | Full-text search, filtering, server-side pagination, allowlisted sorting, service capability search, searchPagination.test.js (9/9 pass). | None |
+| **039** | `security: implement administrative audit and account controls` | ✅ COMMITTED | `af00818` | Audit log sanitization (`[REDACTED]` scrubbing), `/api/v1/audit/logs` router and controller, adminAuditControls.test.js (9/9 pass). | None |
+| **040** | `test: verify user facility and role management` | ✅ COMMITTED | `4193641` | Comprehensive integration suite part05Comprehensive.test.js (12/12 pass), 210/210 backend tests pass, 12/12 db tests pass, docs/PART_05_REPORT.md. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
