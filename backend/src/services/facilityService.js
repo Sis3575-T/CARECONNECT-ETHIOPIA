@@ -31,6 +31,7 @@ export class FacilityService {
     const type = query.type ? String(query.type).trim() : null;
     const region = query.region ? String(query.region).trim() : null;
     const tier = query.tier ? String(query.tier).trim() : null;
+    const service = query.service ? String(query.service).trim() : null;
     const isActive = query.status !== undefined && query.status !== ''
       ? query.status === 'active' || query.status === 'true'
       : null;
@@ -44,6 +45,7 @@ export class FacilityService {
       type,
       region,
       tier,
+      service,
       isActive,
       search,
       sortBy,

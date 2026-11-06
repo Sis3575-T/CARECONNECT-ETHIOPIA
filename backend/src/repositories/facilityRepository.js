@@ -108,6 +108,14 @@ export class FacilityRepository extends BaseRepository {
         conditions.push(`f.tier = $${params.length}`);
       }
 
+      if (service) {
+        params.push(service.toUpperCase());
+        conditions.push(`EXISTS (
+          SELECT 1 FROM facility_services fs 
+          WHERE fs.facility_id = f.id AND fs.service_code = $${params.length} AND fs.is_available = TRUE
+        )`);
+      }
+
       if (isActive !== null && isActive !== undefined) {
         params.push(Boolean(isActive));
         conditions.push(`f.is_active = $${params.length}`);
@@ -151,7 +159,7 @@ export class FacilityRepository extends BaseRepository {
    * Count facilities matching criteria
    */
   async count(options = {}) {
-    const { type = null, region = null, tier = null, isActive = null, search = null } = options;
+    const { type = null, region = null, tier = null, service = null, isActive = null, search = null } = options;
 
     try {
       const conditions = ['f.deleted_at IS NULL'];
@@ -168,6 +176,13 @@ export class FacilityRepository extends BaseRepository {
       if (tier) {
         params.push(tier.toUpperCase());
         conditions.push(`f.tier = $${params.length}`);
+      }
+      if (service) {
+        params.push(service.toUpperCase());
+        conditions.push(`EXISTS (
+          SELECT 1 FROM facility_services fs 
+          WHERE fs.facility_id = f.id AND fs.service_code = $${params.length} AND fs.is_available = TRUE
+        )`);
       }
       if (isActive !== null && isActive !== undefined) {
         params.push(Boolean(isActive));

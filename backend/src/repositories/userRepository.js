@@ -197,7 +197,7 @@ export class UserRepository extends BaseRepository {
       // Fallback
     }
 
-    const list = await this.fallbackSearch(options);
+    const list = await this.fallbackSearch({ ...options, limit: 10000, offset: 0 });
     return list.length;
   }
 
