@@ -36,16 +36,21 @@ export const config = {
   server: {
     port: getInt(process.env.PORT || process.env.BACKEND_PORT, 5000),
     host: process.env.HOST || '0.0.0.0',
-    apiVersion: 'v1'
+    apiVersion: 'v1',
+    apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:5000/api/v1',
+    logLevel: process.env.LOG_LEVEL || 'info'
   },
 
   cors: {
-    allowedOrigins: getArray(process.env.CORS_ALLOWED_ORIGINS || process.env.CORS_ORIGIN, [
-      'http://localhost:5173',
-      'http://localhost:5174',
-      'http://localhost:5175',
-      'http://localhost:5176'
-    ])
+    allowedOrigins: getArray(
+      process.env.FRONTEND_ALLOWED_ORIGINS || process.env.CORS_ALLOWED_ORIGINS || process.env.CORS_ORIGIN,
+      [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://localhost:5176'
+      ]
+    )
   },
 
   db: {
