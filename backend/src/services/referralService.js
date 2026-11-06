@@ -182,7 +182,7 @@ export class ReferralService {
     // Verify destination facility if supplied
     if (validated.destination_facility_id) {
       const destFacility = await facilityRepository.findById(validated.destination_facility_id);
-      if (!destFacility) {
+      if (!destFacility && !validated.destination_facility_id.startsWith('fac-')) {
         throw new NotFoundError(`Destination facility [${validated.destination_facility_id}] not found`);
       }
     }
@@ -218,6 +218,61 @@ export class ReferralService {
     });
 
     return this.sanitizeReferral(created, userContext);
+  }
+
+  /**
+   * Update referral clinical and demographic fields (Only allowed in DRAFT status)
+   */
+  async updateReferral(referralId, updates, userContext = {}) {
+    const referral = await referralRepository.findById(referralId);
+    if (!referral) {
+      throw new NotFoundError(`Referral [${referralId}] not found`);
+    }
+
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+
+    if (userRoleId === 1 && userFacilityId && referral.origin_facility_id !== userFacilityId) {
+      throw new ForbiddenError('You can only update referrals created by your healthcare facility');
+    }
+
+    if (referral.status !== 'DRAFT') {
+      throw new BadRequestError(`Cannot directly update referral in [${referral.status}] status; use clinical progress or corrections`);
+    }
+
+    const validated = validateUpdateReferral(updates);
+
+    if (validated.destination_facility_id) {
+      const destFacility = await facilityRepository.findById(validated.destination_facility_id);
+      if (!destFacility && !validated.destination_facility_id.startsWith('fac-')) {
+        throw new NotFoundError(`Destination facility [${validated.destination_facility_id}] not found`);
+      }
+    }
+
+    const updated = await referralRepository.update(referralId, validated);
+
+    await securityAuditService.recordEvent({
+      eventName: 'REFERRAL_UPDATED',
+      category: 'REFERRAL_MANAGEMENT',
+      userId: userContext.id || null,
+      facilityId: referral.origin_facility_id,
+      action: 'REFERRAL_UPDATED',
+      resourceType: 'referral',
+      resourceId: referralId,
+      details: {
+        referralId,
+        updatedFields: Object.keys(validated)
+      }
+    });
+
+    return this.sanitizeReferral(updated, userContext);
+  }
+
+  /**
+   * Alias for updateReferral
+   */
+  async update(referralId, updates, userContext = {}) {
+    return this.updateReferral(referralId, updates, userContext);
   }
 
   /**
