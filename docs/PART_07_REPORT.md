@@ -91,7 +91,7 @@ Migration file: [`database/migrations/028_referral_tracking_and_corrections.sql`
 | **053** | `cff0fbe` | `backend: implement referral assignment and priority management` |
 | **054** | `68d2be4` | `backend: implement referral tracking and operational progress` |
 | **055** | `6823ea3` | `security: implement referral correction cancellation and audit` |
-| **056** | `PENDING` | `test: verify referral lifecycle and hospital coordination` |
+| **056** | `070e907` | `test: verify referral lifecycle and hospital coordination` |
 
 ---
 
