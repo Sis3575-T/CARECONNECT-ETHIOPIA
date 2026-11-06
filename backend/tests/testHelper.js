@@ -3,6 +3,8 @@
  * Executes requests directly against Express application without TCP sockets.
  */
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+
 import { EventEmitter } from 'events';
 
 export function request(app) {
@@ -43,6 +45,12 @@ function executeRequest(app, method, url, body = null, options = {}) {
     res.setHeader = (k, v) => { res.headers[k.toLowerCase()] = String(v); };
     res.getHeader = (k) => res.headers[k.toLowerCase()];
     res.removeHeader = (k) => { delete res.headers[k.toLowerCase()]; };
+    res.cookie = (name, value, opts) => {
+      res.headers['set-cookie'] = `${name}=${value}; Path=${opts?.path || '/'}`;
+    };
+    res.clearCookie = (name, opts) => {
+      res.headers['set-cookie'] = `${name}=; Max-Age=0; Path=${opts?.path || '/'}`;
+    };
 
     let responseBody = '';
 
