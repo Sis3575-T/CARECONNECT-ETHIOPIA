@@ -1,0 +1,152 @@
+erDiagram
+    %% Identity & Access Management Domain
+    roles ||--o{ role_permissions : "contains"
+    permissions ||--o{ role_permissions : "granted_via"
+    roles ||--o{ users : "assigns"
+    users ||--o{ user_roles : "holds_multiple"
+    roles ||--o{ user_roles : "assigned_in"
+    users ||--o{ user_sessions : "maintains"
+
+    %% Healthcare Facilities Domain
+    facility_types ||--o{ healthcare_facilities : "classifies"
+    healthcare_facilities ||--o{ facility_departments : "operates"
+    healthcare_facilities ||--o{ facility_services : "provides"
+    clinical_services ||--o{ facility_services : "cataloged_as"
+    healthcare_facilities ||--o{ facility_capacity_reports : "logs_history"
+    healthcare_facilities ||--o{ users : "employs"
+    healthcare_facilities ||--o{ facility_staff_assignments : "assigns"
+    users ||--o{ facility_staff_assignments : "serves_in"
+
+    %% Patients Domain
+    healthcare_facilities ||--o{ patients : "registered_at"
+    patients ||--o{ patient_identifiers : "identified_by"
+    patients ||--o{ patient_emergency_contacts : "has_contact"
+
+    %% Referrals Domain
+    patients ||--o{ referrals : "subject_of"
+    healthcare_facilities ||--o{ referrals : "originates"
+    healthcare_facilities ||--o{ referrals : "destined_for"
+    users ||--o{ referrals : "referred_by"
+    users ||--o{ referrals : "received_by"
+    referrals ||--o{ referral_events : "transitions_through"
+    referrals ||--o{ referral_status_history : "records_milestone"
+    referrals ||--o{ referral_decisions : "evaluated_by"
+    referrals ||--o{ referral_feedback : "counter_referred_with"
+
+    %% Documents Domain
+    referrals ||--o{ referral_documents : "attaches"
+    users ||--o{ referral_documents : "uploaded_by"
+    referral_documents ||--o{ document_access_logs : "accessed_via"
+
+    %% Transport Domain
+    healthcare_facilities ||--o{ transport_resources : "stationed_at"
+    referrals ||--o{ transport_records : "requires_transit"
+    transport_resources ||--o{ transport_records : "dispatched_for"
+    transport_records ||--o{ transport_delays : "encounters_delay"
+    transport_records ||--o{ transport_status_history : "tracks_milestone"
+
+    %% Notifications Domain
+    users ||--o{ notifications : "receives_direct"
+    healthcare_facilities ||--o{ notifications : "receives_facility"
+    users ||--o{ notification_preferences : "configures"
+
+    %% AI Subsystem Domain
+    referrals ||--o{ ai_processing_jobs : "queued_for"
+    referrals ||--o{ ai_recommendations : "evaluated_for"
+    healthcare_facilities ||--o{ ai_recommendations : "ranks_destination"
+    referrals ||--o{ ai_predictions : "predicted_for"
+    ai_predictions ||--o{ ai_human_reviews : "verified_by"
+    ai_predictions ||--o{ ai_feedback : "feedback_given"
+    ai_recommendations ||--o{ ai_feedback : "recommendation_feedback"
+    ai_model_versions ||--o{ ai_predictions : "generated_by"
+
+    %% Audit & System Events Domain
+    users ||--o{ audit_logs : "performed_by"
+    healthcare_facilities ||--o{ audit_logs : "scoped_to"
+    users ||--o{ system_events : "triggered_by"
+
+    %% Entity Details
+    users {
+        int id PK
+        uuid uuid UK
+        string email UK
+        string password_hash
+        string first_name
+        string last_name
+        string phone_number
+        int role_id FK
+        string facility_id FK
+        string department
+        boolean is_active
+        timestamp created_at
+    }
+
+    healthcare_facilities {
+        string id PK
+        uuid uuid UK
+        string name
+        string amharic_name
+        string facility_type FK
+        string tier
+        decimal latitude
+        decimal longitude
+        int total_beds
+        int total_icu_beds
+        boolean is_active
+    }
+
+    patients {
+        string id PK
+        uuid uuid UK
+        string first_name
+        string father_name
+        string grandfather_name
+        string gender
+        date date_of_birth
+        int age_years
+        string national_id UK
+        string registered_facility_id FK
+        string blood_type
+    }
+
+    referrals {
+        string id PK
+        uuid uuid UK
+        string patient_id FK
+        string origin_facility_id FK
+        string destination_facility_id FK
+        int referring_clinician_id FK
+        int receiving_clinician_id FK
+        string priority
+        string status
+        text primary_diagnosis
+        text clinical_summary
+        string required_specialty
+        boolean transport_required
+        timestamp created_at
+    }
+
+    referral_documents {
+        int id PK
+        uuid uuid UK
+        string referral_id FK
+        string document_type
+        string file_name
+        string storage_uri
+        string mime_type
+        bigint file_size_bytes
+        string ocr_status
+    }
+
+    transport_records {
+        string id PK
+        uuid uuid UK
+        string referral_id FK
+        string resource_id FK
+        string origin_facility_id FK
+        string destination_facility_id FK
+        string priority
+        string status
+        timestamp dispatched_at
+        timestamp actual_arrival_at
+    }
