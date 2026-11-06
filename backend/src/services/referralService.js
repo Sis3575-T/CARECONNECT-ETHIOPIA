@@ -7,6 +7,7 @@
 import referralRepository from '../repositories/referralRepository.js';
 import patientRepository from '../repositories/patientRepository.js';
 import facilityRepository from '../repositories/facilityRepository.js';
+import coordinationService from './coordinationService.js';
 import securityAuditService from './securityAuditService.js';
 import {
   validateCreateReferral,
@@ -113,6 +114,13 @@ export class ReferralService {
       completed_at: referral.completed_at,
       closed_at: referral.closed_at,
       cancelled_at: referral.cancelled_at,
+      policy_id: referral.policy_id || null,
+      policy_version: referral.policy_version || 1,
+      acknowledgement_deadline: referral.acknowledgement_deadline || null,
+      decision_deadline: referral.decision_deadline || null,
+      escalation_level: referral.escalation_level || 0,
+      followup_count: referral.followup_count || 0,
+      last_followup_at: referral.last_followup_at || null,
       created_at: referral.created_at,
       updated_at: referral.updated_at
     };
@@ -193,12 +201,20 @@ export class ReferralService {
       initialStatus = validated.destination_facility_id ? 'SUBMITTED' : 'PENDING_ASSIGNMENT';
     }
 
-    const created = await referralRepository.create({
+    let created = await referralRepository.create({
       ...validated,
       origin_facility_id: originFacilityId,
       referring_clinician_id: userContext.id || null,
       status: initialStatus
     });
+
+    if (isSubmitting) {
+      try {
+        created = await coordinationService.applyPolicyToReferral(created.id);
+      } catch {
+        // Fallback
+      }
+    }
 
     await securityAuditService.recordEvent({
       eventName: isSubmitting ? 'REFERRAL_SUBMITTED' : 'REFERRAL_CREATED',
@@ -301,11 +317,17 @@ export class ReferralService {
 
     const targetStatus = referral.destination_facility_id ? 'SUBMITTED' : 'PENDING_ASSIGNMENT';
 
-    const updated = await referralRepository.updateStatus(referralId, targetStatus, {
+    let updated = await referralRepository.updateStatus(referralId, targetStatus, {
       userId: userContext.id,
       facilityId: userFacilityId || referral.origin_facility_id,
       reason: 'Referral submitted for receiving hospital review'
     });
+
+    try {
+      updated = await coordinationService.applyPolicyToReferral(referralId);
+    } catch {
+      // Fallback
+    }
 
     await securityAuditService.recordEvent({
       eventName: 'REFERRAL_SUBMITTED',

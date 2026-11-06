@@ -226,7 +226,9 @@ export class ReferralRepository extends BaseRepository {
       'reason_for_referral', 'required_specialty', 'vitals_blood_pressure',
       'vitals_pulse_rate', 'vitals_respiratory_rate', 'vitals_temperature', 'vitals_spo2',
       'provisional_treatment_given', 'transport_required', 'ai_recommended_facility_id',
-      'triage_category', 'triage_notes', 'assigned_bed_type', 'current_progress_notes'
+      'triage_category', 'triage_notes', 'assigned_bed_type', 'current_progress_notes',
+      'policy_id', 'policy_version', 'acknowledgement_deadline', 'decision_deadline',
+      'escalation_level', 'last_followup_at', 'followup_count'
     ];
 
     for (const key of allowedFields) {
