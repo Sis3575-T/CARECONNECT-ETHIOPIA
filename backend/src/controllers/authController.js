@@ -15,7 +15,7 @@ import {
   hashResetToken
 } from '../utils/password.js';
 import { generateAccessToken } from '../utils/token.js';
-import { ConflictError, ValidationError, UnauthorizedError, NotFoundError } from '../utils/errors.js';
+import { ConflictError, ValidationError, UnauthorizedError, NotFoundError, ForbiddenError } from '../utils/errors.js';
 import { SECURITY_EVENTS, AUTH_CONFIG } from '../constants/index.js';
 
 // Dummy bcrypt hash to run constant-time comparison when email is not found
@@ -33,6 +33,13 @@ export class AuthController {
       const strength = validatePasswordStrength(password);
       if (!strength.valid) {
         throw new ValidationError(strength.message);
+      }
+
+      // Users cannot escalate their own role through client input to administrative or regional officer roles
+      const requestedRoleId = Number(roleId || 1);
+      const DISALLOWED_SELF_REGISTER_ROLES = [6, 7];
+      if (DISALLOWED_SELF_REGISTER_ROLES.includes(requestedRoleId)) {
+        throw new ForbiddenError('Self-registration with administrative privileges is forbidden.');
       }
 
       // Check if user already exists

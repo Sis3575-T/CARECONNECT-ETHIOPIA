@@ -63,6 +63,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 04 OF 50: AUTHENTICATION, AUTHORIZATION AND SECURE SESSION MANAGEMENT
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 04 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-06T22:20:00.000Z  
+
+### Part 04 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **025** | `security: establish authentication architecture and policies` | ✅ COMMITTED | `bde1cf1` | Security constants, password policy doc, session policies doc, frontend auth contract, authPolicies.test.js (7/7 pass). | None |
+| **026** | `security: implement secure password management` | ✅ COMMITTED | `d1145f6` | Argon2/Bcrypt hashing with weak password blacklist, 72-byte ceiling, CSPRNG reset token hashing, password.test.js (6/6 pass). | None |
+| **027** | `security: implement login and access token issuance` | ✅ COMMITTED | `98b81a3` | Login endpoint, JWT HS256 issuance (issuer/audience), dummy hash anti-timing, account lockout tracking, loginSecurity.test.js & login.test.js (8/8 pass). | None |
+| **028** | `security: implement refresh token rotation and session management` | ✅ COMMITTED | `bc5c233` | Database SessionModel & SessionService, SHA-256 hash storage, rotation, family reuse detection, session listing/revocation, sessionRotation.test.js & refresh.test.js (10/10 pass). | None |
+| **029** | `security: implement authentication middleware and user context` | ✅ COMMITTED | `d0c9475` | Centralized `authenticate` middleware, token decoding, live DB active/lockout/deletion checks, rich req.user context, authMiddleware.test.js & token.test.js (11/11 pass). | None |
+| **030** | `security: implement role and permission authorization` | ✅ COMMITTED | `634503c` | Granular RBAC (`requirePermission`, `requireRole`, `requirePortal`), DEFAULT_ROLE_PERMISSIONS, GET `/permissions`, authorization.test.js & rbac.test.js & facilityTenancy.test.js (17/17 pass). | None |
+| **031** | `security: implement account recovery and session security` | ✅ COMMITTED | `f74b921` | Migration 025 (password_reset_tokens & family_id), PasswordResetModel, `/change-password`, `/forgot-password`, `/reset-password`, accountRecovery.test.js (5/5 pass). | None |
+| **032** | `test: verify authentication authorization and session security` | ✅ COMMITTED | `d7c6565` | Comprehensive test suite part04SecurityComprehensive.test.js (13/13 pass), all 131 backend tests pass, 12/12 db tests pass, docs/PART_04_REPORT.md. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
