@@ -12,6 +12,13 @@ const router = Router();
 
 // 1. Query audit logs (Requires 'audit:view' permission or System Administrator)
 router.get(
+  '/',
+  authenticate,
+  requirePermission('audit:view'),
+  AuditController.getLogs
+);
+
+router.get(
   '/logs',
   authenticate,
   requirePermission('audit:view'),

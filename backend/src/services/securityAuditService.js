@@ -163,6 +163,13 @@ export class SecurityAuditService {
   static clearStore() {
     inMemoryAuditLogs.length = 0;
   }
+
+  /**
+   * Get all in-memory audit logs (for test inspections)
+   */
+  static getInMemoryLogs() {
+    return [...inMemoryAuditLogs];
+  }
 }
 
 export default SecurityAuditService;

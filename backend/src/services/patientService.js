@@ -153,6 +153,8 @@ export class PatientService {
 
     // Record audit event
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_RECORD_CREATED',
+      category: 'PATIENT_MANAGEMENT',
       userId: creatorUser.id || null,
       facilityId: targetFacilityId,
       action: 'PATIENT_RECORD_CREATED',
@@ -189,6 +191,20 @@ export class PatientService {
       }
     }
 
+    // Record access audit event
+    if (userContext.id) {
+      await securityAuditService.recordEvent({
+        eventName: 'PATIENT_RECORD_VIEWED',
+        category: 'PATIENT_MANAGEMENT',
+        userId: userContext.id,
+        facilityId: userFacilityId || patient.registered_facility_id,
+        action: 'PATIENT_RECORD_VIEWED',
+        resourceType: 'patient',
+        resourceId: patient.id,
+        details: { patientId: patient.id }
+      });
+    }
+
     return this.sanitizePatient(patient, userContext);
   }
 
@@ -220,6 +236,8 @@ export class PatientService {
     const updated = await patientRepository.update(patientId, validated);
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_RECORD_UPDATED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userFacilityId || existing.registered_facility_id,
       action: 'PATIENT_RECORD_UPDATED',
@@ -260,6 +278,8 @@ export class PatientService {
     });
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_STATUS_CHANGED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || existing.registered_facility_id,
       action: 'PATIENT_STATUS_CHANGED',
@@ -301,6 +321,8 @@ export class PatientService {
     });
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_RECORD_CORRECTED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || existing.registered_facility_id,
       action: 'PATIENT_RECORD_CORRECTED',
@@ -508,6 +530,8 @@ export class PatientService {
     });
 
     await securityAuditService.recordEvent({
+      eventName: 'DUPLICATE_REVIEW_RECORDED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || target.registered_facility_id,
       action: 'DUPLICATE_REVIEW_RECORDED',
@@ -553,6 +577,8 @@ export class PatientService {
     );
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_MERGE_REQUESTED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || target.registered_facility_id,
       action: 'PATIENT_MERGE_REQUESTED',
@@ -589,6 +615,8 @@ export class PatientService {
     const contact = await patientRepository.addEmergencyContact(patientId, validated);
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_CONTACT_ADDED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || patient.registered_facility_id,
       action: 'PATIENT_CONTACT_ADDED',
@@ -612,6 +640,8 @@ export class PatientService {
     const updated = await patientRepository.updateEmergencyContact(patientId, contactId, payload);
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_CONTACT_UPDATED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || null,
       action: 'PATIENT_CONTACT_UPDATED',
@@ -632,6 +662,8 @@ export class PatientService {
     await patientRepository.deleteEmergencyContact(patientId, contactId);
 
     await securityAuditService.recordEvent({
+      eventName: 'PATIENT_CONTACT_DELETED',
+      category: 'PATIENT_MANAGEMENT',
       userId: userContext.id || null,
       facilityId: userContext.facilityId || null,
       action: 'PATIENT_CONTACT_DELETED',
