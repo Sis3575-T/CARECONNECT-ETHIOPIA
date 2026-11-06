@@ -6,15 +6,12 @@
 
 import patientService from '../services/patientService.js';
 import { HTTP_STATUS } from '../constants/index.js';
+import { successResponse, paginatedResponse } from '../utils/response.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const registerPatient = asyncHandler(async (req, res) => {
   const patient = await patientService.registerPatient(req.body, req.user);
-  res.status(HTTP_STATUS.CREATED).json({
-    status: 'success',
-    message: 'Patient registered successfully',
-    data: patient
-  });
+  return successResponse(res, { patient }, 'Patient registered successfully', HTTP_STATUS.CREATED);
 });
 
 export const listPatients = asyncHandler(async (req, res) => {
@@ -35,95 +32,59 @@ export const listPatients = asyncHandler(async (req, res) => {
     req.user
   );
 
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    data: results.data,
-    pagination: {
-      total: results.total,
-      page,
-      limit,
-      totalPages: Math.ceil(results.total / limit) || 1
-    }
-  });
+  return paginatedResponse(
+    res,
+    results.data,
+    page,
+    limit,
+    results.total,
+    'Patients retrieved successfully'
+  );
 });
 
 export const getPatient = asyncHandler(async (req, res) => {
   const patient = await patientService.getPatientById(req.params.patientId, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    data: patient
-  });
+  return successResponse(res, { patient }, 'Patient retrieved successfully', HTTP_STATUS.OK);
 });
 
 export const updatePatient = asyncHandler(async (req, res) => {
   const patient = await patientService.updatePatient(req.params.patientId, req.body, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    message: 'Patient record updated successfully',
-    data: patient
-  });
+  return successResponse(res, { patient }, 'Patient record updated successfully', HTTP_STATUS.OK);
 });
 
 export const updatePatientStatus = asyncHandler(async (req, res) => {
   const patient = await patientService.updatePatientStatus(req.params.patientId, req.body, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    message: 'Patient lifecycle status updated successfully',
-    data: patient
-  });
+  return successResponse(res, { patient }, 'Patient lifecycle status updated successfully', HTTP_STATUS.OK);
 });
 
 export const recordCorrection = asyncHandler(async (req, res) => {
   const correction = await patientService.recordDemographicCorrection(req.params.patientId, req.body, req.user);
-  res.status(HTTP_STATUS.CREATED).json({
-    status: 'success',
-    message: 'Demographic correction recorded in audit trail',
-    data: correction
-  });
+  return successResponse(res, { correction }, 'Demographic correction recorded in audit trail', HTTP_STATUS.CREATED);
 });
 
 export const getPatientHistory = asyncHandler(async (req, res) => {
   const history = await patientService.getPatientHistory(req.params.patientId, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    data: history
-  });
+  return successResponse(res, history, 'Patient history retrieved successfully', HTTP_STATUS.OK);
 });
 
 export const identifyPatients = asyncHandler(async (req, res) => {
   const candidates = await patientService.identifyPatients(req.query, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    count: candidates.length,
-    data: candidates
-  });
+  return successResponse(res, { candidates, count: candidates.length }, 'Identification matches computed', HTTP_STATUS.OK);
 });
 
 export const getPossibleDuplicates = asyncHandler(async (req, res) => {
   const candidates = await patientService.findPossibleDuplicates(req.params.patientId, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    count: candidates.length,
-    data: candidates
-  });
+  return successResponse(res, { candidates, count: candidates.length }, 'Possible duplicate records retrieved', HTTP_STATUS.OK);
 });
 
 export const recordDuplicateReview = asyncHandler(async (req, res) => {
   const review = await patientService.recordDuplicateReview(req.params.patientId, req.body, req.user);
-  res.status(HTTP_STATUS.CREATED).json({
-    status: 'success',
-    message: 'Duplicate review outcome recorded successfully',
-    data: review
-  });
+  return successResponse(res, { review }, 'Duplicate review outcome recorded successfully', HTTP_STATUS.CREATED);
 });
 
 export const submitMergeRequest = asyncHandler(async (req, res) => {
   const mergeReq = await patientService.submitMergeRequest(req.body, req.user);
-  res.status(HTTP_STATUS.CREATED).json({
-    status: 'success',
-    message: 'Patient merge request submitted for clinical review',
-    data: mergeReq
-  });
+  return successResponse(res, { mergeRequest: mergeReq }, 'Patient merge request submitted for clinical review', HTTP_STATUS.CREATED);
 });
 
 /* =========================================================================
@@ -131,19 +92,12 @@ export const submitMergeRequest = asyncHandler(async (req, res) => {
  * ========================================================================= */
 export const getEmergencyContacts = asyncHandler(async (req, res) => {
   const contacts = await patientService.getEmergencyContacts(req.params.patientId, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    data: contacts
-  });
+  return successResponse(res, { contacts }, 'Emergency contacts retrieved successfully', HTTP_STATUS.OK);
 });
 
 export const addEmergencyContact = asyncHandler(async (req, res) => {
   const contact = await patientService.addEmergencyContact(req.params.patientId, req.body, req.user);
-  res.status(HTTP_STATUS.CREATED).json({
-    status: 'success',
-    message: 'Emergency contact added successfully',
-    data: contact
-  });
+  return successResponse(res, { contact }, 'Emergency contact added successfully', HTTP_STATUS.CREATED);
 });
 
 export const updateEmergencyContact = asyncHandler(async (req, res) => {
@@ -153,19 +107,12 @@ export const updateEmergencyContact = asyncHandler(async (req, res) => {
     req.body,
     req.user
   );
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    message: 'Emergency contact updated successfully',
-    data: contact
-  });
+  return successResponse(res, { contact }, 'Emergency contact updated successfully', HTTP_STATUS.OK);
 });
 
 export const deleteEmergencyContact = asyncHandler(async (req, res) => {
   await patientService.deleteEmergencyContact(req.params.patientId, req.params.contactId, req.user);
-  res.status(HTTP_STATUS.OK).json({
-    status: 'success',
-    message: 'Emergency contact deleted successfully'
-  });
+  return successResponse(res, { success: true }, 'Emergency contact deleted successfully', HTTP_STATUS.OK);
 });
 
 export default {
