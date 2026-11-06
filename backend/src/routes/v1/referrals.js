@@ -28,6 +28,19 @@ import {
   closeReferral,
   recordCorrection
 } from '../../controllers/referralController.js';
+import {
+  recordFollowUp,
+  getFollowUps,
+  createInformationRequest,
+  respondToInformationRequest,
+  getInfoRequests,
+  reassignReferral,
+  getReassignments,
+  createEscalation,
+  getReferralEscalations,
+  getReferralDelays,
+  getReferralTimeline
+} from '../../controllers/coordinationController.js';
 
 const router = Router();
 
@@ -80,5 +93,26 @@ router.post('/:referralId/close', closeReferral);
 
 // 13. Clinical Corrections
 router.post('/:referralId/corrections', recordCorrection);
+
+// 14. Referral Follow-up Interaction Records
+router.post('/:referralId/follow-ups', recordFollowUp);
+router.get('/:referralId/follow-ups', getFollowUps);
+
+// 15. Structured Additional Information Requests
+router.post('/:referralId/information-requests', createInformationRequest);
+router.get('/:referralId/information-requests', getInfoRequests);
+router.post('/:referralId/information-requests/:requestId/respond', respondToInformationRequest);
+
+// 16. Human-Managed Referral Reassignment
+router.post('/:referralId/reassignments', reassignReferral);
+router.get('/:referralId/reassignments', getReassignments);
+
+// 17. Operational Escalation Rules
+router.post('/:referralId/escalations', createEscalation);
+router.get('/:referralId/escalations', getReferralEscalations);
+
+// 18. Delays Measurement & Unified Coordination Timeline
+router.get('/:referralId/delays', getReferralDelays);
+router.get('/:referralId/timeline', getReferralTimeline);
 
 export default router;
