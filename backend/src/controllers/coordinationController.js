@@ -34,12 +34,12 @@ export const deactivatePolicy = asyncHandler(async (req, res) => {
 
 export const recordFollowUp = asyncHandler(async (req, res) => {
   const followUp = await coordinationService.recordFollowUp(req.params.referralId, req.body, req.user);
-  return successResponse(res, { follow_up: followUp }, 'Referral follow-up interaction recorded', HTTP_STATUS.CREATED);
+  return successResponse(res, { follow_up: followUp, followUp }, 'Referral follow-up interaction recorded', HTTP_STATUS.CREATED);
 });
 
 export const getFollowUps = asyncHandler(async (req, res) => {
   const followUps = await coordinationService.getFollowUps(req.params.referralId, req.user);
-  return successResponse(res, { follow_ups: followUps }, 'Referral follow-up history retrieved', HTTP_STATUS.OK);
+  return successResponse(res, { follow_ups: followUps, followUps }, 'Referral follow-up history retrieved', HTTP_STATUS.OK);
 });
 
 // ==========================================

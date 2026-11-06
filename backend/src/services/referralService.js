@@ -416,12 +416,16 @@ export class ReferralService {
     });
 
     // Update status to ACCEPTED
-    const updated = await referralRepository.updateStatus(referralId, 'ACCEPTED', {
+    let updated = await referralRepository.updateStatus(referralId, 'ACCEPTED', {
       userId: userContext.id,
       facilityId: userFacilityId || referral.destination_facility_id,
       receivingClinicianId: userContext.id,
       reason: payload.decision_notes || 'Referral accepted'
     });
+
+    if (payload.assigned_bed_type) {
+      updated = await referralRepository.update(referralId, { assigned_bed_type: payload.assigned_bed_type });
+    }
 
     await securityAuditService.recordEvent({
       eventName: 'REFERRAL_ACCEPTED',

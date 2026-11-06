@@ -24,12 +24,12 @@ export function validateCreatePolicy(data) {
     errors.push({ field: 'name', message: 'Policy name is required (minimum 3 characters)' });
   }
 
-  const ackMinutes = Number(data.acknowledgement_deadline_minutes);
+  const ackMinutes = Number(data.acknowledgement_deadline_minutes || data.acknowledgement_window_minutes);
   if (isNaN(ackMinutes) || ackMinutes < 1) {
     errors.push({ field: 'acknowledgement_deadline_minutes', message: 'acknowledgement_deadline_minutes must be a positive integer' });
   }
 
-  const decMinutes = Number(data.decision_deadline_minutes);
+  const decMinutes = Number(data.decision_deadline_minutes || data.decision_window_minutes);
   if (isNaN(decMinutes) || decMinutes < 1) {
     errors.push({ field: 'decision_deadline_minutes', message: 'decision_deadline_minutes must be a positive integer' });
   }
