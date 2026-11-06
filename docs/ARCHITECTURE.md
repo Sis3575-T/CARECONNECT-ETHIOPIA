@@ -4,9 +4,11 @@
 
 CareConnect Ethiopia employs a decoupled, service-oriented multi-portal architecture specifically architected for resilient healthcare coordination in Ethiopia.
 
+For the comprehensive functional description, clinical problem statement, and portal feature matrices, see [PROJECT_OVERVIEW.md](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/PROJECT_OVERVIEW.md).
+
 ```mermaid
 graph TB
-    subgraph Client Tier - Independent Portals
+    subgraph Client Tier - Four Autonomous Portals
         P1["Health Centre Portal<br/>(React + Vite, Port 5173)"]
         P2["Hospital Portal<br/>(React + Vite, Port 5174)"]
         P3["Transport Portal<br/>(React + Vite, Port 5175)"]
@@ -19,7 +21,7 @@ graph TB
     end
 
     subgraph Persistence Tier
-        DB[("PostgreSQL Database<br/>Port 5432")]
+        DB[("Neon Managed PostgreSQL<br/>Port 5432 / TLS 1.3")]
         FS["File Storage<br/>(Uploads & Document Archive)"]
     end
 
@@ -28,8 +30,8 @@ graph TB
     P3 -->|HTTP / REST + JWT| API
     P4 -->|HTTP / REST + JWT| API
 
-    API -->|Internal HTTP Proxy| AI
-    API -->|pg Pool / Parameterized SQL| DB
+    API -->|Internal HTTP Proxy / Timeout Shield| AI
+    API -->|pg Pool / Parameterized SQL / SSL| DB
     API -->|Local / S3 Compatible FS| FS
     AI -->|OpenCV / Tesseract / Scikit-learn| AI
 ```
