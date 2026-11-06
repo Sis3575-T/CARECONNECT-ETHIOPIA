@@ -249,6 +249,13 @@ export class UserModel {
   static clearMockUsers() {
     inMemoryUsers.clear();
   }
+
+  /**
+   * Get all in-memory users (for testing)
+   */
+  static getAllMockUsers() {
+    return Array.from(inMemoryUsers.values());
+  }
 }
 
 export default UserModel;

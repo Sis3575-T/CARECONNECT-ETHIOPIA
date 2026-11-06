@@ -7,6 +7,7 @@ import { Router } from 'express';
 import healthRouter from './health.js';
 import docsRouter from './docs.js';
 import authRouter from './auth.js';
+import usersRouter from './users.js';
 
 const router = Router();
 
@@ -14,6 +15,7 @@ const router = Router();
 router.use('/health', healthRouter);
 router.use('/docs', docsRouter);
 router.use('/auth', authRouter);
+router.use('/users', usersRouter);
 
 // v1 Root Information
 router.get('/', (req, res) => {
