@@ -3,10 +3,10 @@
  */
 
 import UserModel from '../models/userModel.js';
-import TokenModel from '../models/tokenModel.js';
+import SessionService from '../services/sessionService.js';
 import SecurityAuditService from '../services/securityAuditService.js';
 import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password.js';
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/token.js';
+import { generateAccessToken } from '../utils/token.js';
 import { ConflictError, ValidationError, UnauthorizedError, NotFoundError } from '../utils/errors.js';
 import { SECURITY_EVENTS, AUTH_CONFIG } from '../constants/index.js';
 
@@ -148,19 +148,20 @@ export class AuthController {
         userAgent
       });
 
-      // 6. Generate JWT Access & Refresh Tokens
+      // 6. Generate JWT Access Token & Persistent Hashed Refresh Token Session
       const accessToken = generateAccessToken(user);
-      const refreshToken = generateRefreshToken(user);
-      await TokenModel.saveRefreshToken(user.id, refreshToken);
+      const { refreshToken, session } = await SessionService.createSession(user.id, req);
 
       // Set hardened HttpOnly cookie for browser clients
-      res.cookie(AUTH_CONFIG.REFRESH_COOKIE_NAME, refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/api/v1/auth',
-        maxAge: AUTH_CONFIG.REFRESH_TOKEN_TTL_MS
-      });
+      if (res.cookie) {
+        res.cookie(AUTH_CONFIG.REFRESH_COOKIE_NAME, refreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/api/v1/auth',
+          maxAge: AUTH_CONFIG.REFRESH_TOKEN_TTL_MS
+        });
+      }
 
       // Safe user payload (password hash is strictly stripped)
       const safeUser = {
@@ -183,6 +184,7 @@ export class AuthController {
           user: safeUser,
           accessToken,
           refreshToken,
+          sessionId: session.id,
           expiresIn: AUTH_CONFIG.ACCESS_TOKEN_TTL_SECONDS
         }
       });
@@ -192,37 +194,35 @@ export class AuthController {
   }
 
   /**
-   * Refresh expired access token using valid refresh token
+   * Refresh expired access token using valid refresh token (with rotation & reuse detection)
    */
   static async refresh(req, res, next) {
     try {
-      const refreshToken = req.body.refreshToken || req.cookies?.[AUTH_CONFIG.REFRESH_COOKIE_NAME];
-      if (!refreshToken) {
+      const rawRefreshToken = req.body.refreshToken || req.cookies?.[AUTH_CONFIG.REFRESH_COOKIE_NAME];
+      if (!rawRefreshToken) {
         throw new UnauthorizedError('Refresh token is required');
       }
 
-      // Verify cryptographic signature and expiration
-      const decoded = verifyRefreshToken(refreshToken);
+      // Rotate session: revokes previous token, checks for reuse, issues new token pair
+      const { accessToken, refreshToken: newRefreshToken } = await SessionService.rotateSession(rawRefreshToken, req);
 
-      // Verify token hasn't been revoked
-      const isValid = await TokenModel.isTokenValid(refreshToken);
-      if (!isValid) {
-        throw new UnauthorizedError('Refresh token has been revoked or expired');
+      // Update cookie for browser clients
+      if (res.cookie) {
+        res.cookie(AUTH_CONFIG.REFRESH_COOKIE_NAME, newRefreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/api/v1/auth',
+          maxAge: AUTH_CONFIG.REFRESH_TOKEN_TTL_MS
+        });
       }
-
-      const user = await UserModel.findById(decoded.userId);
-      if (!user || !user.is_active) {
-        throw new UnauthorizedError('User account not found or deactivated');
-      }
-
-      // Generate new access token
-      const newAccessToken = generateAccessToken(user);
 
       res.status(200).json({
         success: true,
         message: 'Access token renewed successfully',
         data: {
-          accessToken: newAccessToken,
+          accessToken,
+          refreshToken: newRefreshToken,
           expiresIn: AUTH_CONFIG.ACCESS_TOKEN_TTL_SECONDS
         }
       });
@@ -232,31 +232,101 @@ export class AuthController {
   }
 
   /**
-   * Terminate session and revoke tokens
+   * Terminate current session and revoke tokens
    */
   static async logout(req, res, next) {
     try {
-      const refreshToken = req.body.refreshToken || req.cookies?.[AUTH_CONFIG.REFRESH_COOKIE_NAME];
-      if (refreshToken) {
-        await TokenModel.revokeToken(refreshToken);
+      const rawRefreshToken = req.body.refreshToken || req.cookies?.[AUTH_CONFIG.REFRESH_COOKIE_NAME];
+      if (rawRefreshToken) {
+        await SessionService.revokeCurrentSession(rawRefreshToken);
       }
 
-      // If user is authenticated, revoke all user tokens
       if (req.user && req.user.userId) {
-        await TokenModel.revokeAllUserTokens(req.user.userId);
+        await SessionService.revokeAllSessions(req.user.userId);
       }
 
       // Clear refresh cookie
-      res.clearCookie(AUTH_CONFIG.REFRESH_COOKIE_NAME, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/api/v1/auth'
-      });
+      if (res.clearCookie) {
+        res.clearCookie(AUTH_CONFIG.REFRESH_COOKIE_NAME, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/api/v1/auth'
+        });
+      }
 
       res.status(200).json({
         success: true,
         message: 'Session terminated successfully and tokens revoked'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Terminate all active sessions across all devices
+   */
+  static async logoutAll(req, res, next) {
+    try {
+      if (!req.user || !req.user.userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      await SessionService.revokeAllSessions(req.user.userId);
+
+      if (res.clearCookie) {
+        res.clearCookie(AUTH_CONFIG.REFRESH_COOKIE_NAME, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          path: '/api/v1/auth'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'All active sessions have been terminated'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * List active sessions for authenticated user
+   */
+  static async getSessions(req, res, next) {
+    try {
+      if (!req.user || !req.user.userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      const sessions = await SessionService.listSessions(req.user.userId);
+      res.status(200).json({
+        success: true,
+        data: { sessions }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Revoke specific session by ID or UUID
+   */
+  static async revokeSession(req, res, next) {
+    try {
+      if (!req.user || !req.user.userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      const { sessionId } = req.params;
+      await SessionService.revokeSessionById(req.user.userId, sessionId);
+
+      res.status(200).json({
+        success: true,
+        message: 'Session revoked successfully'
       });
     } catch (err) {
       next(err);

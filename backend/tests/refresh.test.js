@@ -63,6 +63,6 @@ test('Refresh Token Management Suite', async (t) => {
     });
 
     assert.equal(refreshRes.status, 401);
-    assert.equal(refreshRes.body.error.code, 'UNAUTHORIZED');
+    assert.ok(['UNAUTHORIZED', 'TOKEN_REVOKED'].includes(refreshRes.body.error.code));
   });
 });

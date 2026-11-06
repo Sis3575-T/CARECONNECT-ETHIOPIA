@@ -1,5 +1,5 @@
 /**
- * CareConnect Ethiopia - Authentication Routes
+ * CareConnect Ethiopia - Authentication & Session Management Routes
  */
 
 import { Router } from 'express';
@@ -30,13 +30,20 @@ const loginSchema = {
 
 router.post('/login', authRateLimiter, validate(loginSchema), AuthController.login);
 
-// Refresh Token route
-router.post('/refresh', validate({ refreshToken: { required: true } }), AuthController.refresh);
+// Refresh Token route (validates either body refreshToken or cookie)
+router.post('/refresh', AuthController.refresh);
 
-// Logout and token revocation
+// Logout current session
 router.post('/logout', AuthController.logout);
+
+// Global logout across all devices
+router.post('/logout-all', authenticate, AuthController.logoutAll);
 
 // Current User Profile
 router.get('/me', authenticate, AuthController.getProfile);
+
+// Active Sessions Management
+router.get('/sessions', authenticate, AuthController.getSessions);
+router.delete('/sessions/:sessionId', authenticate, AuthController.revokeSession);
 
 export default router;

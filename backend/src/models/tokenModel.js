@@ -1,48 +1,55 @@
 /**
- * CareConnect Ethiopia - Refresh Token Model & Revocation Store
+ * CareConnect Ethiopia - Refresh Token Model & Delegation Adapter
+ * Delegates to SessionModel and SessionService while maintaining backwards compatibility.
  */
 
-const refreshTokensStore = new Map(); // token -> { userId, expiresAt, revoked: boolean }
+import SessionModel from './sessionModel.js';
+import crypto from 'crypto';
 
 export class TokenModel {
+  static hashToken(token) {
+    if (!token) return '';
+    return crypto.createHash('sha256').update(token).digest('hex');
+  }
+
   static async saveRefreshToken(userId, token, ttlMs = 7 * 24 * 60 * 60 * 1000) {
-    refreshTokensStore.set(token, {
+    const tokenHash = this.hashToken(token);
+    await SessionModel.createSession({
       userId: Number(userId),
-      expiresAt: Date.now() + ttlMs,
-      revoked: false
+      tokenHash,
+      ttlMs
     });
     return true;
   }
 
   static async isTokenValid(token) {
-    const record = refreshTokensStore.get(token);
-    if (!record) return false;
-    if (record.revoked) return false;
-    if (Date.now() > record.expiresAt) return false;
+    if (!token) return false;
+    const tokenHash = this.hashToken(token);
+    const session = await SessionModel.findByTokenHash(tokenHash);
+    if (!session) return false;
+    if (session.is_revoked) return false;
+    if (new Date(session.expires_at).getTime() < Date.now()) return false;
     return true;
   }
 
   static async revokeToken(token) {
-    const record = refreshTokensStore.get(token);
-    if (record) {
-      record.revoked = true;
+    if (!token) return false;
+    const tokenHash = this.hashToken(token);
+    const session = await SessionModel.findByTokenHash(tokenHash);
+    if (session) {
+      await SessionModel.revokeSession(session.id);
       return true;
     }
     return false;
   }
 
   static async revokeAllUserTokens(userId) {
-    const uId = Number(userId);
-    for (const record of refreshTokensStore.values()) {
-      if (record.userId === uId) {
-        record.revoked = true;
-      }
-    }
+    await SessionModel.revokeAllUserSessions(Number(userId));
     return true;
   }
 
   static clearStore() {
-    refreshTokensStore.clear();
+    SessionModel.clearStore();
   }
 }
 
