@@ -10,8 +10,17 @@ test('API Documentation Foundation Suite', async (t) => {
     assert.equal(res.body.openapi, '3.0.3');
     assert.equal(res.body.info.title, 'CareConnect Ethiopia REST API');
     assert.ok(res.body.paths['/health']);
+    assert.ok(res.body.paths['/health/liveness']);
     assert.ok(res.body.paths['/auth/login']);
+    assert.ok(res.body.paths['/auth/register']);
     assert.ok(res.body.paths['/referrals']);
     assert.ok(res.body.paths['/ai/recommend']);
+
+    // Component schemas and security definitions
+    assert.ok(res.body.components.securitySchemes.BearerAuth);
+    assert.equal(res.body.components.securitySchemes.BearerAuth.scheme, 'bearer');
+    assert.ok(res.body.components.schemas.SuccessEnvelope);
+    assert.ok(res.body.components.schemas.ErrorEnvelope);
+    assert.ok(res.body.components.schemas.PaginationMeta);
   });
 });
