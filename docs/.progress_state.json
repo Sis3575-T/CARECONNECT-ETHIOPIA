@@ -426,8 +426,8 @@
     "id": 48,
     "title": "backend: implement facility-based access restrictions",
     "phase": 5,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "a059742",
     "testsPerformed": "Ran backend/tests/facilityTenancy.test.js (5/5 tests passed) verifying facility tenancy boundaries, cross-facility prevention, unauthenticated rejection, and administrator oversight exceptions",
     "remainingIssues": "None"
   },
