@@ -703,6 +703,9 @@ export class CoordinationService {
       throw new NotFoundError(`Referral [${referralId}] not found`);
     }
 
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+    const isTransportCoordinator = userRoleId === 4;
+
     const [statusHistory, decisions, followUps, infoRequests, reassignments, escalations] =
       await Promise.all([
         referralRepository.getStatusHistory(referralId),
@@ -720,10 +723,15 @@ export class CoordinationService {
       timeline.push({
         event_type: 'STATUS_TRANSITION',
         timestamp: h.created_at,
-        actor_user_id: h.changed_by_user_id,
-        facility_id: h.changed_at_facility_id,
+        actor_type: h.changed_by_user_id ? 'HUMAN' : 'SYSTEM',
+        actor_user_id: h.changed_by_user_id || null,
+        facility_id: h.changed_at_facility_id || null,
         description: `Referral status progressed from [${h.from_status || 'INITIAL'}] to [${h.to_status}]`,
-        details: { fromStatus: h.from_status, toStatus: h.to_status, reason: h.reason_text }
+        details: {
+          fromStatus: h.from_status,
+          toStatus: h.to_status,
+          reason: isTransportCoordinator ? '[Operational status change]' : h.reason_text
+        }
       });
     }
 
@@ -732,10 +740,15 @@ export class CoordinationService {
       timeline.push({
         event_type: 'CLINICAL_DECISION',
         timestamp: d.decision_timestamp,
+        actor_type: 'HUMAN',
         actor_user_id: d.evaluating_clinician_id,
         facility_id: d.hospital_id,
         description: `Hospital recorded clinical triage decision: [${d.decision}]`,
-        details: { decision: d.decision, notes: d.decision_notes, bedAllocated: d.bed_allocated }
+        details: {
+          decision: d.decision,
+          notes: isTransportCoordinator ? '[Clinical details redacted for transport logistics]' : d.decision_notes,
+          bedAllocated: d.bed_allocated
+        }
       });
     }
 
@@ -744,10 +757,16 @@ export class CoordinationService {
       timeline.push({
         event_type: 'COORDINATION_FOLLOWUP',
         timestamp: f.attempted_at,
+        actor_type: 'HUMAN',
         actor_user_id: f.responsible_user_id,
         facility_id: f.facility_id,
         description: `Referral follow-up attempted via [${f.communication_channel}] with outcome [${f.outcome}]`,
-        details: { channel: f.communication_channel, outcome: f.outcome, notes: f.reason_or_notes }
+        details: {
+          channel: f.communication_channel,
+          outcome: f.outcome,
+          notes: isTransportCoordinator ? '[Communication notes redacted]' : f.reason_or_notes,
+          isManualRecord: !f.provider_message_id
+        }
       });
     }
 
@@ -756,20 +775,27 @@ export class CoordinationService {
       timeline.push({
         event_type: 'INFO_REQUESTED',
         timestamp: r.requested_at,
+        actor_type: 'HUMAN',
         actor_user_id: r.requesting_user_id,
         facility_id: r.requesting_facility_id,
         description: `Hospital requested additional clinical information`,
-        details: { requestedInfo: r.requested_information, reason: r.clinical_reason }
+        details: {
+          requestedInfo: isTransportCoordinator ? '[Confidential medical inquiry]' : r.requested_information,
+          reason: isTransportCoordinator ? '[Clinical justification redacted]' : r.clinical_reason
+        }
       });
 
       if (r.responded_at) {
         timeline.push({
           event_type: 'INFO_RESPONDED',
           timestamp: r.responded_at,
+          actor_type: 'HUMAN',
           actor_user_id: r.responding_user_id,
           facility_id: r.responding_facility_id,
           description: `Health centre provided response to information request`,
-          details: { responseNotes: r.response_notes }
+          details: {
+            responseNotes: isTransportCoordinator ? '[Clinical response redacted]' : r.response_notes
+          }
         });
       }
     }
@@ -779,10 +805,14 @@ export class CoordinationService {
       timeline.push({
         event_type: 'HOSPITAL_REASSIGNED',
         timestamp: re.reassigned_at,
+        actor_type: 'HUMAN',
         actor_user_id: re.authorized_by_user_id,
         facility_id: re.new_facility_id,
         description: `Human-managed reassignment to hospital [${re.new_facility_id}]`,
-        details: { reason: re.reassignment_reason, notes: re.reassignment_notes }
+        details: {
+          reason: re.reassignment_reason,
+          notes: isTransportCoordinator ? '[Reassignment notes]' : re.reassignment_notes
+        }
       });
     }
 
@@ -791,20 +821,28 @@ export class CoordinationService {
       timeline.push({
         event_type: 'OPERATIONAL_ESCALATION',
         timestamp: esc.created_at,
+        actor_type: 'SYSTEM',
         actor_user_id: null,
         facility_id: esc.responsible_facility_id,
         description: `Operational escalation Level ${esc.escalation_level} triggered: [${esc.escalation_condition}]`,
-        details: { level: esc.escalation_level, condition: esc.escalation_condition, reason: esc.escalation_reason }
+        details: {
+          level: esc.escalation_level,
+          condition: esc.escalation_condition,
+          reason: esc.escalation_reason
+        }
       });
 
       if (esc.resolved_at) {
         timeline.push({
           event_type: 'ESCALATION_RESOLVED',
           timestamp: esc.resolved_at,
+          actor_type: 'HUMAN',
           actor_user_id: esc.resolved_by_user_id,
           facility_id: esc.responsible_facility_id,
           description: `Operational escalation Level ${esc.escalation_level} resolved`,
-          details: { explanation: esc.resolution_explanation }
+          details: {
+            explanation: esc.resolution_explanation
+          }
         });
       }
     }
@@ -817,6 +855,7 @@ export class CoordinationService {
       reference_number: referral.reference_number,
       status: referral.status,
       priority: referral.priority,
+      is_redacted: isTransportCoordinator,
       total_events: timeline.length,
       timeline
     };

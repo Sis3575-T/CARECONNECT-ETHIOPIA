@@ -64,7 +64,8 @@ export function validateCreateFollowUp(data) {
     ]);
   }
 
-  const channel = data.communication_channel ? String(data.communication_channel).toUpperCase() : null;
+  let channel = data.communication_channel ? String(data.communication_channel).toUpperCase() : null;
+  if (channel === 'PHONE') channel = 'PHONE_CALL';
   if (!channel || !Object.values(FOLLOWUP_CHANNEL).includes(channel)) {
     errors.push({ field: 'communication_channel', message: `communication_channel must be one of: ${Object.values(FOLLOWUP_CHANNEL).join(', ')}` });
   }
