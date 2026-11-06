@@ -25,6 +25,7 @@
     "dev:admin": "vite --config portals/administrator/vite.config.js portals/administrator",
     "dev:all": "concurrently -n \"SERVER:5000,HEALTH:5173,HOSPITAL:5174,TRANSPORT:5175,ADMIN:5176\" -c \"yellow.bold,cyan.bold,green.bold,magenta.bold,blue.bold\" \"npm run server\" \"npm run dev:health\" \"npm run dev:hospital\" \"npm run dev:transport\" \"npm run dev:admin\"",
     "check:ports": "node scripts/dev-orchestrator.js",
+    "check:standards": "node scripts/verify-standards.js",
     "build:health": "vite build portals/health-centre --config portals/health-centre/vite.config.js",
     "build:hospital": "vite build portals/hospital --config portals/hospital/vite.config.js",
     "build:transport": "vite build portals/transport --config portals/transport/vite.config.js",
