@@ -205,15 +205,70 @@ npm run build:all
 
 ## Technological Specifications
 
-- **UI Framework**: React 18 with Vite 5
+- **UI Framework**: React 18 with Vite 5 (Pure Modern JavaScript / JSX — No TypeScript)
 - **Styling**: Tailwind CSS with customized color palettes per portal, complete Dark Mode support
+- **Shared Tokens**: CSS variables and theme tokens defined in `shared/styles/theme.css`
 - **Icons**: Lucide React
 - **Analytics & Data Visualization**: Recharts (Pie, Bar, Area, Donut charts)
 - **API & State**: Axios with token interceptors and mock fallback data
 - **Forms**: React Hook Form
 - **Mapping**: Leaflet and React-Leaflet
-- **Animations**: Framer Motion
-- **Language**: Pure Modern JavaScript (ES2022+ / JSX)
+- **Backend API**: Node.js v20+ / Express 5 with Helmet, CORS whitelist, and JWT authentication
+- **AI Microservice**: Python 3.12+ FastAPI with Tesseract OCR, OpenCV, and Scikit-learn
+- **Database**: PostgreSQL on Neon Cloud with SSL encryption, connection pooling, and zero-leakage logging
+
+---
+
+## Service Directory & Port Map
+
+| Service / Application | Port | Technology | Role |
+|---|---|---|---|
+| **Health Centre Portal** | `5173` | React / Vite | Patient intake, referral drafting, OCR uploads |
+| **Hospital Portal** | `5174` | React / Vite | Triage queue, bed capacity, arrival check-in |
+| **Transport Portal** | `5175` | React / Vite | Ambulance dispatch, route telemetry, delay logging |
+| **Administrator Portal** | `5176` | React / Vite | RBAC governance, facility registry, audit trail |
+| **Main Backend API** | `5000` | Node / Express | REST API, referral state machine, auth tokens |
+| **AI Decision Service** | `8000` | Python / FastAPI| Document OCR & clinical recommendation ranking |
+| **PostgreSQL Database** | `5432` | Neon Cloud / PG | Relational schema, migrations & seed persistence |
+
+---
+
+## Getting Started & Development Commands
+
+```bash
+# 1. Environment Setup
+cp .env.example .env
+
+# 2. Verify Port Availability
+npm run check:ports
+
+# 3. Code Standards & Architecture Validation
+npm run check:standards
+
+# 4. Execute Test Suites
+npm run test:backend   # Express API and Auth suites (60+ tests)
+npm run test:db        # Database migration and connection security suites
+
+# 5. Launch Independent Portals & Services
+npm run dev:health     # Health Centre Portal (Port 5173)
+npm run dev:hospital   # Hospital Portal (Port 5174)
+npm run dev:transport  # Transport Portal (Port 5175)
+npm run dev:admin      # Administrator Portal (Port 5176)
+npm run dev:backend    # Express REST API (Port 5000)
+npm run dev:ai         # Python FastAPI AI Service (Port 8000)
+```
+
+---
+
+## Documentation Library
+
+- [Complete Project Overview](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/PROJECT_OVERVIEW.md)
+- [System Architecture](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/ARCHITECTURE.md)
+- [Environment Configuration Guide](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/ENVIRONMENT.md)
+- [Security & Secret Management](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/SECURITY.md)
+- [Database Architecture & Neon Setup](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/DATABASE.md)
+- [Code Quality & Engineering Standards](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/CODE_STANDARDS.md)
+- [Part 01 Development Report](file:///C:/Users/DELL%207020/Desktop/CareConnect%20Ethiopia%20Healthcare%20Dashboard%20Collage/docs/PART_01_REPORT.md)
 
 ---
 
