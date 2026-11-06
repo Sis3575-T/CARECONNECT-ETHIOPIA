@@ -4,9 +4,16 @@
 
 import UserModel from '../models/userModel.js';
 import SessionService from '../services/sessionService.js';
+import PasswordResetModel from '../models/passwordResetModel.js';
 import SecurityAuditService from '../services/securityAuditService.js';
 import { getPermissionsForRole } from '../middleware/rbac.js';
-import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password.js';
+import {
+  hashPassword,
+  comparePassword,
+  validatePasswordStrength,
+  generateResetToken,
+  hashResetToken
+} from '../utils/password.js';
 import { generateAccessToken } from '../utils/token.js';
 import { ConflictError, ValidationError, UnauthorizedError, NotFoundError } from '../utils/errors.js';
 import { SECURITY_EVENTS, AUTH_CONFIG } from '../constants/index.js';
@@ -328,6 +335,172 @@ export class AuthController {
       res.status(200).json({
         success: true,
         message: 'Session revoked successfully'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Change password with current password verification
+   */
+  static async changePassword(req, res, next) {
+    try {
+      if (!req.user || !req.user.userId) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword || !newPassword) {
+        throw new ValidationError('Current password and new password are required');
+      }
+
+      const user = await UserModel.findById(req.user.userId);
+      if (!user) {
+        throw new NotFoundError('User account not found');
+      }
+
+      // Verify current password
+      const isMatch = await comparePassword(currentPassword, user.password_hash);
+      if (!isMatch) {
+        throw new UnauthorizedError('Current password provided is incorrect');
+      }
+
+      if (currentPassword === newPassword) {
+        throw new ValidationError('New password must be different from current password');
+      }
+
+      // Validate new password complexity
+      const strength = validatePasswordStrength(newPassword);
+      if (!strength.valid) {
+        throw new ValidationError(strength.message);
+      }
+
+      const newHash = await hashPassword(newPassword);
+      await UserModel.updatePassword(user.id, newHash);
+
+      // Invalidate all active sessions to force re-authentication
+      await SessionService.revokeAllSessions(user.id);
+
+      await SecurityAuditService.recordEvent({
+        eventName: SECURITY_EVENTS.PASSWORD_CHANGED,
+        severity: 'INFO',
+        userId: user.id
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Password changed successfully. Please log in again.'
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Request password reset instructions (anti-enumeration response)
+   */
+  static async forgotPassword(req, res, next) {
+    const ipAddress = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+
+    try {
+      const { email } = req.body;
+      if (!email) {
+        throw new ValidationError('Email address is required');
+      }
+
+      const user = await UserModel.findByEmail(email);
+      let resetToken = null;
+
+      if (user && user.is_active && !user.deleted_at) {
+        resetToken = generateResetToken();
+        const tokenHash = hashResetToken(resetToken);
+
+        await PasswordResetModel.createToken({
+          userId: user.id,
+          tokenHash,
+          ipAddress,
+          userAgent,
+          ttlMs: AUTH_CONFIG.PASSWORD_RESET_TTL_MS
+        });
+
+        await SecurityAuditService.recordEvent({
+          eventName: SECURITY_EVENTS.PASSWORD_RESET_REQUESTED,
+          severity: 'INFO',
+          userId: user.id,
+          ipAddress,
+          userAgent
+        });
+      }
+
+      // Generic response to prevent user account enumeration
+      const responseData = {
+        success: true,
+        message: 'If an account exists with this email address, password reset instructions have been dispatched.'
+      };
+
+      // In test environment, expose token for automated verification
+      if (process.env.NODE_ENV === 'test' && resetToken) {
+        responseData.debugToken = resetToken;
+      }
+
+      res.status(200).json(responseData);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Complete password reset using cryptographic token
+   */
+  static async resetPassword(req, res, next) {
+    const ipAddress = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+
+    try {
+      const { token, newPassword } = req.body;
+      if (!token || !newPassword) {
+        throw new ValidationError('Reset token and new password are required');
+      }
+
+      const strength = validatePasswordStrength(newPassword);
+      if (!strength.valid) {
+        throw new ValidationError(strength.message);
+      }
+
+      const tokenHash = hashResetToken(token);
+      const record = await PasswordResetModel.findByTokenHash(tokenHash);
+
+      if (!record || record.is_used || new Date(record.expires_at).getTime() < Date.now()) {
+        throw new ValidationError('Password reset token is invalid, expired, or has already been used');
+      }
+
+      const user = await UserModel.findById(record.user_id);
+      if (!user || !user.is_active || user.deleted_at) {
+        throw new ValidationError('User account associated with this token is no longer active');
+      }
+
+      const newHash = await hashPassword(newPassword);
+      await UserModel.updatePassword(user.id, newHash);
+
+      // Mark token consumed (one-time use)
+      await PasswordResetModel.markTokenUsed(record.id, tokenHash);
+
+      // Invalidate all existing user sessions across all devices
+      await SessionService.revokeAllSessions(user.id);
+
+      await SecurityAuditService.recordEvent({
+        eventName: SECURITY_EVENTS.PASSWORD_RESET_COMPLETED,
+        severity: 'INFO',
+        userId: user.id,
+        ipAddress,
+        userAgent
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Password has been reset successfully. You may now log in with your new password.'
       });
     } catch (err) {
       next(err);

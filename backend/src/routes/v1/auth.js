@@ -45,6 +45,11 @@ router.get('/me', authenticate, AuthController.getProfile);
 // User Permissions & Portal Access
 router.get('/permissions', authenticate, AuthController.getPermissions);
 
+// Password Management & Account Recovery
+router.post('/change-password', authenticate, AuthController.changePassword);
+router.post('/forgot-password', authRateLimiter, AuthController.forgotPassword);
+router.post('/reset-password', authRateLimiter, AuthController.resetPassword);
+
 // Active Sessions Management
 router.get('/sessions', authenticate, AuthController.getSessions);
 router.delete('/sessions/:sessionId', authenticate, AuthController.revokeSession);
