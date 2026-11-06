@@ -6,6 +6,7 @@
 import { Router } from 'express';
 import FacilityController from '../../controllers/facilityController.js';
 import AssignmentController from '../../controllers/assignmentController.js';
+import ClinicalDepartmentController from '../../controllers/clinicalDepartmentController.js';
 import { authenticate } from '../../middleware/auth.js';
 import { requirePermission } from '../../middleware/rbac.js';
 import {
@@ -69,6 +70,67 @@ router.get(
   authenticate,
   validateFacilityId,
   AssignmentController.getFacilityStaff
+);
+
+// 7. Get clinical services offered by facility
+router.get(
+  '/:facilityId/services',
+  authenticate,
+  validateFacilityId,
+  ClinicalDepartmentController.getFacilityServices
+);
+
+// 8. Add clinical service to facility (Requires 'facility:manage' permission)
+router.post(
+  '/:facilityId/services',
+  authenticate,
+  requirePermission('facility:manage'),
+  validateFacilityId,
+  ClinicalDepartmentController.addFacilityService
+);
+
+// 9. Update clinical service at facility
+router.patch(
+  '/:facilityId/services/:serviceId',
+  authenticate,
+  requirePermission('facility:manage'),
+  validateFacilityId,
+  ClinicalDepartmentController.updateFacilityService
+);
+
+// 10. Remove clinical service from facility
+router.delete(
+  '/:facilityId/services/:serviceId',
+  authenticate,
+  requirePermission('facility:manage'),
+  validateFacilityId,
+  ClinicalDepartmentController.deleteFacilityService
+);
+
+// 11. Get facility departments
+router.get(
+  '/:facilityId/departments',
+  authenticate,
+  validateFacilityId,
+  ClinicalDepartmentController.getFacilityDepartments
+);
+
+// 12. Create department in facility
+router.post(
+  '/:facilityId/departments',
+  authenticate,
+  requirePermission('facility:manage'),
+  validateFacilityId,
+  ClinicalDepartmentController.createFacilityDepartment
+);
+
+// 13. Update department in facility
+router.patch(
+  '/:facilityId/departments/:departmentId',
+  authenticate,
+  requirePermission('facility:manage'),
+  validateFacilityId,
+  ClinicalDepartmentController.updateFacilityDepartment
 );
 
 export default router;
