@@ -10,7 +10,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { configureSecurity } from './middleware/security.js';
+import requestIdMiddleware from './middleware/requestId.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import healthRouter from './routes/v1/health.js';
 import v1Router from './routes/v1/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,10 +25,13 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 const app = express();
 const server = http.createServer(app);
 
+// Request Correlation ID Middleware (First in stack)
+app.use(requestIdMiddleware);
+
 // Apply Security Headers & CORS
 configureSecurity(app);
 
-// Request Correlation ID & HTTP Logging
+// HTTP Request Logging
 app.use(requestLogger);
 
 const PORT = parseInt(process.env.PORT || process.env.BACKEND_PORT || '5000', 10);
@@ -35,6 +40,9 @@ const HOST = process.env.HOST || '0.0.0.0';
 // Basic JSON & URL-encoded parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Cloud Orchestrator Root Health Probes
+app.use('/health', healthRouter);
 
 // Root welcome route
 app.get('/', (req, res) => {

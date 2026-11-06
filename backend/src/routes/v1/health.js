@@ -39,12 +39,12 @@ router.get('/', async (req, res) => {
 });
 
 // Container Liveness Probe (Returns 200 if process is running)
-router.get('/liveness', (req, res) => {
+router.get(['/liveness', '/live'], (req, res) => {
   res.status(200).json({ status: 'ALIVE', timestamp: new Date().toISOString() });
 });
 
 // Container Readiness Probe (Returns 200 if database and dependencies ready)
-router.get('/readiness', async (req, res) => {
+router.get(['/readiness', '/ready'], async (req, res) => {
   const dbHealth = await DbService.healthCheck();
   if (dbHealth.connected) {
     return res.status(200).json({ status: 'READY', database: 'CONNECTED' });

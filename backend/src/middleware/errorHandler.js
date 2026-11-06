@@ -15,12 +15,14 @@ export function errorHandler(err, req, res, _next) {
 
   const errorResponse = {
     success: false,
+    message,
     error: {
       code,
       message,
       ...(err.details ? { details: err.details } : {}),
       timestamp: new Date().toISOString()
-    }
+    },
+    ...(req && req.requestId ? { requestId: req.requestId } : {})
   };
 
   if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {

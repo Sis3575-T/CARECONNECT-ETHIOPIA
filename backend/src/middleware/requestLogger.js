@@ -5,10 +5,12 @@
 import crypto from 'crypto';
 
 export function requestLogger(req, res, next) {
-  // Generate or forward Correlation ID
-  const requestId = req.headers['x-request-id'] || `req-${crypto.randomBytes(8).toString('hex')}`;
+  // Generate or forward Correlation ID if not already assigned
+  const requestId = req.requestId || req.headers['x-request-id'] || `req-${crypto.randomBytes(8).toString('hex')}`;
   req.requestId = requestId;
-  res.setHeader('X-Request-Id', requestId);
+  if (!res.getHeader('X-Request-Id')) {
+    res.setHeader('X-Request-Id', requestId);
+  }
 
   const start = Date.now();
 

@@ -20,4 +20,21 @@ test('Health & Readiness Check Endpoints Suite', async (t) => {
     assert.ok(typeof res.body.checks.memory.heapUsedMb === 'number');
     assert.ok(res.body.checks.database);
   });
+
+  await t.test('Cloud orchestrator root probes GET /health/live and GET /health/ready', async () => {
+    const liveRes = await request(app).get('/health/live');
+    assert.equal(liveRes.status, 200);
+    assert.equal(liveRes.body.status, 'ALIVE');
+
+    const readyRes = await request(app).get('/health/ready');
+    assert.ok([200, 503].includes(readyRes.status));
+    assert.ok(['READY', 'NOT_READY'].includes(readyRes.body.status));
+  });
+
+  await t.test('Cloud orchestrator root probe GET /health returns full diagnostics', async () => {
+    const res = await request(app).get('/health');
+    assert.ok([200, 503].includes(res.status));
+    assert.ok(['HEALTHY', 'DEGRADED'].includes(res.body.status));
+    assert.equal(res.body.service, 'careconnect-backend-api');
+  });
 });
