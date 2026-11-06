@@ -410,21 +410,16 @@ export class CoordinationService {
       authorized_by_user_id: userContext.id || 1
     });
 
-    // Update referral destination and set status to ASSIGNED
-    await referralRepository.update(referralId, {
-      destination_facility_id: validated.new_facility_id,
-      status: 'ASSIGNED'
+    // Update referral destination and status to ASSIGNED
+    await referralRepository.updateStatus(referralId, 'ASSIGNED', {
+      userId: userContext.id,
+      facilityId: userContext.facilityId,
+      destinationFacilityId: validated.new_facility_id,
+      reason: `Human-managed reassignment from [${previousHospitalId || 'None'}] to [${validated.new_facility_id}]: ${validated.reassignment_notes}`
     });
 
     // Recalculate response deadlines based on new hospital policy
     await this.applyPolicyToReferral(referralId);
-
-    // Record status transition in audit log
-    await referralRepository.recordStatusTransition(referralId, referral.status, 'ASSIGNED', {
-      userId: userContext.id,
-      facilityId: userContext.facilityId,
-      reason: `Human-managed reassignment from [${previousHospitalId || 'None'}] to [${validated.new_facility_id}]: ${validated.reassignment_notes}`
-    });
 
     await securityAuditService.recordEvent({
       eventName: 'REFERRAL_REASSIGNED',
