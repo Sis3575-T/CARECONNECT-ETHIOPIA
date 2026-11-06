@@ -12,6 +12,7 @@ import facilitiesRouter from './facilities.js';
 import rolesRouter from './roles.js';
 import auditRouter from './audit.js';
 import patientsRouter from './patients.js';
+import referralsRouter from './referrals.js';
 
 const router = Router();
 
@@ -24,6 +25,7 @@ router.use('/facilities', facilitiesRouter);
 router.use('/roles', rolesRouter);
 router.use('/audit', auditRouter);
 router.use('/patients', patientsRouter);
+router.use('/referrals', referralsRouter);
 
 // v1 Root Information
 router.get('/', (req, res) => {
