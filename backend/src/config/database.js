@@ -1,7 +1,7 @@
 /**
  * Backend Database Client re-export
  */
-import connection, { pool, query, testConnection, dbConfig } from '../../../database/connection.js';
+import connection, { pool, query, testConnection, dbConfig, sanitizeConnectionString } from '../../../database/connection.js';
 
-export { pool, query, testConnection, dbConfig };
+export { pool, query, testConnection, dbConfig, sanitizeConnectionString };
 export default connection;
