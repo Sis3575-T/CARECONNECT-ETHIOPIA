@@ -7,7 +7,7 @@ import { Router } from 'express';
 import UserController from '../../controllers/userController.js';
 import { authenticate } from '../../middleware/auth.js';
 import { requirePermission } from '../../middleware/rbac.js';
-import { validateUserId, validateUserQuery } from '../../validators/userValidator.js';
+import { validateUserId, validateUserQuery, validateUserCreate, validateUserUpdate, validateStatusUpdate } from '../../validators/userValidator.js';
 
 const router = Router();
 
@@ -32,6 +32,41 @@ router.get(
     return requirePermission('user:manage')(req, res, next);
   },
   UserController.getUserById
+);
+
+// 3. Create user account (Requires 'user:manage' permission or System Administrator)
+router.post(
+  '/',
+  authenticate,
+  requirePermission('user:manage'),
+  validateUserCreate,
+  UserController.createUser
+);
+
+// 4. Update user account
+router.patch(
+  '/:userId',
+  authenticate,
+  validateUserId,
+  validateUserUpdate,
+  (req, res, next) => {
+    // If updating self basic profile (no role change) or user:manage administrator
+    if (req.user && Number(req.user.userId) === Number(req.params.userId) && req.body.roleId === undefined) {
+      return next();
+    }
+    return requirePermission('user:manage')(req, res, next);
+  },
+  UserController.updateUser
+);
+
+// 5. Activate / deactivate user account
+router.patch(
+  '/:userId/status',
+  authenticate,
+  validateUserId,
+  validateStatusUpdate,
+  requirePermission('user:manage'),
+  UserController.updateUserStatus
 );
 
 export default router;

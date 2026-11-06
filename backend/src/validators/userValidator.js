@@ -84,9 +84,52 @@ export function validateStatusUpdate(req, res, next) {
   next();
 }
 
+export function validateUserCreate(req, res, next) {
+  const { email, firstName, lastName, roleId, phoneNumber, facilityId, initialPassword } = req.body;
+
+  if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    return next(new ValidationError('A valid email address is required'));
+  }
+
+  if (!firstName || typeof firstName !== 'string' || firstName.trim().length === 0 || firstName.length > 100) {
+    return next(new ValidationError('First name is required and must not exceed 100 characters'));
+  }
+
+  if (!lastName || typeof lastName !== 'string' || lastName.trim().length === 0 || lastName.length > 100) {
+    return next(new ValidationError('Last name is required and must not exceed 100 characters'));
+  }
+
+  const role = parseInt(roleId, 10);
+  if (isNaN(role) || role < 1 || role > 7) {
+    return next(new ValidationError('Valid role ID (1 to 7) is required'));
+  }
+
+  // Facility-scoped roles require facilityId
+  const FACILITY_SCOPED_ROLES = [1, 2, 3];
+  if (FACILITY_SCOPED_ROLES.includes(role) && (!facilityId || typeof facilityId !== 'string' || facilityId.trim().length === 0)) {
+    return next(new ValidationError('Facility-scoped roles (Health Centre, Hospital Staff/Triage) require a valid facilityId'));
+  }
+
+  if (phoneNumber !== undefined && phoneNumber !== null && phoneNumber !== '') {
+    const phoneRegex = /^(\+251|0)?[97]\d{8}$/;
+    if (typeof phoneNumber !== 'string' || (!phoneRegex.test(phoneNumber.trim()) && phoneNumber.trim().length < 8)) {
+      return next(new ValidationError('Phone number format is invalid'));
+    }
+  }
+
+  if (initialPassword !== undefined && initialPassword !== null) {
+    if (typeof initialPassword !== 'string' || initialPassword.length < 8) {
+      return next(new ValidationError('Initial password must be at least 8 characters long'));
+    }
+  }
+
+  next();
+}
+
 export default {
   validateUserId,
   validateUserQuery,
+  validateUserCreate,
   validateUserUpdate,
   validateStatusUpdate
 };
