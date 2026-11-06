@@ -12,6 +12,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { configureSecurity } from './middleware/security.js';
 import requestIdMiddleware from './middleware/requestId.js';
 import { requestLogger } from './middleware/requestLogger.js';
+import { apiRateLimiter } from './middleware/rateLimit.js';
 import healthRouter from './routes/v1/health.js';
 import v1Router from './routes/v1/index.js';
 
@@ -55,8 +56,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// Mount Versioned API Routes
-app.use('/api/v1', v1Router);
+// Mount Versioned API Routes with Rate Limiting
+app.use('/api/v1', apiRateLimiter, v1Router);
 
 // Centralized error handling
 app.use(notFoundHandler);

@@ -28,7 +28,15 @@ export const corsOptions = {
     'X-Request-Id',
     'X-Facility-ID'
   ],
-  exposedHeaders: ['Content-Range', 'X-Total-Count', 'X-Request-Id'],
+  exposedHeaders: [
+    'Content-Range',
+    'X-Total-Count',
+    'X-Request-Id',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-RateLimit-Reset',
+    'Retry-After'
+  ],
   maxAge: 86400 // 24 hours preflight cache
 };
 

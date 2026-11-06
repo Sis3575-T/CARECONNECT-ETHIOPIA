@@ -6,6 +6,7 @@ import { Router } from 'express';
 import AuthController from '../../controllers/authController.js';
 import { validate } from '../../middleware/validate.js';
 import { authenticate } from '../../middleware/auth.js';
+import { authRateLimiter } from '../../middleware/rateLimit.js';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ const registerSchema = {
   facilityId: { required: false }
 };
 
-router.post('/register', validate(registerSchema), AuthController.register);
+router.post('/register', authRateLimiter, validate(registerSchema), AuthController.register);
 
 // Login validation schema
 const loginSchema = {
@@ -27,7 +28,7 @@ const loginSchema = {
   password: { required: true, minLength: 1 }
 };
 
-router.post('/login', validate(loginSchema), AuthController.login);
+router.post('/login', authRateLimiter, validate(loginSchema), AuthController.login);
 
 // Refresh Token route
 router.post('/refresh', validate({ refreshToken: { required: true } }), AuthController.refresh);

@@ -20,6 +20,9 @@ function executeRequest(app, method, url, body = null, options = {}) {
     const req = new EventEmitter();
     req.method = method;
     req.url = url;
+    req.unpipe = () => {};
+    req.socket = { remoteAddress: '127.0.0.1' };
+    req.connection = req.socket;
     req.headers = {
       host: 'localhost',
       'user-agent': 'careconnect-test-agent',
@@ -37,7 +40,7 @@ function executeRequest(app, method, url, body = null, options = {}) {
     const res = new EventEmitter();
     res.statusCode = 200;
     res.headers = {};
-    res.setHeader = (k, v) => { res.headers[k.toLowerCase()] = v; };
+    res.setHeader = (k, v) => { res.headers[k.toLowerCase()] = String(v); };
     res.getHeader = (k) => res.headers[k.toLowerCase()];
     res.removeHeader = (k) => { delete res.headers[k.toLowerCase()]; };
 
