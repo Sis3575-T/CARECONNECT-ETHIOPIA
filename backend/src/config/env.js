@@ -40,7 +40,7 @@ export const config = {
   },
 
   cors: {
-    allowedOrigins: getArray(process.env.CORS_ORIGIN, [
+    allowedOrigins: getArray(process.env.CORS_ALLOWED_ORIGINS || process.env.CORS_ORIGIN, [
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:5175',
@@ -59,15 +59,19 @@ export const config = {
   },
 
   jwt: {
-    secret: process.env.JWT_SECRET || 'careconnect_dev_jwt_secret_change_in_production_min_32_chars',
+    secret: process.env.JWT_ACCESS_SECRET || process.env.JWT_SECRET || 'careconnect_dev_jwt_secret_change_in_production_min_32_chars',
     expiresIn: process.env.JWT_EXPIRES_IN || '15m',
-    refreshSecret: process.env.REFRESH_TOKEN_SECRET || 'careconnect_dev_refresh_secret_change_in_production_min_32_chars',
+    refreshSecret: process.env.JWT_REFRESH_SECRET || process.env.REFRESH_TOKEN_SECRET || 'careconnect_dev_refresh_secret_change_in_production_min_32_chars',
     refreshExpiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d'
   },
 
   aiService: {
     url: process.env.AI_SERVICE_URL || 'http://localhost:8000',
     timeoutMs: getInt(process.env.AI_TIMEOUT_MS, 15000)
+  },
+
+  externalService: {
+    apiKey: process.env.EXTERNAL_SERVICE_API_KEY || null
   },
 
   uploads: {

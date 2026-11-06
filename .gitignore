@@ -47,20 +47,20 @@ portals/*/dist/
 
 # Environment Variables & Secrets (NEVER commit real credentials)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-*.pem
-*.key
-*.cert
-*.crt
-
-# Keep example files tracked
+.env.*
 !.env.example
 !portals/*/.env.example
 !backend/.env.example
 !ai-service/.env.example
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+*credentials*.json
+*service-account*.json
+*.secret
 
 # File Uploads & Temporary Storage
 uploads/
