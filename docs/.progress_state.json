@@ -417,8 +417,8 @@
     "id": 47,
     "title": "backend: implement role-based authorization",
     "phase": 5,
-    "status": "TESTED",
-    "commitHash": "",
+    "status": "COMMITTED",
+    "commitHash": "c067ad9",
     "testsPerformed": "Ran backend/tests/rbac.test.js (5/5 tests passed) verifying requireRole, requirePortal, cross-portal separation, and administrator access",
     "remainingIssues": "None"
   },
@@ -426,9 +426,9 @@
     "id": 48,
     "title": "backend: implement facility-based access restrictions",
     "phase": 5,
-    "status": "NOT STARTED",
+    "status": "TESTED",
     "commitHash": "",
-    "testsPerformed": "None",
+    "testsPerformed": "Ran backend/tests/facilityTenancy.test.js (5/5 tests passed) verifying facility tenancy boundaries, cross-facility prevention, unauthenticated rejection, and administrator oversight exceptions",
     "remainingIssues": "None"
   },
   "49": {
