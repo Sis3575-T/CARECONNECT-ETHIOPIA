@@ -23,6 +23,8 @@ function executeRequest(app, method, url, body = null, options = {}) {
     req.method = method;
     req.url = url;
     req.unpipe = () => {};
+    req.resume = () => req;
+    req.pause = () => req;
     req.socket = { remoteAddress: '127.0.0.1' };
     req.connection = req.socket;
     req.headers = {
