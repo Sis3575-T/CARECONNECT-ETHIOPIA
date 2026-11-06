@@ -180,6 +180,16 @@ export class CoordinationService {
       throw new NotFoundError(`Referral [${referralId}] not found`);
     }
 
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    if (userRoleId === 1 && userFacilityId && referral.origin_facility_id !== userFacilityId) {
+      throw new ForbiddenError('Health centre staff can only record follow-ups for their own referrals');
+    }
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && referral.destination_facility_id !== userFacilityId) {
+      throw new ForbiddenError('Hospital staff can only record follow-ups for referrals assigned to their facility');
+    }
+
     const validated = validateCreateFollowUp(payload);
     const now = new Date().toISOString();
 
@@ -464,6 +474,17 @@ export class CoordinationService {
       throw new NotFoundError(`Referral [${referralId}] not found`);
     }
 
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    // Enforce cross-facility boundaries
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && referral.destination_facility_id !== userFacilityId) {
+      throw new ForbiddenError('Hospital staff can only escalate referrals assigned to their hospital');
+    }
+    if (userRoleId === 1 && userFacilityId && referral.origin_facility_id !== userFacilityId) {
+      throw new ForbiddenError('Health centre staff can only escalate referrals originated by their health centre');
+    }
+
     if (['COMPLETED', 'CLOSED', 'CANCELLED'].includes(referral.status)) {
       throw new BadRequestError(`Cannot trigger operational escalation on referral in [${referral.status}] status`);
     }
@@ -518,6 +539,16 @@ export class CoordinationService {
 
     if (escalation.escalation_status === 'RESOLVED') {
       throw new BadRequestError(`Escalation [${escalationId}] is already resolved`);
+    }
+
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    if (userRoleId === 4) {
+      throw new ForbiddenError('Transport coordinators cannot resolve operational hospital escalations');
+    }
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && escalation.responsible_facility_id !== userFacilityId) {
+      throw new ForbiddenError('Hospital staff can only resolve escalations assigned to their hospital');
     }
 
     const validated = validateResolveEscalation(payload);
