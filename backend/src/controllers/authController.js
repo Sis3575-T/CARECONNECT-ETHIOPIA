@@ -5,6 +5,7 @@
 import UserModel from '../models/userModel.js';
 import SessionService from '../services/sessionService.js';
 import SecurityAuditService from '../services/securityAuditService.js';
+import { getPermissionsForRole } from '../middleware/rbac.js';
 import { hashPassword, comparePassword, validatePasswordStrength } from '../utils/password.js';
 import { generateAccessToken } from '../utils/token.js';
 import { ConflictError, ValidationError, UnauthorizedError, NotFoundError } from '../utils/errors.js';
@@ -357,6 +358,31 @@ export class AuthController {
             jobTitle: user.job_title,
             isActive: user.is_active
           }
+        }
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /**
+   * Get authenticated user's permissions and portal access
+   */
+  static async getPermissions(req, res, next) {
+    try {
+      if (!req.user || !req.user.roleId) {
+        throw new UnauthorizedError('Authentication required');
+      }
+
+      const permissions = await getPermissionsForRole(req.user.roleId);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          roleId: req.user.roleId,
+          roleName: req.user.roleName,
+          portal: req.user.portal,
+          permissions
         }
       });
     } catch (err) {

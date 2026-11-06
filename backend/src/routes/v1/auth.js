@@ -42,6 +42,9 @@ router.post('/logout-all', authenticate, AuthController.logoutAll);
 // Current User Profile
 router.get('/me', authenticate, AuthController.getProfile);
 
+// User Permissions & Portal Access
+router.get('/permissions', authenticate, AuthController.getPermissions);
+
 // Active Sessions Management
 router.get('/sessions', authenticate, AuthController.getSessions);
 router.delete('/sessions/:sessionId', authenticate, AuthController.revokeSession);
