@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import FacilityController from '../../controllers/facilityController.js';
+import AssignmentController from '../../controllers/assignmentController.js';
 import { authenticate } from '../../middleware/auth.js';
 import { requirePermission } from '../../middleware/rbac.js';
 import {
@@ -60,6 +61,14 @@ router.patch(
   validateFacilityId,
   validateFacilityStatus,
   FacilityController.updateFacilityStatus
+);
+
+// 6. View staff assigned to facility (Requires authentication)
+router.get(
+  '/:facilityId/staff',
+  authenticate,
+  validateFacilityId,
+  AssignmentController.getFacilityStaff
 );
 
 export default router;
