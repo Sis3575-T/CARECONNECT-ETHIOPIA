@@ -105,6 +105,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 06 OF 50: PATIENT REGISTRATION AND PATIENT RECORD MANAGEMENT
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 06 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-06T23:15:00.000Z  
+
+### Part 06 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **041** | `backend: establish patient management domain` | ✅ COMMITTED | `2b53977` | Migration `027_patient_lifecycle_and_reviews.sql`, PatientRepository, PatientService, PatientValidator, `patientDomain.test.js` (6/6 pass). | None |
+| **042** | `backend: implement secure patient registration` | ✅ COMMITTED | `3437cb2` | Standardized `ETH-PAT-YYYY-XXXXXX` ID generation, facility assignment, missing phone/DOB support, `patientRegistration.test.js` (6/6 pass). | None |
+| **043** | `backend: implement patient profile and correction management` | ✅ COMMITTED | `e1087a0` | Demographic updates, lifecycle status transitions (ACTIVE, DECEASED, MERGED), demographic corrections history, `patientProfileCorrections.test.js` (8/8 pass). | None |
+| **044** | `backend: implement patient identification and duplicate detection` | ✅ COMMITTED | `1e403ce` | Multi-signal matching (Fayda, phone, patronymic names, woreda), clinical duplicate reviews, merge requests, `duplicateDetection.test.js` (6/6 pass). | None |
+| **045** | `backend: implement patient emergency contact management` | ✅ COMMITTED | `0ba02db` | Normalized emergency contacts CRUD, primary/alternate contact handling, phone validation, `patientEmergencyContacts.test.js` (7/7 pass). | None |
+| **046** | `backend: implement secure patient search and facility isolation` | ✅ COMMITTED | `436b1e0` | Server-side pagination, multi-attribute filtering, facility tenancy boundaries, `patientSearchTenancy.test.js` (6/6 pass). | None |
+| **047** | `security: implement patient record audit and privacy controls` | ✅ COMMITTED | `0880eef` | Security audit logging, sensitive note scrubbing from audit details, role-based data sanitization, `patientPrivacyAudit.test.js` (6/6 pass). | None |
+| **048** | `test: verify patient registration identification and privacy` | ✅ COMMITTED | `a019510` | Comprehensive integration suite `part06Comprehensive.test.js` (10/10 pass), 265/265 backend tests pass, 12/12 db tests pass, `docs/PART_06_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
