@@ -1,0 +1,36 @@
+/**
+ * CareConnect Ethiopia - Shared Design Tokens & Theme Variables
+ * Common CSS variables for colors, typography, and layout across all four portals.
+ */
+
+:root {
+  /* Brand Primary - Ethiopian Healthcare Emerald & Sky */
+  --cc-primary-50: #ecfdf5;
+  --cc-primary-100: #d1fae5;
+  --cc-primary-500: #10b981;
+  --cc-primary-600: #059669;
+  --cc-primary-700: #047857;
+
+  /* Secondary Clinical Blue */
+  --cc-clinical-50: #eff6ff;
+  --cc-clinical-500: #3b82f6;
+  --cc-clinical-600: #2563eb;
+  --cc-clinical-700: #1d4ed8;
+
+  /* Priority & Triage Severity */
+  --cc-triage-emergency: #ef4444;
+  --cc-triage-urgent: #f59e0b;
+  --cc-triage-priority: #3b82f6;
+  --cc-triage-routine: #10b981;
+
+  /* Surface & Neutrals */
+  --cc-bg-page: #f8fafc;
+  --cc-bg-card: #ffffff;
+  --cc-border-subtle: #e2e8f0;
+  --cc-text-main: #0f172a;
+  --cc-text-muted: #64748b;
+
+  /* Layout Constants */
+  --cc-sidebar-width: 260px;
+  --cc-topbar-height: 64px;
+}

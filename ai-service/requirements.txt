@@ -1,0 +1,29 @@
+# CareConnect Ethiopia - AI Decision Service Dependencies
+# Python 3.12+ compatible requirements
+
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+pydantic>=2.8.0,<3.0.0
+pydantic-settings>=2.4.0,<3.0.0
+python-dotenv>=1.0.1,<2.0.0
+httpx>=0.27.0,<1.0.0
+
+# Machine Learning & Data Processing
+scikit-learn>=1.5.0,<2.0.0
+numpy>=1.26.0,<2.0.0
+pandas>=2.2.0,<3.0.0
+scipy>=1.13.0,<2.0.0
+
+# OCR & Computer Vision for Document Intake
+pytesseract>=0.3.10,<1.0.0
+opencv-python-headless>=4.10.0,<5.0.0
+Pillow>=10.4.0,<11.0.0
+
+# Natural Language Processing
+nltk>=3.9.0,<4.0.0
+
+# Testing & Quality Assurance
+pytest>=8.3.0,<9.0.0
+pytest-asyncio>=0.24.0,<1.0.0
+ruff>=0.6.0
+black>=24.8.0
