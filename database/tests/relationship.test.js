@@ -9,11 +9,11 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '../..');
 
 test('Database Migrations and Seeds Integrity Test', async (t) => {
-  await t.test('All 18 SQL migration scripts exist and contain valid DDL statements', () => {
+  await t.test('All 24 SQL migration scripts exist and contain valid DDL statements', () => {
     const migrationsDir = path.join(ROOT_DIR, 'database', 'migrations');
     const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
 
-    assert.equal(files.length, 18, 'Expected 18 migration scripts to exist');
+    assert.equal(files.length, 24, 'Expected 24 migration scripts to exist');
 
     const expectedPrefixes = [
       '001_initial_migration_tracker',
@@ -33,7 +33,13 @@ test('Database Migrations and Seeds Integrity Test', async (t) => {
       '015_create_audit_logs',
       '016_create_ai_recommendations',
       '017_create_ai_predictions',
-      '018_create_ai_models_and_feedback'
+      '018_create_ai_models_and_feedback',
+      '019_identity_and_facility_schema',
+      '020_patient_data_schema',
+      '021_referral_workflow_schema',
+      '022_document_and_transport_schema',
+      '023_notification_ai_audit_schema',
+      '024_performance_indexes_and_integrity'
     ];
 
     for (let i = 0; i < expectedPrefixes.length; i++) {
