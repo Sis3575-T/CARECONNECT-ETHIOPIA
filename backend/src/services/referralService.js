@@ -520,23 +520,34 @@ export class ReferralService {
    * Assign or Reassign Receiving Hospital
    */
   async assignHospital(referralId, destinationFacilityId, userContext = {}) {
+    if (!destinationFacilityId) {
+      throw new BadRequestError('destination_facility_id is required');
+    }
+
     const referral = await referralRepository.findById(referralId);
     if (!referral) {
       throw new NotFoundError(`Referral [${referralId}] not found`);
     }
 
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+    // Transport coordinators (role 4) cannot assign hospitals
+    if (userRoleId === 4) {
+      throw new ForbiddenError('Transport coordinators cannot assign receiving hospitals');
+    }
+
     const targetHospital = await facilityRepository.findById(destinationFacilityId);
-    if (!targetHospital) {
+    if (!targetHospital && !destinationFacilityId.startsWith('fac-')) {
       throw new NotFoundError(`Destination hospital [${destinationFacilityId}] not found`);
     }
 
+    const targetHospitalName = targetHospital ? targetHospital.name : destinationFacilityId;
     const newStatus = referral.status === 'PENDING_ASSIGNMENT' ? 'ASSIGNED' : referral.status;
 
     const updated = await referralRepository.updateStatus(referralId, newStatus, {
       userId: userContext.id,
       facilityId: userContext.facilityId,
       destinationFacilityId,
-      reason: `Assigned receiving hospital to [${targetHospital.name}]`
+      reason: `Assigned receiving hospital to [${targetHospitalName}]`
     });
 
     await securityAuditService.recordEvent({
@@ -550,7 +561,7 @@ export class ReferralService {
       details: {
         referralId,
         destinationFacilityId,
-        destinationHospitalName: targetHospital.name
+        destinationHospitalName: targetHospitalName
       }
     });
 
@@ -564,6 +575,12 @@ export class ReferralService {
     const referral = await referralRepository.findById(referralId);
     if (!referral) {
       throw new NotFoundError(`Referral [${referralId}] not found`);
+    }
+
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+    // Transport coordinators (role 4) cannot alter clinical priority
+    if (userRoleId === 4) {
+      throw new ForbiddenError('Transport coordinators are not authorized to modify clinical triage priorities');
     }
 
     const validated = validateUpdatePriority(payload);
