@@ -32,8 +32,9 @@
     "build:admin": "vite build portals/administrator --config portals/administrator/vite.config.js",
     "build:all": "npm run build:health && npm run build:hospital && npm run build:transport && npm run build:admin",
     "test:backend": "node --test backend/tests/**/*.test.js",
+    "test:frontend": "node --test shared/tests/*.test.js",
     "test:ai": "python -m pytest ai-service/tests",
-    "test:all": "npm run test:backend"
+    "test:all": "npm run test:backend && npm run test:frontend"
   },
   "dependencies": {
     "axios": "^1.7.7",

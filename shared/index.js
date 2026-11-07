@@ -20,6 +20,10 @@ export * from './services/apiClient.js';
 
 // Router & Guards
 export * from './router/index.js';
+export * from './router/ProtectedRoute.jsx';
+export * from './router/RoleRoute.jsx';
+export * from './router/NotFoundPage.jsx';
+export * from './router/UnauthorizedPage.jsx';
 
 // UI Primitives
 export * from './components/ui/Button.jsx';

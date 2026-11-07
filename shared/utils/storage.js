@@ -1,13 +1,15 @@
 /**
  * CareConnect Ethiopia - Safe Storage Utility
- * Provides safe access to window.localStorage with error handling and fallback.
+ * Provides safe access to window.localStorage with error handling and in-memory fallback for SSR/tests.
  */
 
 const memoryStore = new Map();
 
 export const storage = {
   get(key, defaultValue = null) {
-    if (typeof window === 'undefined') return defaultValue;
+    if (typeof window === 'undefined') {
+      return memoryStore.has(key) ? memoryStore.get(key) : defaultValue;
+    }
     try {
       const item = window.localStorage.getItem(key);
       if (item === null) return defaultValue;
@@ -16,7 +18,7 @@ export const storage = {
       try {
         return window.localStorage.getItem(key) || defaultValue;
       } catch {
-        return memoryStore.get(key) ?? defaultValue;
+        return memoryStore.has(key) ? memoryStore.get(key) : defaultValue;
       }
     }
   },
