@@ -35,6 +35,8 @@ export const AuthContext = createContext({
   loading: true,
   login: async () => {},
   logout: async () => {},
+  refreshSession: async () => {},
+  isSessionValid: () => false,
   hasRole: () => false,
   hasPermission: () => false
 });
@@ -44,23 +46,79 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load initial session from storage
+  // Load and verify initial session from storage and backend
   useEffect(() => {
-    try {
-      const storedToken = authService.getStoredAccessToken();
-      const storedUser = authService.getStoredUser();
+    let isMounted = true;
 
-      if (storedToken && storedUser) {
-        setToken(storedToken);
-        setUser(normalizeUser(storedUser));
-      } else if (storedUser) {
-        setUser(normalizeUser(storedUser));
+    async function restoreSession() {
+      try {
+        const storedToken = authService.getStoredAccessToken();
+        const storedUser = authService.getStoredUser();
+
+        if (storedToken) {
+          try {
+            // Verify session with backend /auth/me
+            const verifiedUser = await authService.getCurrentUser();
+            if (isMounted && verifiedUser) {
+              const normalized = normalizeUser({ ...storedUser, ...verifiedUser });
+              authService.setSessionStorage({ user: normalized });
+              setUser(normalized);
+              setToken(storedToken);
+            }
+          } catch (verifyError) {
+            // If token expired (401), attempt silent token renewal
+            if (verifyError?.status === 401 && authService.getStoredRefreshToken()) {
+              try {
+                const refreshed = await authService.refreshToken();
+                if (isMounted && refreshed) {
+                  const newAccessToken = refreshed.accessToken || refreshed.data?.accessToken;
+                  const newRefreshToken = refreshed.refreshToken || refreshed.data?.refreshToken;
+                  const refreshedUser = refreshed.user || refreshed.data?.user || storedUser;
+                  const normalized = normalizeUser(refreshedUser);
+                  authService.setSessionStorage({
+                    accessToken: newAccessToken,
+                    refreshToken: newRefreshToken,
+                    user: normalized
+                  });
+                  setToken(newAccessToken);
+                  setUser(normalized);
+                }
+              } catch {
+                if (isMounted) {
+                  authService.clearSessionStorage();
+                  setToken(null);
+                  setUser(null);
+                }
+              }
+            } else if (verifyError?.isNetworkError && storedUser) {
+              // Server unreachable or offline: fallback to cached storage credentials
+              if (isMounted) {
+                setUser(normalizeUser(storedUser));
+                setToken(storedToken);
+              }
+            } else if (isMounted) {
+              authService.clearSessionStorage();
+              setToken(null);
+              setUser(null);
+            }
+          }
+        } else if (storedUser && isMounted) {
+          setUser(normalizeUser(storedUser));
+        }
+      } catch (e) {
+        console.warn('[CareConnect Auth] Failed to restore session from storage:', e);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch (e) {
-      console.warn('[CareConnect Auth] Failed to restore session from storage:', e);
-    } finally {
-      setLoading(false);
     }
+
+    restoreSession();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Synchronize across browser tabs via storage events
@@ -138,6 +196,31 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const refreshSession = useCallback(async () => {
+    try {
+      const refreshed = await authService.refreshToken();
+      const newAccessToken = refreshed.accessToken || refreshed.data?.accessToken;
+      const newRefreshToken = refreshed.refreshToken || refreshed.data?.refreshToken;
+      const refreshedUser = refreshed.user || refreshed.data?.user || user;
+      const normalized = normalizeUser(refreshedUser);
+      authService.setSessionStorage({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+        user: normalized
+      });
+      setToken(newAccessToken);
+      setUser(normalized);
+      return { accessToken: newAccessToken, user: normalized };
+    } catch (err) {
+      await logout();
+      throw err;
+    }
+  }, [user, logout]);
+
+  const isSessionValid = useCallback(() => {
+    return Boolean(token && user);
+  }, [token, user]);
+
   const hasRole = useCallback((roles) => {
     if (!user) return false;
     // Admins have all-role oversight
@@ -164,6 +247,8 @@ export function AuthProvider({ children }) {
     loading,
     login,
     logout,
+    refreshSession,
+    isSessionValid,
     hasRole,
     hasPermission
   };

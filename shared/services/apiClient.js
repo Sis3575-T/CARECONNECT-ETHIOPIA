@@ -65,8 +65,23 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(normalizeApiError(error))
 );
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 /**
- * Response Interceptor: Unwraps data and normalizes errors
+ * Response Interceptor: Unwraps data and normalizes errors,
+ * with automatic access token renewal queue on 401 responses.
  */
 apiClient.interceptors.response.use(
   (response) => {
@@ -76,11 +91,92 @@ apiClient.interceptors.response.use(
     }
     return response.data;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+    const status = error.response?.status;
+    const isAuthEndpoint =
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/refresh') ||
+      originalRequest?.url?.includes('/auth/forgot-password') ||
+      originalRequest?.url?.includes('/auth/reset-password');
+
+    // Handle token expiration & automatic renewal
+    if (
+      status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !isAuthEndpoint &&
+      typeof window !== 'undefined'
+    ) {
+      const storedRefreshToken = localStorage.getItem('careconnect_refresh_token');
+
+      if (storedRefreshToken) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((newToken) => {
+              originalRequest.headers.Authorization = `Bearer ${newToken}`;
+              return apiClient(originalRequest);
+            })
+            .catch((err) => Promise.reject(normalizeApiError(err)));
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        return new Promise((resolve, reject) => {
+          axios
+            .post(
+              `${API_BASE_URL}/auth/refresh`,
+              { refreshToken: storedRefreshToken },
+              { headers: { 'Content-Type': 'application/json' } }
+            )
+            .then(({ data }) => {
+              const payload = data.data || data;
+              const newAccessToken = payload.accessToken;
+              const newRefreshToken = payload.refreshToken;
+
+              if (newAccessToken) {
+                localStorage.setItem('careconnect_access_token', newAccessToken);
+                apiClient.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+              }
+              if (newRefreshToken) {
+                localStorage.setItem('careconnect_refresh_token', newRefreshToken);
+              }
+
+              processQueue(null, newAccessToken);
+              resolve(apiClient(originalRequest));
+            })
+            .catch((refreshErr) => {
+              processQueue(refreshErr, null);
+              try {
+                localStorage.removeItem('careconnect_access_token');
+                localStorage.removeItem('careconnect_refresh_token');
+                localStorage.removeItem('careconnect_user');
+                localStorage.removeItem('careconnect_token');
+                window.dispatchEvent(
+                  new CustomEvent('careconnect:session_expired', {
+                    detail: { error: normalizeApiError(refreshErr) }
+                  })
+                );
+              } catch {
+                // Storage restricted
+              }
+              reject(normalizeApiError(refreshErr));
+            })
+            .finally(() => {
+              isRefreshing = false;
+            });
+        });
+      }
+    }
+
     const normalizedError = normalizeApiError(error);
 
-    // If 401 Unauthorized / Session Expired, notify app
-    if (normalizedError.status === 401 && typeof window !== 'undefined') {
+    // If 401 Unauthorized on non-login request, notify app
+    if (normalizedError.status === 401 && !isAuthEndpoint && typeof window !== 'undefined') {
       try {
         window.dispatchEvent(
           new CustomEvent('careconnect:session_expired', {
