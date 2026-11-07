@@ -8,6 +8,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import config from '../config/env.js';
 import { connectionRegistry } from './connectionRegistry.js';
 import { WS_CLOSE_CODES, SERVER_MESSAGE_TYPES, CLIENT_MESSAGE_TYPES } from '../constants/realtime.js';
+import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
 
 export class RealtimeServer {
   constructor(options = {}) {
@@ -24,6 +25,9 @@ export class RealtimeServer {
     this.heartbeatTimer = null;
     this.isShuttingDown = false;
     this.messageHandlers = new Set();
+
+    // Register core authentication message handler
+    this.addMessageHandler(createAuthMessageHandler(this.registry));
   }
 
   /**
@@ -130,6 +134,34 @@ export class RealtimeServer {
       authRequired: true,
       authTimeoutMs: this.authTimeoutMs
     });
+
+    // Immediate handshake authentication if token present in request headers/cookie
+    const { token: initialToken, error: tokenErr } = extractAuthToken(req);
+    if (tokenErr) {
+      this._send(ws, {
+        type: SERVER_MESSAGE_TYPES.AUTH_ERROR,
+        error: tokenErr
+      });
+      ws.close(WS_CLOSE_CODES.POLICY_VIOLATION, tokenErr);
+      return;
+    }
+
+    if (initialToken) {
+      authenticateConnection(meta, initialToken, this.registry).then((result) => {
+        if (result.success && ws.readyState === WebSocket.OPEN) {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.AUTH_SUCCESS,
+            user: result.user
+          });
+        } else if (!result.success && ws.readyState === WebSocket.OPEN) {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.AUTH_ERROR,
+            error: result.error
+          });
+          ws.close(result.code || WS_CLOSE_CODES.UNAUTHORIZED, result.error);
+        }
+      });
+    }
 
     // Schedule authentication timeout enforcement
     meta.authTimer = setTimeout(() => {

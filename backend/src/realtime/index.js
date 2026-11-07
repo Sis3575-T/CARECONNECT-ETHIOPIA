@@ -4,11 +4,15 @@
 
 import { realtimeServer } from './realtimeServer.js';
 import { connectionRegistry } from './connectionRegistry.js';
+import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
 import { WS_CLOSE_CODES, CLIENT_MESSAGE_TYPES, SERVER_MESSAGE_TYPES, CHANNEL_TYPES } from '../constants/realtime.js';
 
 export {
   realtimeServer,
   connectionRegistry,
+  extractAuthToken,
+  authenticateConnection,
+  createAuthMessageHandler,
   WS_CLOSE_CODES,
   CLIENT_MESSAGE_TYPES,
   SERVER_MESSAGE_TYPES,
