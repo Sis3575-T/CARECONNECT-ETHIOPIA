@@ -15,6 +15,8 @@ import {
   NOTIFICATION_PRIORITIES
 } from '../constants/notifications.js';
 import { OUTBOX_EVENT_TYPES, NOTIFICATION_CHANNELS } from '../constants/jobs.js';
+import { eventBroadcaster } from '../realtime/eventBroadcaster.js';
+import { createRealtimeEvent, REALTIME_EVENT_TYPES } from '../realtime/eventContract.js';
 
 export class NotificationEventSubscriber {
   constructor(options = {}) {
@@ -101,6 +103,44 @@ export class NotificationEventSubscriber {
 
       createdNotifications.push(notifRecord);
 
+      // Real-time transport notification event broadcast
+      try {
+        const rtNotif = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_CREATED, {
+          notificationId: notifRecord.id,
+          uuid: notifRecord.uuid,
+          title: notifRecord.title,
+          message: notifRecord.message,
+          category: notifRecord.category,
+          priority: notifRecord.priority,
+          entityType: notifRecord.entityType,
+          entityId: notifRecord.entityId,
+          actionUrl: notifRecord.metadata?.actionUrl,
+          createdAt: notifRecord.createdAt
+        });
+        eventBroadcaster.broadcastToChannels(`user:${recipient.userId}`, rtNotif);
+      } catch {
+        // Broadcaster resilience
+      }
+
+      // Real-time notification event broadcast to recipient user channel
+      try {
+        const rtNotif = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_CREATED, {
+          notificationId: notifRecord.id,
+          uuid: notifRecord.uuid,
+          title: notifRecord.title,
+          message: notifRecord.message,
+          category: notifRecord.category,
+          priority: notifRecord.priority,
+          entityType: notifRecord.entityType,
+          entityId: notifRecord.entityId,
+          actionUrl: notifRecord.metadata?.actionUrl,
+          createdAt: notifRecord.createdAt
+        });
+        eventBroadcaster.broadcastToChannels(`user:${recipient.userId}`, rtNotif);
+      } catch {
+        // Broadcaster resilience
+      }
+
       // Optional multi-channel delivery trigger
       if (recipient.email) {
         this.deliveryService.dispatch({
@@ -156,6 +196,25 @@ export class NotificationEventSubscriber {
         }
       });
       createdNotifications.push(notifRecord);
+
+      // Real-time transport notification event broadcast
+      try {
+        const rtNotif = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_CREATED, {
+          notificationId: notifRecord.id,
+          uuid: notifRecord.uuid,
+          title: notifRecord.title,
+          message: notifRecord.message,
+          category: notifRecord.category,
+          priority: notifRecord.priority,
+          entityType: notifRecord.entityType,
+          entityId: notifRecord.entityId,
+          actionUrl: notifRecord.metadata?.actionUrl,
+          createdAt: notifRecord.createdAt
+        });
+        eventBroadcaster.broadcastToChannels(`user:${recipient.userId}`, rtNotif);
+      } catch {
+        // Broadcaster resilience
+      }
     }
 
     return createdNotifications;

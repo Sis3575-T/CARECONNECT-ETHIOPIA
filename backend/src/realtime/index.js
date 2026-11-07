@@ -7,6 +7,7 @@ import { connectionRegistry } from './connectionRegistry.js';
 import { subscriptionManager, SubscriptionManager } from './subscriptionManager.js';
 import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
 import { eventBroadcaster, EventBroadcaster } from './eventBroadcaster.js';
+import { referralRealtimeService, ReferralRealtimeService } from './referralRealtimeService.js';
 import {
   REALTIME_EVENT_TYPES,
   validateEventEnvelope,
@@ -22,6 +23,8 @@ export {
   SubscriptionManager,
   eventBroadcaster,
   EventBroadcaster,
+  referralRealtimeService,
+  ReferralRealtimeService,
   extractAuthToken,
   authenticateConnection,
   createAuthMessageHandler,

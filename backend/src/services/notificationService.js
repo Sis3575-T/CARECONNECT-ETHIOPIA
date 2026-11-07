@@ -6,6 +6,8 @@
 
 import { notificationRepository } from '../repositories/notificationRepository.js';
 import { NotFoundError, ForbiddenError } from '../utils/errors.js';
+import { eventBroadcaster } from '../realtime/eventBroadcaster.js';
+import { createRealtimeEvent, REALTIME_EVENT_TYPES } from '../realtime/eventContract.js';
 
 export class NotificationService {
   constructor(repo = notificationRepository) {
@@ -75,7 +77,20 @@ export class NotificationService {
       return notif; // Idempotent: already read
     }
 
-    return await this.repo.markAsRead(identifier, recipientUserId);
+    const updated = await this.repo.markAsRead(identifier, recipientUserId);
+    try {
+      const count = await this.repo.countUnread(recipientUserId);
+      const rtEvent = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_READ, {
+        notificationId: updated.id,
+        uuid: updated.uuid,
+        unreadCount: count
+      });
+      eventBroadcaster.broadcastToChannels(`user:${recipientUserId}`, rtEvent);
+    } catch {
+      // Non-blocking real-time broadcast
+    }
+
+    return updated;
   }
 
   /**
@@ -95,7 +110,20 @@ export class NotificationService {
       return notif; // Idempotent: already unread
     }
 
-    return await this.repo.markAsUnread(identifier, recipientUserId);
+    const updated = await this.repo.markAsUnread(identifier, recipientUserId);
+    try {
+      const count = await this.repo.countUnread(recipientUserId);
+      const rtEvent = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_UNREAD, {
+        notificationId: updated.id,
+        uuid: updated.uuid,
+        unreadCount: count
+      });
+      eventBroadcaster.broadcastToChannels(`user:${recipientUserId}`, rtEvent);
+    } catch {
+      // Non-blocking real-time broadcast
+    }
+
+    return updated;
   }
 
   /**
@@ -103,6 +131,16 @@ export class NotificationService {
    */
   async markAllAsRead(recipientUserId, options = {}) {
     const updatedCount = await this.repo.markAllAsRead(recipientUserId, options);
+    try {
+      const count = await this.repo.countUnread(recipientUserId);
+      const rtEvent = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_UNREAD_COUNT_CHANGED, {
+        markedCount: updatedCount,
+        unreadCount: count
+      });
+      eventBroadcaster.broadcastToChannels(`user:${recipientUserId}`, rtEvent);
+    } catch {
+      // Non-blocking real-time broadcast
+    }
     return {
       success: true,
       markedCount: updatedCount
@@ -122,7 +160,20 @@ export class NotificationService {
       throw new ForbiddenError('Access denied: You cannot dismiss another user notification');
     }
 
-    return await this.repo.dismiss(identifier, recipientUserId);
+    const updated = await this.repo.dismiss(identifier, recipientUserId);
+    try {
+      const count = await this.repo.countUnread(recipientUserId);
+      const rtEvent = createRealtimeEvent(REALTIME_EVENT_TYPES.NOTIFICATION_DISMISSED, {
+        notificationId: updated.id,
+        uuid: updated.uuid,
+        unreadCount: count
+      });
+      eventBroadcaster.broadcastToChannels(`user:${recipientUserId}`, rtEvent);
+    } catch {
+      // Non-blocking real-time broadcast
+    }
+
+    return updated;
   }
 }
 

@@ -9,6 +9,8 @@ import patientRepository from '../repositories/patientRepository.js';
 import facilityRepository from '../repositories/facilityRepository.js';
 import coordinationService from './coordinationService.js';
 import securityAuditService from './securityAuditService.js';
+import { referralRealtimeService } from '../realtime/referralRealtimeService.js';
+import { REALTIME_EVENT_TYPES } from '../realtime/eventContract.js';
 import {
   validateCreateReferral,
   validateUpdateReferral,
@@ -344,6 +346,16 @@ export class ReferralService {
       }
     });
 
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_SUBMITTED,
+        updated,
+        { userId: userContext.id, reason: 'Referral submitted for receiving hospital review' }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
+
     return this.sanitizeReferral(updated, userContext);
   }
 
@@ -383,6 +395,16 @@ export class ReferralService {
       resourceId: referralId,
       details: { referralId, referenceNumber: updated.reference_number }
     });
+
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_ACKNOWLEDGED,
+        updated,
+        { userId: userContext.id, notes }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
 
     return this.sanitizeReferral(updated, userContext);
   }
@@ -438,6 +460,16 @@ export class ReferralService {
       details: { referralId, referenceNumber: updated.reference_number }
     });
 
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_ACCEPTED,
+        updated,
+        { userId: userContext.id, bedType: payload.assigned_bed_type }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
+
     return this.sanitizeReferral(updated, userContext);
   }
 
@@ -492,6 +524,16 @@ export class ReferralService {
       }
     });
 
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_REJECTED,
+        updated,
+        { userId: userContext.id, reason: validated.reason, rejectionCode: validated.rejection_reason_code }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
+
     return this.sanitizeReferral(updated, userContext);
   }
 
@@ -538,6 +580,16 @@ export class ReferralService {
       resourceId: referralId,
       details: { referralId, notes: validated.notes }
     });
+
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_INFO_REQUESTED,
+        updated,
+        { userId: userContext.id, reason: validated.notes }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
 
     return this.sanitizeReferral(updated, userContext);
   }
@@ -738,6 +790,16 @@ export class ReferralService {
       details: { referralId, referenceNumber: updated.reference_number }
     });
 
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_COMPLETED,
+        updated,
+        { userId: userContext.id, reason: payload.outcome_notes }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
+
     return this.sanitizeReferral(updated, userContext);
   }
 
@@ -800,6 +862,16 @@ export class ReferralService {
       resourceId: referralId,
       details: { referralId, reason: validated.reason }
     });
+
+    try {
+      await referralRealtimeService.publishReferralEvent(
+        REALTIME_EVENT_TYPES.REFERRAL_CANCELLED,
+        updated,
+        { userId: userContext.id, reason: validated.reason }
+      );
+    } catch {
+      // Non-blocking real-time notification
+    }
 
     return this.sanitizeReferral(updated, userContext);
   }
