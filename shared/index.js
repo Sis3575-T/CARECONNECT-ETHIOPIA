@@ -3,7 +3,39 @@
  * Central re-export of constants, utilities, hooks, context, and components.
  */
 
+// Constants
 export * from './constants/index.js';
+
+// Utilities
 export * from './utils/index.js';
+
+// Context & Hooks
 export * from './context/ThemeContext.jsx';
 export * from './hooks/useTheme.js';
+
+// UI Primitives
+export * from './components/ui/Button.jsx';
+
+// Form Components
+export * from './components/forms/TextInput.jsx';
+export * from './components/forms/PasswordInput.jsx';
+export * from './components/forms/Select.jsx';
+export * from './components/forms/Textarea.jsx';
+export * from './components/forms/Checkbox.jsx';
+export * from './components/forms/SearchInput.jsx';
+
+// Display Components
+export * from './components/display/Card.jsx';
+export * from './components/display/Badge.jsx';
+export * from './components/display/StatusIndicator.jsx';
+export * from './components/display/Avatar.jsx';
+export * from './components/display/Divider.jsx';
+export * from './components/display/EmptyState.jsx';
+export * from './components/display/Pagination.jsx';
+
+// Feedback Components
+export * from './components/feedback/Alert.jsx';
+export * from './components/feedback/Spinner.jsx';
+export * from './components/feedback/Skeleton.jsx';
+export * from './components/feedback/Modal.jsx';
+export * from './components/feedback/Toast.jsx';
