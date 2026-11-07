@@ -1,6 +1,6 @@
 /**
  * CareConnect Ethiopia - Shared Library Gateway
- * Central re-export of constants, utilities, hooks, context, components, and router.
+ * Central re-export of constants, utilities, hooks, context, components, router, and API client.
  */
 
 // Constants
@@ -11,7 +11,12 @@ export * from './utils/index.js';
 
 // Context & Hooks
 export * from './context/ThemeContext.jsx';
+export * from './context/AuthContext.jsx';
 export * from './hooks/useTheme.js';
+export * from './hooks/useAuth.js';
+
+// Services
+export * from './services/apiClient.js';
 
 // Router & Guards
 export * from './router/index.js';
