@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
@@ -7,11 +7,13 @@ import {
   Building2,
   Calendar,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  WifiOff
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { useAuth } from '@shared/context/AuthContext.jsx';
 import { ROLE_LABELS } from '@shared/constants/roles.js';
+import { Alert } from '@shared/components/feedback/Alert.jsx';
 import { healthCentreService } from '../services/healthCentreService.js';
 import { HealthCentreStats } from '../components/dashboard/HealthCentreStats.jsx';
 import { RecentReferralsTable } from '../components/dashboard/RecentReferralsTable.jsx';
@@ -50,6 +52,8 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState(null);
+  const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
   const [error, setError] = useState(null);
   const [summary, setSummary] = useState(null);
   const [actions, setActions] = useState({
@@ -60,18 +64,47 @@ export default function DashboardPage() {
   });
   const [notifications, setNotifications] = useState([]);
 
-  const clinicianName =
-    user?.name ||
-    [user?.firstName || user?.first_name, user?.lastName || user?.last_name].filter(Boolean).join(' ') ||
-    'Dr. Alemayehu Tekle';
+  // Network offline detection
+  useEffect(() => {
+    function handleOnline() {
+      setIsOffline(false);
+      loadDashboardData(true);
+    }
+    function handleOffline() {
+      setIsOffline(true);
+    }
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const clinicianName = useMemo(() => {
+    return (
+      user?.name ||
+      [user?.firstName || user?.first_name, user?.lastName || user?.last_name].filter(Boolean).join(' ') ||
+      'Dr. Alemayehu Tekle'
+    );
+  }, [user]);
 
   const facilityName = user?.facilityName || 'Yeka Health Centre';
   const facilityRegion = user?.facilityRegion || 'Woreda 03, Addis Ababa';
-  const roleTitle = ROLE_LABELS[user?.role] || user?.roleName || user?.role || 'Health Centre Referral Clinician';
+  const roleTitle = useMemo(() => {
+    return ROLE_LABELS[user?.role] || user?.roleName || user?.role || 'Health Centre Referral Clinician';
+  }, [user?.role, user?.roleName]);
 
-  // Load live operational data
+  // Load live operational data with debounce guard
   const loadDashboardData = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
+      if (refreshing) return;
+      // Debounce: prevent refreshing more than once every 2 seconds
+      if (lastRefreshedAt && Date.now() - lastRefreshedAt < 2000) {
+        return;
+      }
       setRefreshing(true);
     } else {
       setLoading(true);
@@ -89,6 +122,7 @@ export default function DashboardPage() {
       setSummary(summaryRes);
       setActions(actionsRes);
       setNotifications(notificationsRes);
+      setLastRefreshedAt(Date.now());
     } catch (err) {
       console.error('[DashboardPage] Failed to fetch dashboard data:', err);
       setError(err.message || 'Error loading dashboard metrics');
@@ -96,14 +130,18 @@ export default function DashboardPage() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [user?.facilityId]);
+  }, [user?.facilityId, refreshing, lastRefreshedAt]);
 
   useEffect(() => {
+    let isMounted = true;
     loadDashboardData(false);
-  }, [loadDashboardData]);
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.facilityId]);
 
   // Recommended hospital details for referrals
-  const recommendedHospital = {
+  const recommendedHospital = useMemo(() => ({
     name: 'Tikur Anbessa Specialized Hospital',
     type: 'Tertiary Specialized Hospital',
     zone: 'Lideta Sub-City, Addis Ababa',
@@ -113,12 +151,24 @@ export default function DashboardPage() {
     availableBeds: 14,
     icuBeds: 3,
     workloadLevel: 'Moderate Capacity'
-  };
+  }), []);
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto" role="main" aria-label="Health Centre Operational Dashboard">
+      {/* Network Offline Alert */}
+      {isOffline && (
+        <Alert
+          variant="warning"
+          title="Network Connection Offline"
+          description="Operating in offline mode. Operational data reflects your last synchronized state and will resume live sync once network is restored."
+        />
+      )}
+
       {/* 1. Welcome & Operational Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800">
+      <section
+        aria-label="Clinician overview banner"
+        className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800"
+      >
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
@@ -131,11 +181,11 @@ export default function DashboardPage() {
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap items-center gap-2">
             <span className="font-semibold text-slate-700 dark:text-slate-200">{facilityName}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
             <span>{facilityRegion}</span>
-            <span>•</span>
+            <span aria-hidden="true">•</span>
             <span className="flex items-center gap-1 text-slate-400">
-              <Calendar className="w-3 h-3" />
+              <Calendar className="w-3 h-3" aria-hidden="true" />
               <span>{formatCurrentDate()}</span>
             </span>
           </p>
@@ -146,7 +196,7 @@ export default function DashboardPage() {
           onRefresh={() => loadDashboardData(true)}
           refreshing={refreshing}
         />
-      </div>
+      </section>
 
       {/* 2. Top Operational Statistics (6 Cards) */}
       <HealthCentreStats
@@ -167,7 +217,10 @@ export default function DashboardPage() {
         {/* Left Column (2/3): Volume Trend Chart + Recent Referrals Table */}
         <div className="lg:col-span-2 space-y-6">
           {/* Monthly Referral Volume Trend */}
-          <div className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700 shadow-xs">
+          <section
+            aria-label="Monthly referral volume trend"
+            className="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-700 shadow-xs"
+          >
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-bold text-slate-800 dark:text-white text-sm">
@@ -179,10 +232,10 @@ export default function DashboardPage() {
               </div>
               <div className="flex items-center gap-4 text-xs font-medium">
                 <span className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#0284c7]" /> Sent
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#0284c7]" aria-hidden="true" /> Sent
                 </span>
                 <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]" /> Completed
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#10b981]" aria-hidden="true" /> Completed
                 </span>
               </div>
             </div>
@@ -217,7 +270,7 @@ export default function DashboardPage() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </div>
+          </section>
 
           {/* Outgoing Electronic Referrals Table */}
           <RecentReferralsTable
@@ -230,11 +283,14 @@ export default function DashboardPage() {
         {/* Right Column (1/3): AI Match Card + Notification Center */}
         <div className="space-y-6">
           {/* AI Recommended Destination Hospital */}
-          <div className="bg-gradient-to-br from-sky-50 to-blue-50/40 dark:from-slate-800 dark:to-slate-800/80 rounded-2xl p-5 border border-sky-200/80 dark:border-sky-900/50 shadow-xs flex flex-col justify-between">
+          <section
+            aria-label="AI recommended destination hospital"
+            className="bg-gradient-to-br from-sky-50 to-blue-50/40 dark:from-slate-800 dark:to-slate-800/80 rounded-2xl p-5 border border-sky-200/80 dark:border-sky-900/50 shadow-xs flex flex-col justify-between"
+          >
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="px-2.5 py-1 rounded-full bg-sky-600 text-white text-[10px] font-bold flex items-center gap-1 shadow-xs">
-                  <Sparkles className="w-3 h-3 text-amber-300" />
+                  <Sparkles className="w-3 h-3 text-amber-300" aria-hidden="true" />
                   <span>AI Hospital Match</span>
                 </span>
                 <span className="font-extrabold text-xs text-sky-700 dark:text-sky-300 bg-sky-100 dark:bg-sky-950 px-2 py-0.5 rounded-md">
@@ -274,12 +330,12 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => navigate('/hospitals')}
-              className="mt-4 w-full py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-98 transition-all"
+              className="mt-4 w-full py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs cursor-pointer active:scale-98 transition-all focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
               <span>Explore All Hospital Matches</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
-          </div>
+          </section>
 
           {/* Recent In-App Notifications Widget */}
           <RecentNotificationsWidget
