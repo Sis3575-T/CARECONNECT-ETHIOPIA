@@ -9,6 +9,7 @@ import { extractAuthToken, authenticateConnection, createAuthMessageHandler } fr
 import { eventBroadcaster, EventBroadcaster } from './eventBroadcaster.js';
 import { referralRealtimeService, ReferralRealtimeService } from './referralRealtimeService.js';
 import { eventRecoveryService, EventRecoveryService, RECONNECT_POLICY } from './eventRecoveryService.js';
+import { realtimeMetrics, RealtimeMetricsService } from './realtimeMetrics.js';
 import {
   REALTIME_EVENT_TYPES,
   validateEventEnvelope,
@@ -29,6 +30,8 @@ export {
   eventRecoveryService,
   EventRecoveryService,
   RECONNECT_POLICY,
+  realtimeMetrics,
+  RealtimeMetricsService,
   extractAuthToken,
   authenticateConnection,
   createAuthMessageHandler,

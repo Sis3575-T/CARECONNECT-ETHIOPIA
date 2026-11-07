@@ -11,6 +11,7 @@ import { WS_CLOSE_CODES, SERVER_MESSAGE_TYPES, CLIENT_MESSAGE_TYPES } from '../c
 import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
 import { subscriptionManager } from './subscriptionManager.js';
 import { eventRecoveryService, RECONNECT_POLICY } from './eventRecoveryService.js';
+import { realtimeMetrics } from './realtimeMetrics.js';
 
 export class RealtimeServer {
   constructor(options = {}) {
@@ -25,6 +26,8 @@ export class RealtimeServer {
     this.subscriptionManager = options.subscriptionManager || subscriptionManager;
     this.subscriptionManager.setRegistry(this.registry);
     this.recoveryService = options.recoveryService || eventRecoveryService;
+    this.metrics = options.metrics || realtimeMetrics;
+    this.rateLimitMaxMessages = options.rateLimitMaxMessages || config.realtime?.rateLimitMaxMessagesPerMin || 60;
 
     this.wss = null;
     this.heartbeatTimer = null;
@@ -60,6 +63,7 @@ export class RealtimeServer {
             duplicate: Boolean(res.duplicate)
           });
         } else {
+          this.metrics.recordUnauthorizedSubscription();
           this._send(ws, {
             type: SERVER_MESSAGE_TYPES.ERROR,
             code: 'FORBIDDEN_CHANNEL',
@@ -98,6 +102,7 @@ export class RealtimeServer {
 
         try {
           const result = await this.recoveryService.recoverMissedEvents(meta.user, message);
+          this.metrics.recordSyncRequest(result.replayedCount);
           this._send(ws, {
             type: SERVER_MESSAGE_TYPES.SYNC_RESPONSE,
             replayedCount: result.replayedCount,
@@ -197,6 +202,7 @@ export class RealtimeServer {
    * Configures newly established WebSocket connection
    */
   _handleConnection(ws, req) {
+    this.metrics.recordConnectionAttempt();
     const meta = this.registry.register(ws, req);
     if (!meta) {
       ws.close(WS_CLOSE_CODES.POLICY_VIOLATION, 'Connection limit reached');
@@ -236,6 +242,7 @@ export class RealtimeServer {
     if (initialToken) {
       authenticateConnection(meta, initialToken, this.registry).then(async (result) => {
         if (result.success && ws.readyState === WebSocket.OPEN) {
+          this.metrics.recordAuthSuccess();
           try {
             await this.subscriptionManager.autoSubscribe(meta);
           } catch {
@@ -246,6 +253,7 @@ export class RealtimeServer {
             user: result.user
           });
         } else if (!result.success && ws.readyState === WebSocket.OPEN) {
+          this.metrics.recordAuthFailure();
           this._send(ws, {
             type: SERVER_MESSAGE_TYPES.AUTH_ERROR,
             error: result.error
@@ -258,6 +266,7 @@ export class RealtimeServer {
     // Schedule authentication timeout enforcement
     meta.authTimer = setTimeout(() => {
       if (!meta.authenticated && ws.readyState === WebSocket.OPEN) {
+        this.metrics.recordAuthTimeout();
         this._send(ws, {
           type: SERVER_MESSAGE_TYPES.AUTH_ERROR,
           error: 'Authentication timed out. Disconnecting.'
@@ -285,12 +294,14 @@ export class RealtimeServer {
 
     // Error handling
     ws.on('error', (err) => {
+      this.metrics.recordDisconnection();
       this.subscriptionManager.cleanupConnection(meta.connectionId);
       this.registry.unregister(meta.connectionId);
     });
 
     // Disconnect cleanup
     ws.on('close', (code, reason) => {
+      this.metrics.recordDisconnection();
       this.subscriptionManager.cleanupConnection(meta.connectionId);
       this.registry.unregister(meta.connectionId);
     });
@@ -316,6 +327,24 @@ export class RealtimeServer {
         type: SERVER_MESSAGE_TYPES.ERROR,
         error: 'Message payload must be an object'
       });
+      return;
+    }
+
+    // Message rate limiting per connection
+    const now = Date.now();
+    if (now - meta.windowStartMs > 60000) {
+      meta.windowStartMs = now;
+      meta.messageCount = 0;
+    }
+    meta.messageCount++;
+    if (meta.messageCount > this.rateLimitMaxMessages) {
+      this.metrics.recordRateLimitViolation();
+      this._send(ws, {
+        type: SERVER_MESSAGE_TYPES.ERROR,
+        code: 'RATE_LIMITED',
+        error: 'Message rate limit exceeded. Disconnecting.'
+      });
+      ws.close(WS_CLOSE_CODES.RATE_LIMITED, 'Rate limit exceeded');
       return;
     }
 
@@ -377,11 +406,14 @@ export class RealtimeServer {
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
 
     this.heartbeatTimer = setInterval(() => {
+      this.metrics.recordHeartbeatSweep();
       const allConnections = this.registry.getAll();
       for (const meta of allConnections) {
         const ws = meta.ws;
         if (!meta.isAlive) {
           // Client did not respond to last ping within interval
+          this.metrics.recordHeartbeatTimeout();
+          this.subscriptionManager.cleanupConnection(meta.connectionId);
           this.registry.unregister(meta.connectionId);
           try {
             ws.terminate();
@@ -394,6 +426,7 @@ export class RealtimeServer {
           try {
             ws.ping();
           } catch {
+            this.subscriptionManager.cleanupConnection(meta.connectionId);
             this.registry.unregister(meta.connectionId);
           }
         }
@@ -403,6 +436,36 @@ export class RealtimeServer {
     if (this.heartbeatTimer.unref) {
       this.heartbeatTimer.unref();
     }
+  }
+
+  /**
+   * Forcibly disconnects all active WebSocket connections for a given user ID
+   * @param {number|string} userId
+   * @param {string} [reason]
+   * @returns {number} Disconnected connection count
+   */
+  disconnectUser(userId, reason = 'Administrative termination') {
+    const connections = this.registry.getByUserId(userId);
+    let count = 0;
+    for (const meta of connections) {
+      if (meta.authTimer) clearTimeout(meta.authTimer);
+      if (meta.ws && meta.ws.readyState === WebSocket.OPEN) {
+        try {
+          this._send(meta.ws, {
+            type: SERVER_MESSAGE_TYPES.WARNING,
+            message: reason
+          });
+          meta.ws.close(WS_CLOSE_CODES.SESSION_EXPIRED, reason);
+          count++;
+        } catch {
+          // Ignore
+        }
+      }
+      this.subscriptionManager.cleanupConnection(meta.connectionId);
+      this.registry.unregister(meta.connectionId);
+      this.metrics.recordDisconnection();
+    }
+    return count;
   }
 
   /**
