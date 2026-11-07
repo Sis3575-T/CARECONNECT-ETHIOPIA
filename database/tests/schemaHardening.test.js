@@ -71,4 +71,18 @@ describe('Schema Hardening & Integrity Suite — Commit 073', () => {
     assert.ok(sql32.includes('uq_patient_active_merge_request'), 'Must define unique pending patient merge request index');
     assert.ok(sql32.includes('fk_documents_parent'), 'Must define parent document foreign key');
   });
+
+  it('Migration 033 defines performance partial indexes for SLA queues and document lookups', () => {
+    const m33Path = path.join(__dirname, '..', 'migrations', '033_performance_indexes_and_optimizations.sql');
+    const sql33 = fs.readFileSync(m33Path, 'utf-8');
+
+    assert.ok(sql33.includes('idx_patients_search_names'), 'Must define patient name index');
+    assert.ok(sql33.includes('idx_referrals_pending_assignment'), 'Must define pending assignment index');
+    assert.ok(sql33.includes('idx_referrals_sla_ack_monitor'), 'Must define SLA acknowledgement monitor index');
+    assert.ok(sql33.includes('idx_referrals_sla_dec_monitor'), 'Must define SLA decision monitor index');
+    assert.ok(sql33.includes('idx_documents_patient_latest'), 'Must define latest patient document index');
+    assert.ok(sql33.includes('idx_documents_referral_latest'), 'Must define latest referral document index');
+    assert.ok(sql33.includes('idx_documents_pending_verification'), 'Must define pending verification index');
+    assert.ok(sql33.includes('idx_documents_pending_processing'), 'Must define pending processing index');
+  });
 });

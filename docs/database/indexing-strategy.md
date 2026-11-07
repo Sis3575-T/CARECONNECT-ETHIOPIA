@@ -68,3 +68,42 @@ CareConnect Ethiopia optimizes database performance through deliberate, workload
   ON notifications(recipient_user_id, created_at DESC) 
   WHERE is_read = FALSE;
   ```
+
+---
+
+### 2.5 SLA Monitoring & Document Lifecycle Indexes (Part 10 Hardening)
+
+- **SLA Breach Scanners:**
+  ```sql
+  -- Fast scan for pending SLA acknowledgement breaches
+  CREATE INDEX idx_referrals_sla_ack_monitor
+  ON referrals (acknowledgement_deadline ASC)
+  WHERE status = 'SUBMITTED' AND deleted_at IS NULL;
+
+  -- Fast scan for pending hospital decision breaches
+  CREATE INDEX idx_referrals_sla_dec_monitor
+  ON referrals (decision_deadline ASC)
+  WHERE status IN ('ACKNOWLEDGED', 'INFO_REQUESTED') AND deleted_at IS NULL;
+  ```
+
+- **Latest Document Retrieval (Omits historical/superseded records):**
+  ```sql
+  CREATE INDEX idx_documents_patient_latest
+  ON referral_documents (patient_id, created_at DESC)
+  WHERE is_latest = TRUE AND deleted_at IS NULL;
+
+  CREATE INDEX idx_documents_referral_latest
+  ON referral_documents (referral_id, created_at DESC)
+  WHERE is_latest = TRUE AND deleted_at IS NULL;
+  ```
+
+- **Background Worker Queues (OCR and Verification):**
+  ```sql
+  CREATE INDEX idx_documents_pending_verification
+  ON referral_documents (facility_id, created_at ASC)
+  WHERE verification_status = 'PENDING_REVIEW' AND deleted_at IS NULL;
+
+  CREATE INDEX idx_documents_pending_processing
+  ON referral_documents (created_at ASC)
+  WHERE processing_status = 'PENDING' AND deleted_at IS NULL;
+  ```
