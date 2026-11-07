@@ -46,6 +46,10 @@
       "description": "End-to-end referral workflow, status transitions and attachments"
     },
     {
+      "name": "Documents & Attachments",
+      "description": "Secure medical referral attachments, private storage, versioning and verification"
+    },
+    {
       "name": "Transport",
       "description": "Emergency ambulance request and vehicle dispatch tracking"
     },
@@ -638,6 +642,274 @@
         "responses": {
           "201": {
             "description": "Referral submitted"
+          }
+        }
+      }
+    },
+    "/documents": {
+      "post": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Upload and attach a validated medical document (PDF, JPEG, PNG)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Document uploaded and persisted safely"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}": {
+      "get": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Retrieve sanitized document metadata",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document metadata"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Soft-delete a document with mandatory justification",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document soft-deleted"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/download": {
+      "get": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Authorized binary download with secure disposition headers",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary stream attachment"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/preview": {
+      "get": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Authorized inline preview with anti-sniffing headers",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inline binary preview"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/replace": {
+      "post": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Upload replacement version with optimistic concurrency check",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "New version created"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/versions": {
+      "get": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Query complete version history lineage for a document group",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of historical versions"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/verify": {
+      "post": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Record human procedural review outcome (VERIFIED, REJECTED, REQUIRES_CORRECTION)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification status updated"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/archive": {
+      "post": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Transition document to ARCHIVED lifecycle state",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document archived"
+          }
+        }
+      }
+    },
+    "/documents/{documentId}/processing": {
+      "get": {
+        "tags": [
+          "Documents & Attachments"
+        ],
+        "summary": "Inspect asynchronous AI/OCR processing preparation status",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Processing pipeline status"
           }
         }
       }

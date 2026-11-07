@@ -114,3 +114,25 @@ X-Request-Id: req-98f2b7a14e9102c3
 | `POST` | `/ai/recommend` | Calculate ranked hospital recommendations & weights | Health Centre Staff |
 | `POST` | `/ai/predict/delay` | Estimate predicted triage and transit delay risk | Health Centre / Hospital |
 | `POST` | `/ai/assistant` | Query grounded clinical knowledge base & guidelines | Authenticated |
+
+### 3.7 Secure Document Management (`/documents`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `POST` | `/documents` | Upload and attach medical document (PDF, JPEG, PNG) | Health Centre / Hospital Staff |
+| `GET` | `/documents/:id` | Retrieve sanitized document metadata | Authorized Facility Staff |
+| `GET` | `/documents/:id/download` | Authorized binary download with secure disposition | Authorized Facility Staff |
+| `GET` | `/documents/:id/preview` | Authorized inline binary preview (anti-sniffing) | Authorized Facility Staff |
+| `POST` | `/documents/:id/replace` | Upload replacement version (with concurrency check) | Authorized Facility Staff |
+| `GET` | `/documents/:id/versions` | Query document version history lineage | Authorized Facility Staff |
+| `POST` | `/documents/:id/verify` | Record human verification review outcome | Clinician Reviewer |
+| `POST` | `/documents/:id/archive` | Transition document to ARCHIVED lifecycle state | Originating Facility / Admin |
+| `DELETE` | `/documents/:id` | Soft-delete document with mandatory justification | Authorized Staff / Admin |
+| `GET` | `/documents/:id/logs` | Query document access and audit trail history | Facility Staff / Admin |
+| `GET` | `/documents/:id/processing` | Query AI/OCR processing preparation status | Authorized Facility Staff |
+| `POST` | `/documents/:id/processing/queue` | Queue document for AI/OCR processing pipeline | Authorized Facility Staff |
+| `POST` | `/documents/:id/processing/complete` | Worker callback recording processing results | Worker / Service |
+| `GET` | `/referrals/:id/documents` | List attachments associated with a referral | Referring / Receiving Facility |
+| `POST` | `/referrals/:id/documents` | Upload attachment directly against a referral | Referring / Receiving Facility |
+| `GET` | `/patients/:id/documents` | List attachments associated with a patient | Registered Facility Staff |
+| `POST` | `/patients/:id/documents` | Upload attachment directly against a patient | Registered Facility Staff |
+

@@ -382,7 +382,7 @@ export class DocumentService {
   /**
    * Replace document version with optimistic concurrency check
    */
-  async replaceDocumentVersion({ documentId, file, payload = {}, user }) {
+  async replaceDocumentVersion({ documentId, file, payload = {}, user, context = {} }) {
     if (!user) {
       throw new ForbiddenError('Authentication required to upload replacement document');
     }
