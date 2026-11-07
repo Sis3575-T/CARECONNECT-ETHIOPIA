@@ -4,17 +4,16 @@
  */
 
 import http from 'http';
-import app from './app.js';
+import app, { server, realtimeServer } from './app.js';
 import config from './config/env.js';
 import { pool } from './config/database.js';
 
 const PORT = config.server.port;
 const HOST = config.server.host;
 
-const server = http.createServer(app);
-
 server.listen(PORT, HOST, () => {
   console.log(`[CareConnect Server] Running in ${config.env} mode on http://${HOST}:${PORT}`);
+  console.log(`[CareConnect Server] Real-Time WebSocket endpoint: ws://${HOST}:${PORT}/ws`);
   console.log(`[CareConnect Server] API Documentation: http://${HOST}:${PORT}/api/v1/docs`);
   console.log(`[CareConnect Server] Health Probe: http://${HOST}:${PORT}/health`);
 });
@@ -24,6 +23,15 @@ server.listen(PORT, HOST, () => {
  */
 async function gracefulShutdown(signal) {
   console.log(`\n[CareConnect Server] Received ${signal}. Terminating gracefully...`);
+
+  try {
+    if (realtimeServer) {
+      await realtimeServer.close();
+      console.log('[CareConnect Server] Real-time WebSocket server closed.');
+    }
+  } catch (err) {
+    console.error('[CareConnect Server] Error closing real-time server:', err.message);
+  }
 
   server.close(async () => {
     console.log('[CareConnect Server] HTTP connections closed.');

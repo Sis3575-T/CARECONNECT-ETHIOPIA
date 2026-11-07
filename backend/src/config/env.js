@@ -41,6 +41,18 @@ export const config = {
     logLevel: process.env.LOG_LEVEL || 'info'
   },
 
+  realtime: {
+    enabled: process.env.REALTIME_ENABLED !== 'false',
+    path: process.env.WS_PATH || '/ws',
+    heartbeatIntervalMs: getInt(process.env.WS_HEARTBEAT_INTERVAL_MS, 30000),
+    heartbeatTimeoutMs: getInt(process.env.WS_HEARTBEAT_TIMEOUT_MS, 10000),
+    authTimeoutMs: getInt(process.env.WS_AUTH_TIMEOUT_MS, 5000),
+    maxConnections: getInt(process.env.WS_MAX_CONNECTIONS, 1000),
+    maxPayloadBytes: getInt(process.env.WS_MAX_PAYLOAD_BYTES, 16384),
+    rateLimitMaxMessagesPerMin: getInt(process.env.WS_RATE_LIMIT_PER_MIN, 60),
+    maxSubscriptionsPerClient: getInt(process.env.WS_MAX_SUBSCRIPTIONS, 25)
+  },
+
   cors: {
     allowedOrigins: getArray(
       process.env.FRONTEND_ALLOWED_ORIGINS || process.env.CORS_ALLOWED_ORIGINS || process.env.CORS_ORIGIN,

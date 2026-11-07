@@ -16,6 +16,7 @@ import { requestLogger } from './middleware/requestLogger.js';
 import { apiRateLimiter } from './middleware/rateLimit.js';
 import healthRouter from './routes/v1/health.js';
 import v1Router from './routes/v1/index.js';
+import { realtimeServer } from './realtime/realtimeServer.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,6 +27,11 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const server = http.createServer(app);
+
+// Initialize real-time WebSocket server infrastructure
+if (process.env.REALTIME_ENABLED !== 'false') {
+  realtimeServer.initialize(server);
+}
 
 // Request Correlation ID Middleware (First in stack)
 app.use(requestIdMiddleware);
@@ -85,7 +91,12 @@ export function startServer(port = PORT) {
 /**
  * Stop HTTP server
  */
-export function stopServer() {
+export async function stopServer() {
+  try {
+    await realtimeServer.close();
+  } catch {
+    // Ignore close error during teardown
+  }
   return new Promise((resolve, reject) => {
     server.close((err) => {
       if (err) return reject(err);
@@ -95,8 +106,9 @@ export function stopServer() {
 }
 
 // Graceful shutdown listeners
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('[CareConnect API] Received SIGTERM signal. Shutting down gracefully...');
+  await realtimeServer.close();
   server.close(() => process.exit(0));
 });
 
@@ -104,5 +116,5 @@ if (process.argv[1] && process.argv[1].endsWith('app.js')) {
   startServer();
 }
 
-export { app, server };
+export { app, server, realtimeServer };
 export default app;
