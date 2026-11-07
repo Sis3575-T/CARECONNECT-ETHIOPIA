@@ -26,7 +26,9 @@ export const corsOptions = {
     'X-Requested-With',
     'Accept',
     'X-Request-Id',
-    'X-Facility-ID'
+    'X-Facility-ID',
+    'Idempotency-Key',
+    'X-Idempotency-Key'
   ],
   exposedHeaders: [
     'Content-Range',

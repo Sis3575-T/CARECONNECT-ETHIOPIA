@@ -9,7 +9,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
-import { configureSecurity } from './middleware/security.js';
+import { configureSecurity, enforceContentType } from './middleware/security.js';
 import requestIdMiddleware from './middleware/requestId.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { apiRateLimiter } from './middleware/rateLimit.js';
@@ -34,6 +34,9 @@ configureSecurity(app);
 
 // HTTP Request Logging
 app.use(requestLogger);
+
+// Media Type Content-Type Enforcement
+app.use(enforceContentType);
 
 const PORT = parseInt(process.env.PORT || process.env.BACKEND_PORT || '5000', 10);
 const HOST = process.env.HOST || '0.0.0.0';

@@ -3,6 +3,8 @@
  * Protects endpoints from brute-force and DDoS attacks.
  */
 
+import { formatError } from '../utils/response.js';
+
 export function createRateLimiter(options = {}) {
   const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutes default
   const max = options.max || 100;
@@ -66,20 +68,16 @@ export function createRateLimiter(options = {}) {
     res.setHeader('X-RateLimit-Limit', String(max));
     res.setHeader('X-RateLimit-Remaining', String(remaining));
     res.setHeader('X-RateLimit-Reset', String(resetSeconds));
+    res.setHeader('RateLimit-Limit', String(max));
+    res.setHeader('RateLimit-Remaining', String(remaining));
+    res.setHeader('RateLimit-Reset', String(resetSeconds));
 
     if (record.count > max) {
       res.setHeader('Retry-After', String(retryAfter));
-      return res.status(statusCode).json({
-        success: false,
-        message,
-        error: {
-          code: 'RATE_LIMIT_EXCEEDED',
-          message,
-          retryAfter,
-          timestamp: new Date().toISOString()
-        },
-        ...(req.requestId ? { requestId: req.requestId } : {})
-      });
+      const requestId = req?.requestId || (res && typeof res.getHeader === 'function' ? res.getHeader('X-Request-Id') : null);
+      const payload = formatError(message, 'RATE_LIMIT_EXCEEDED', { retryAfter }, requestId);
+      payload.error.retryAfter = retryAfter;
+      return res.status(statusCode).json(payload);
     }
 
     next();

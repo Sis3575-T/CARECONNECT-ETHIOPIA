@@ -103,17 +103,19 @@ export function paginatedResponse(res, items = [], page = 1, limit = 20, total =
  */
 export function formatError(message = 'An error occurred', code = 'INTERNAL_ERROR', details = null, requestId = null, meta = {}) {
   const reqId = requestId || meta.requestId || null;
+  const isoTimestamp = new Date().toISOString();
   return {
     success: false,
     message,
     error: {
       code,
       message,
-      ...(details ? { details } : {})
+      ...(details ? { details } : {}),
+      timestamp: isoTimestamp
     },
     meta: {
       ...(reqId ? { requestId: reqId } : {}),
-      timestamp: new Date().toISOString(),
+      timestamp: isoTimestamp,
       ...meta
     },
     // Top-level requestId preserved for client backward compatibility
