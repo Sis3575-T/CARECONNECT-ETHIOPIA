@@ -14,6 +14,10 @@ export const ETHIOPIA_TIMEZONE_OFFSET_HOURS = 3; // EAT is fixed UTC+3 (no DST)
 export class SchedulerService {
   static sharedLeases = new Map(); // Shared in-memory lease table across instances
 
+  static clearSharedLeases() {
+    SchedulerService.sharedLeases.clear();
+  }
+
   constructor(options = {}) {
     this.instanceId = options.instanceId || `instance-${crypto.randomBytes(4).toString('hex')}`;
     this.pollIntervalMs = Number(options.pollIntervalMs) || 5000;

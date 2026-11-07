@@ -231,6 +231,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 12 OF 50: BACKGROUND JOBS, SCHEDULING, OUTBOX PROCESSING AND NOTIFICATION DELIVERY INFRASTRUCTURE
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 12 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-07T10:45:00.000Z  
+
+### Part 12 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **089** | `backend: establish background job processing architecture` | ✅ COMMITTED | `63e89d3` | Authored `docs/architecture/part12-background-jobs-and-outbox-assessment.md`, migration `035_background_jobs_and_outbox_schema.sql`, `jobRegistry.js`, `jobQueueService.js`, `jobs.js` constants; test `backend/tests/jobQueueArchitecture.test.js` (5/5 pass). | None |
+| **090** | `backend: implement reliable job execution and retry handling` | ✅ COMMITTED | `cf35743` | `jobWorker.js` with `FOR UPDATE SKIP LOCKED` row claiming, priority sorting, concurrency limits, exponential backoff with jitter, crash recovery; test `backend/tests/jobExecutionAndRetry.test.js` (6/6 pass). | None |
+| **091** | `backend: implement transactional outbox event processing` | ✅ COMMITTED | `ed6166e` | `outboxService.js` with atomic transaction helper, standalone creation, deduplication via `idempotencyKey`, row claiming, subscriber dispatch; test `backend/tests/transactionalOutbox.test.js` (6/6 pass). | None |
+| **092** | `backend: implement scheduling and recurring job infrastructure` | ✅ COMMITTED | `009399a` | `schedulerService.js` supporting delayed jobs, recurring tasks, distributed lease locking (`scheduled_tasks_lease`), East Africa Time (EAT: UTC+3) and clinical working hours evaluation; test `backend/tests/schedulerInfrastructure.test.js` (5/5 pass). | None |
+| **093** | `backend: automate referral deadline and escalation processing` | ✅ COMMITTED | `c8e273b` | `referralDeadlineService.js` inspecting acknowledgement/decision deadlines, recording exceptions, generating level-incremented escalations, outbox events, suppressing terminal states; test `backend/tests/referralDeadlineEscalation.test.js` (4/4 pass). | None |
+| **094** | `backend: implement notification delivery infrastructure` | ✅ COMMITTED | `5b043f8` | `notificationDeliveryService.js`, providers (`inAppProvider`, `emailProvider`, `smsProvider`) with non-PII templates and portal deep-links, deduplication; test `backend/tests/notificationDelivery.test.js` (5/5 pass). | None |
+| **095** | `backend: implement job and notification monitoring` | ✅ COMMITTED | `187f9b3` | `jobMonitoringService.js`, `/api/v1/jobs` endpoints (`GET /metrics`, `GET /failed`, `GET /outbox/backlog`, `POST /retry`, `POST /cancel`); test `backend/tests/jobMonitoring.test.js` (7/7 pass). | None |
+| **096** | `test: verify background processing scheduling and delivery reliability` | ✅ COMMITTED | `c574a44` | Comprehensive 24-scenario test suite `backend/tests/part12Comprehensive.test.js` (24/24 pass), all 628 backend tests pass, all 38 database tests pass, `docs/PART_12_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
