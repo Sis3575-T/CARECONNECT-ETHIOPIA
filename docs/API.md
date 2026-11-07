@@ -136,3 +136,54 @@ X-Request-Id: req-98f2b7a14e9102c3
 | `GET` | `/patients/:id/documents` | List attachments associated with a patient | Registered Facility Staff |
 | `POST` | `/patients/:id/documents` | Upload attachment directly against a patient | Registered Facility Staff |
 
+### 3.8 Notification Center (`/notifications`)
+| Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `GET` | `/notifications` | List user notifications with filtering and pagination | Authenticated |
+| `GET` | `/notifications/unread-count` | Get total count of unread notifications | Authenticated |
+| `GET` | `/notifications/unread` | Fetch latest unread notifications list | Authenticated |
+| `PATCH` | `/notifications/:id/read` | Mark individual notification as read (idempotent) | Notification Owner |
+| `PATCH` | `/notifications/:id/unread` | Mark individual notification as unread | Notification Owner |
+| `POST` | `/notifications/read-all` | Mark all unread notifications as read | Authenticated |
+| `DELETE` | `/notifications/:id` | Dismiss / soft-delete notification | Notification Owner |
+| `GET` | `/notifications/preferences` | Retrieve user notification preferences | Authenticated |
+| `PUT` | `/notifications/preferences` | Update user notification preferences | Authenticated |
+
+### 3.9 Real-Time Event Infrastructure (`/realtime` & WebSocket)
+| Protocol / Method | Endpoint | Description | Access |
+|---|---|---|---|
+| `WS` | `/ws` | Authenticated real-time WebSocket connection | Authenticated (JWT) |
+| `GET` | `/realtime/health` | Real-time WebSocket server health & telemetry probe | Public / Orchestrator |
+| `GET` | `/realtime/missed-events` | Reconnection sync endpoint for offline event catchup | Authenticated |
+| `GET` | `/realtime/metrics` | Real-time connection, throughput & error metrics | Admin / Regional Officer |
+| `POST` | `/realtime/disconnect-user/:userId` | Administrative force disconnect across user sockets | System Administrator |
+
+#### WebSocket Connection & Handshake Specification
+- **Path:** `/ws` (or root `/` upgrade)
+- **Supported Auth Handshakes:**
+  1. HTTP Header: `Authorization: Bearer <jwt_access_token>`
+  2. Subprotocol: `Sec-WebSocket-Protocol: careconnect-auth, <jwt_access_token>`
+  3. Cookie: `careconnect_access_token=<jwt_access_token>`
+  4. First-Frame Message: `{"type": "auth", "token": "<jwt_access_token>"}` within 5000ms
+- **Prohibited:** Tokens in URL query parameters (`?token=...`) are rejected with WS Close Code `1008` (Policy Violation).
+- **Supported Client Message Types:**
+  - `{"type": "subscribe", "channel": "facility:<facilityId>"}`
+  - `{"type": "unsubscribe", "channel": "facility:<facilityId>"}`
+  - `{"type": "sync", "since": "2026-11-07T10:00:00.000Z", "lastEventId": "uuid"}`
+  - `{"type": "ping"}`
+- **Server Standard Event Format:**
+  ```json
+  {
+    "eventId": "uuid",
+    "type": "referral.status_changed",
+    "version": 1,
+    "occurredAt": "2026-11-07T12:00:00.000Z",
+    "requestId": "req-uuid",
+    "data": {
+      "referralId": "referral-uuid",
+      "status": "ACCEPTED"
+    }
+  }
+  ```
+
+

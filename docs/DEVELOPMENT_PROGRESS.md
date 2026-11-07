@@ -273,6 +273,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 14 OF 50: REAL-TIME COMMUNICATION INFRASTRUCTURE, WEBSOCKET EVENTS, LIVE REFERRAL UPDATES AND CONNECTION MANAGEMENT
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 14 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-07T20:10:00.000Z  
+
+### Part 14 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **105** | `backend: establish secure real-time server architecture` | ✅ COMMITTED | `a703e87` | WebSocket server integrated on Express HTTP server lifecycle with configurable limits, origin checks, heartbeat ping/pong, and graceful termination. Test suite `backend/tests/realtime/realtimeServer.test.js` (6/6 pass). | None |
+| **106** | `backend: implement authenticated websocket connections` | ✅ COMMITTED | `bf83c92` | Multi-strategy token handshake (Authorization Bearer, Sec-WebSocket-Protocol, cookie, first-frame JSON), query token prohibition (1008), 5s auth timeout (4408), max 5 sockets/user, active account validation. Test suite `backend/tests/realtime/websocketAuthentication.test.js` (9/9 pass). | None |
+| **107** | `backend: implement authorized real-time subscriptions` | ✅ COMMITTED | `a738bcc` | Server-validated channel grammar (`user:<id>`, `facility:<id>`, `referral:<id>`, `transport`, `admin`), automatic facility/user binding, strict cross-facility rejection, duplicate prevention, and clean disconnect teardown. Test suite `backend/tests/realtime/authorizedSubscriptions.test.js` (10/10 pass). | None |
+| **108** | `backend: implement standardized real-time event contracts` | ✅ COMMITTED | `4cd38ea` | Standard event envelope (`eventId`, `type`, `version`, `occurredAt`, `requestId`, `data`), PII/clinical note stripping, transactional outbox bridging, and multi-channel recipient deduplication. Test suite `backend/tests/realtime/standardizedEventContracts.test.js` (6/6 pass). | None |
+| **109** | `backend: implement real-time referral and notification events` | ✅ COMMITTED | `c31b6c8` | Live referral status lifecycle broadcasts, transactional notification events, unread count differential updates, and transport dispatch event dispatching. Test suite `backend/tests/realtime/referralNotificationEvents.test.js` (6/6 pass). | None |
+| **110** | `backend: implement reconnection and missed-event recovery` | ✅ COMMITTED | `7aff115` | Dual reconnection strategy (WS `{type: 'sync'}` frame and REST `GET /api/v1/realtime/missed-events`), event replay deduplication, and facility tenancy isolation on replay. Test suite `backend/tests/realtime/reconnectionMissedEvents.test.js` (5/5 pass). | None |
+| **111** | `backend: implement real-time monitoring and operational controls` | ✅ COMMITTED | `67346f6` | Realtime telemetry (`GET /api/v1/realtime/metrics`), public health probe (`GET /api/v1/realtime/health`), administrative forced user disconnect (`POST /api/v1/realtime/disconnect-user/:userId`), and sliding window per-socket rate limiting (4429). Test suite `backend/tests/realtime/realtimeMonitoring.test.js` (6/6 pass). | None |
+| **112** | `test: verify real-time security reliability and event delivery` | ✅ COMMITTED | `fe52219` | Comprehensive verification test suite `backend/tests/realtime/realtimeVerificationSuite.test.js` (18/18 pass), covering all 8 architectural domains. Full backend regression verification (760/760 tests pass across 70 test suites, 38/38 db tests pass), `docs/PART_14_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
