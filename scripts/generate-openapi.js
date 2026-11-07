@@ -1,0 +1,990 @@
+/**
+ * CareConnect Ethiopia - OpenAPI 3.0.3 Specification Generator
+ * Generates backend/docs/openapi.json containing comprehensive documentation
+ * for all 4 portals across all REST API domains.
+ */
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const outputPath = path.resolve(__dirname, '../backend/docs/openapi.json');
+
+const spec = {
+  openapi: '3.0.3',
+  info: {
+    title: 'CareConnect Ethiopia REST API',
+    version: '1.0.0',
+    description: 'National smart healthcare referral and patient coordination service connecting Health Centres, Hospitals, Transport Fleet, and Regional Health Authorities across Ethiopia.',
+    contact: {
+      name: 'CareConnect Ethiopia Technical Architecture Team',
+      email: 'tech@careconnect.et',
+      url: 'https://careconnect.et'
+    },
+    license: {
+      name: 'Proprietary - Ministry of Health Ethiopia',
+      url: 'https://moh.gov.et'
+    }
+  },
+  servers: [
+    { url: '/api/v1', description: 'Default API Gateway Root' },
+    { url: 'http://localhost:5000/api/v1', description: 'Local Development Environment' }
+  ],
+  tags: [
+    { name: 'Health & Diagnostics', description: 'Platform health probes and dependency diagnostic checks' },
+    { name: 'Authentication', description: 'User authentication, token lifecycle and session management' },
+    { name: 'Users & Identity', description: 'User accounts, role assignments, and facility associations' },
+    { name: 'Facilities', description: 'Healthcare facility directory, tier levels, services, and departments' },
+    { name: 'Patients', description: 'National patient registry, Fayda ID and patronymic demographic records' },
+    { name: 'Referrals', description: 'End-to-end referral workflow, status transitions and attachments' },
+    { name: 'Referral Coordination', description: 'Clinical timeline, messaging, and multi-tier escalation tracking' },
+    { name: 'Documents & Attachments', description: 'Secure medical referral attachments, private storage, versioning and verification' },
+    { name: 'Audit & Security Logs', description: 'Immutable security event logging and regulatory compliance audits' },
+    { name: 'Transport', description: 'Emergency ambulance request and vehicle dispatch tracking' },
+    { name: 'AI & Triage', description: 'Machine learning clinical matching and priority scoring' }
+  ],
+  components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Provide JSON Web Token in Authorization header: Bearer <token>'
+      },
+      CookieAuth: {
+        type: 'apiKey',
+        in: 'cookie',
+        name: 'refreshToken',
+        description: 'HTTP-only secure cookie containing encrypted refresh token'
+      },
+      FacilityHeader: {
+        type: 'apiKey',
+        in: 'header',
+        name: 'X-Facility-ID',
+        description: 'Active facility tenancy UUID for multi-facility healthcare workers'
+      }
+    },
+    schemas: {
+      SuccessEnvelope: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean', example: true },
+          message: { type: 'string', example: 'Operation completed successfully' },
+          data: { type: 'object' },
+          meta: {
+            type: 'object',
+            properties: {
+              requestId: { type: 'string', example: 'req-89a1c3f4e' },
+              timestamp: { type: 'string', format: 'date-time' }
+            }
+          }
+        },
+        required: ['success', 'message', 'data']
+      },
+      PaginatedEnvelope: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean', example: true },
+          message: { type: 'string', example: 'Records retrieved successfully' },
+          data: {
+            type: 'array',
+            items: { type: 'object' }
+          },
+          meta: {
+            type: 'object',
+            properties: {
+              requestId: { type: 'string', example: 'req-89a1c3f4e' },
+              timestamp: { type: 'string', format: 'date-time' },
+              pagination: { $ref: '#/components/schemas/PaginationMeta' }
+            },
+            required: ['pagination']
+          }
+        },
+        required: ['success', 'message', 'data', 'meta']
+      },
+      ErrorEnvelope: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean', example: false },
+          message: { type: 'string', example: 'Invalid referral payload' },
+          error: {
+            type: 'object',
+            properties: {
+              code: { type: 'string', example: 'VALIDATION_ERROR' },
+              message: { type: 'string', example: 'Field validation failed' },
+              details: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    field: { type: 'string', example: 'priority' },
+                    message: { type: 'string', example: 'Priority must be ROUTINE, URGENT, or EMERGENCY' },
+                    source: { type: 'string', example: 'body' }
+                  }
+                }
+              },
+              timestamp: { type: 'string', format: 'date-time' }
+            },
+            required: ['code', 'message', 'timestamp']
+          },
+          meta: {
+            type: 'object',
+            properties: {
+              requestId: { type: 'string', example: 'req-89a1c3f4e' },
+              timestamp: { type: 'string', format: 'date-time' }
+            }
+          },
+          requestId: { type: 'string', example: 'req-89a1c3f4e' }
+        },
+        required: ['success', 'message', 'error']
+      },
+      PaginationMeta: {
+        type: 'object',
+        properties: {
+          page: { type: 'integer', example: 1 },
+          limit: { type: 'integer', example: 20 },
+          total: { type: 'integer', example: 142 },
+          totalPages: { type: 'integer', example: 8 },
+          hasNext: { type: 'boolean', example: true },
+          hasPrev: { type: 'boolean', example: false }
+        },
+        required: ['page', 'limit', 'total', 'totalPages', 'hasNext', 'hasPrev']
+      },
+      HealthCheckResponse: {
+        type: 'object',
+        properties: {
+          status: { type: 'string', enum: ['HEALTHY', 'DEGRADED'], example: 'HEALTHY' },
+          service: { type: 'string', example: 'careconnect-backend-api' },
+          version: { type: 'string', example: '1.0.0' },
+          environment: { type: 'string', example: 'development' },
+          uptimeSeconds: { type: 'integer', example: 3420 },
+          timestamp: { type: 'string', format: 'date-time' },
+          checks: {
+            type: 'object',
+            properties: {
+              database: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string', example: 'UP' },
+                  latencyMs: { type: 'number', example: 28.4 }
+                }
+              },
+              memory: {
+                type: 'object',
+                properties: {
+                  heapUsedMb: { type: 'integer', example: 64 },
+                  heapTotalMb: { type: 'integer', example: 128 },
+                  rssMb: { type: 'integer', example: 180 }
+                }
+              }
+            }
+          }
+        }
+      },
+      LoginRequest: {
+        type: 'object',
+        required: ['email', 'password'],
+        properties: {
+          email: { type: 'string', format: 'email', example: 'doctor@tikuranbessa.gov.et' },
+          password: { type: 'string', format: 'password', example: 'SecureP@ss2026' }
+        }
+      },
+      RegisterRequest: {
+        type: 'object',
+        required: ['email', 'password', 'firstName', 'lastName'],
+        properties: {
+          email: { type: 'string', format: 'email', example: 'nurse.helen@bolehealth.gov.et' },
+          password: { type: 'string', minLength: 8, example: 'CareSecure#2026' },
+          firstName: { type: 'string', example: 'Helen' },
+          lastName: { type: 'string', example: 'Tadesse' },
+          roleId: { type: 'integer', example: 2 },
+          facilityId: { type: 'string', format: 'uuid', example: 'f81d4fae-7dec-11d0-a765-00a0c91e6bf6' }
+        }
+      },
+      ForgotPasswordRequest: {
+        type: 'object',
+        required: ['email'],
+        properties: {
+          email: { type: 'string', format: 'email', example: 'doctor@tikuranbessa.gov.et' }
+        }
+      },
+      ResetPasswordRequest: {
+        type: 'object',
+        required: ['token', 'newPassword'],
+        properties: {
+          token: { type: 'string', example: 'b8e9f2a4c102...' },
+          newPassword: { type: 'string', minLength: 8, example: 'NewSecret#2026' }
+        }
+      },
+      ChangePasswordRequest: {
+        type: 'object',
+        required: ['currentPassword', 'newPassword'],
+        properties: {
+          currentPassword: { type: 'string', example: 'OldPassword#2025' },
+          newPassword: { type: 'string', minLength: 8, example: 'NewPassword#2026' }
+        }
+      },
+      UserSummary: {
+        type: 'object',
+        properties: {
+          id: { type: 'integer', example: 42 },
+          uuid: { type: 'string', format: 'uuid' },
+          email: { type: 'string', format: 'email' },
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          roleName: { type: 'string' },
+          facilityName: { type: 'string' },
+          isActive: { type: 'boolean' }
+        }
+      },
+      FacilitySummary: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          name: { type: 'string', example: 'Tikur Anbessa Specialized Hospital' },
+          facilityType: { type: 'string', example: 'SPECIALIZED_HOSPITAL' },
+          region: { type: 'string', example: 'Addis Ababa' },
+          woreda: { type: 'string', example: 'Kirkos' },
+          operationalStatus: { type: 'string', example: 'OPERATIONAL' },
+          totalBeds: { type: 'integer', example: 800 },
+          icuBeds: { type: 'integer', example: 35 }
+        }
+      },
+      PatientSummary: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          faydaId: { type: 'string', example: 'ET-1234-5678-9012' },
+          mrn: { type: 'string', example: 'MRN-2026-0091' },
+          firstName: { type: 'string', example: 'Abebe' },
+          fatherName: { type: 'string', example: 'Kebede' },
+          grandfatherName: { type: 'string', example: 'Mamo' },
+          gender: { type: 'string', enum: ['MALE', 'FEMALE', 'OTHER'] },
+          dateOfBirth: { type: 'string', format: 'date' },
+          phoneNumber: { type: 'string', example: '+251911223344' },
+          region: { type: 'string', example: 'Addis Ababa' }
+        }
+      },
+      ReferralSummary: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          referralCode: { type: 'string', example: 'REF-2026-0042' },
+          patientId: { type: 'string', format: 'uuid' },
+          originatingFacilityId: { type: 'string', format: 'uuid' },
+          receivingFacilityId: { type: 'string', format: 'uuid' },
+          priority: { type: 'string', enum: ['ROUTINE', 'URGENT', 'EMERGENCY'] },
+          status: { type: 'string', enum: ['DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'ACCEPTED', 'REJECTED', 'CANCELLED', 'COMPLETED', 'INFO_REQUESTED'] },
+          reasonForReferral: { type: 'string' },
+          createdAt: { type: 'string', format: 'date-time' }
+        }
+      },
+      DocumentMetadata: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          referralId: { type: 'string', format: 'uuid' },
+          patientId: { type: 'string', format: 'uuid' },
+          facilityId: { type: 'string', format: 'uuid' },
+          documentCategory: { type: 'string', example: 'REFERRAL_LETTER' },
+          originalFilename: { type: 'string', example: 'referral_summary.pdf' },
+          mimeType: { type: 'string', example: 'application/pdf' },
+          fileSizeBytes: { type: 'integer', example: 245000 },
+          sha256Checksum: { type: 'string', example: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' },
+          verificationStatus: { type: 'string', enum: ['PENDING', 'VERIFIED', 'REJECTED', 'REQUIRES_CORRECTION'] },
+          versionNumber: { type: 'integer', example: 1 },
+          createdAt: { type: 'string', format: 'date-time' }
+        }
+      },
+      AuditLogEntry: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', format: 'uuid' },
+          eventCategory: { type: 'string', example: 'SECURITY' },
+          eventName: { type: 'string', example: 'USER_LOGIN_SUCCESS' },
+          severity: { type: 'string', enum: ['INFO', 'WARNING', 'ERROR', 'CRITICAL'] },
+          actorId: { type: 'integer', example: 12 },
+          clientIp: { type: 'string', example: '196.188.2.14' },
+          requestId: { type: 'string', example: 'req-01928374' },
+          createdAt: { type: 'string', format: 'date-time' }
+        }
+      }
+    }
+  },
+  paths: {
+    '/health': {
+      get: {
+        tags: ['Health & Diagnostics'],
+        summary: 'System diagnostics and database health status',
+        responses: {
+          '200': {
+            description: 'System operational and database healthy',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/HealthCheckResponse' } } }
+          },
+          '503': {
+            description: 'Degraded health',
+            content: { 'application/json': { schema: { $ref: '#/components/schemas/HealthCheckResponse' } } }
+          }
+        }
+      }
+    },
+    '/health/liveness': {
+      get: {
+        tags: ['Health & Diagnostics'],
+        summary: 'Container orchestrator liveness probe',
+        responses: {
+          '200': {
+            description: 'Process alive and responsive',
+            content: { 'application/json': { schema: { type: 'object', properties: { status: { type: 'string', example: 'ALIVE' } } } } }
+          }
+        }
+      }
+    },
+    '/health/readiness': {
+      get: {
+        tags: ['Health & Diagnostics'],
+        summary: 'Container orchestrator readiness probe',
+        responses: {
+          '200': { description: 'Dependencies ready to serve traffic' },
+          '503': { description: 'Dependencies not ready' }
+        }
+      }
+    },
+    '/health/live': {
+      get: {
+        tags: ['Health & Diagnostics'],
+        summary: 'Root liveness probe alias',
+        responses: { '200': { description: 'Process alive' } }
+      }
+    },
+    '/health/ready': {
+      get: {
+        tags: ['Health & Diagnostics'],
+        summary: 'Root readiness probe alias',
+        responses: { '200': { description: 'Service ready' } }
+      }
+    },
+    '/auth/register': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Register new healthcare professional or coordinator account',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/RegisterRequest' } } }
+        },
+        responses: {
+          '201': { description: 'User account created successfully' },
+          '400': { description: 'Validation error' },
+          '409': { description: 'Email address already registered' }
+        }
+      }
+    },
+    '/auth/login': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Authenticate credentials and obtain JWT session tokens',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/LoginRequest' } } }
+        },
+        responses: {
+          '200': { description: 'Authentication successful with tokens' },
+          '401': { description: 'Invalid email or password' },
+          '429': { description: 'Rate limit exceeded' }
+        }
+      }
+    },
+    '/auth/refresh': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Exchange valid refresh token for fresh access token',
+        requestBody: {
+          content: { 'application/json': { schema: { type: 'object', properties: { refreshToken: { type: 'string' } } } } }
+        },
+        responses: {
+          '200': { description: 'New access token issued' },
+          '401': { description: 'Invalid or revoked refresh token' }
+        }
+      }
+    },
+    '/auth/logout': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Terminate session and revoke refresh token',
+        responses: { '200': { description: 'Session terminated' } }
+      }
+    },
+    '/auth/me': {
+      get: {
+        tags: ['Authentication'],
+        summary: 'Retrieve authenticated user identity and facility affiliation',
+        security: [{ BearerAuth: [] }],
+        responses: {
+          '200': { description: 'Current user profile payload' },
+          '401': { description: 'Missing or invalid authorization token' }
+        }
+      }
+    },
+    '/auth/forgot-password': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Initiate password reset via anti-enumeration email token',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/ForgotPasswordRequest' } } }
+        },
+        responses: { '200': { description: 'Reset link dispatched if account exists' } }
+      }
+    },
+    '/auth/reset-password': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Complete password reset using cryptographic token',
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/ResetPasswordRequest' } } }
+        },
+        responses: {
+          '200': { description: 'Password reset successfully' },
+          '400': { description: 'Invalid or expired reset token' }
+        }
+      }
+    },
+    '/auth/change-password': {
+      post: {
+        tags: ['Authentication'],
+        summary: 'Update authenticated user password with current password verification',
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/ChangePasswordRequest' } } }
+        },
+        responses: {
+          '200': { description: 'Password changed successfully' },
+          '400': { description: 'Incorrect current password or weak new password' }
+        }
+      }
+    },
+    '/users': {
+      get: {
+        tags: ['Users & Identity'],
+        summary: 'List users with pagination, role, and facility filtering',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'roleId', in: 'query', schema: { type: 'integer' } },
+          { name: 'facilityId', in: 'query', schema: { type: 'string', format: 'uuid' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: { '200': { description: 'Paginated user list' } }
+      },
+      post: {
+        tags: ['Users & Identity'],
+        summary: 'Create a new user account (Administrator only)',
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: { 'application/json': { schema: { $ref: '#/components/schemas/RegisterRequest' } } }
+        },
+        responses: { '201': { description: 'User created' } }
+      }
+    },
+    '/users/{userId}': {
+      get: {
+        tags: ['Users & Identity'],
+        summary: 'Retrieve user details by ID',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'User details' }, '404': { description: 'User not found' } }
+      },
+      patch: {
+        tags: ['Users & Identity'],
+        summary: 'Update user profile fields',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'User updated' } }
+      },
+      delete: {
+        tags: ['Users & Identity'],
+        summary: 'Deactivate user account',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'User deactivated' } }
+      }
+    },
+    '/users/{userId}/status': {
+      patch: {
+        tags: ['Users & Identity'],
+        summary: 'Toggle active status or lock status of user',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'User status updated' } }
+      }
+    },
+    '/users/{userId}/facilities': {
+      get: {
+        tags: ['Users & Identity'],
+        summary: 'List healthcare facilities assigned to user',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Assigned facilities' } }
+      },
+      post: {
+        tags: ['Users & Identity'],
+        summary: 'Assign healthcare facility to user',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'userId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'Facility assigned' } }
+      }
+    },
+    '/facilities': {
+      get: {
+        tags: ['Facilities'],
+        summary: 'Query healthcare facility directory with geolocation and tier filtering',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'tier', in: 'query', schema: { type: 'string' } },
+          { name: 'region', in: 'query', schema: { type: 'string' } },
+          { name: 'search', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: { '200': { description: 'Paginated list of healthcare facilities' } }
+      },
+      post: {
+        tags: ['Facilities'],
+        summary: 'Register new healthcare facility',
+        security: [{ BearerAuth: [] }],
+        responses: { '201': { description: 'Facility registered' } }
+      }
+    },
+    '/facilities/{facilityId}': {
+      get: {
+        tags: ['Facilities'],
+        summary: 'Retrieve facility profile and live bed availability',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Facility details' }, '404': { description: 'Facility not found' } }
+      },
+      patch: {
+        tags: ['Facilities'],
+        summary: 'Update facility operational attributes',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Facility updated' } }
+      }
+    },
+    '/facilities/{facilityId}/departments': {
+      get: {
+        tags: ['Facilities'],
+        summary: 'List clinical departments for a facility',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Department list' } }
+      },
+      post: {
+        tags: ['Facilities'],
+        summary: 'Create clinical department in facility',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'Department created' } }
+      }
+    },
+    '/facilities/{facilityId}/departments/{departmentId}': {
+      patch: {
+        tags: ['Facilities'],
+        summary: 'Update clinical department details',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'departmentId', in: 'path', required: true, schema: { type: 'string' } }
+        ],
+        responses: { '200': { description: 'Department updated' } }
+      },
+      delete: {
+        tags: ['Facilities'],
+        summary: 'Remove clinical department',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'departmentId', in: 'path', required: true, schema: { type: 'string' } }
+        ],
+        responses: { '200': { description: 'Department deleted' } }
+      }
+    },
+    '/facilities/{facilityId}/services': {
+      get: {
+        tags: ['Facilities'],
+        summary: 'List clinical services offered by facility',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Service list' } }
+      },
+      post: {
+        tags: ['Facilities'],
+        summary: 'Add clinical service to facility',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'Service added' } }
+      }
+    },
+    '/facilities/{facilityId}/services/{serviceId}': {
+      delete: {
+        tags: ['Facilities'],
+        summary: 'Remove clinical service from facility',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'facilityId', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'serviceId', in: 'path', required: true, schema: { type: 'string' } }
+        ],
+        responses: { '200': { description: 'Service removed' } }
+      }
+    },
+    '/patients': {
+      get: {
+        tags: ['Patients'],
+        summary: 'Query patient registry with pagination',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: { '200': { description: 'Matching patient records' } }
+      },
+      post: {
+        tags: ['Patients'],
+        summary: 'Register new patient with Ethiopian patronymic name convention',
+        security: [{ BearerAuth: [] }],
+        responses: { '201': { description: 'Patient registered successfully' } }
+      }
+    },
+    '/patients/search': {
+      get: {
+        tags: ['Patients'],
+        summary: 'Search patients by Fayda ID, MRN, name, or phone number',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'q', in: 'query', schema: { type: 'string' } },
+          { name: 'faydaId', in: 'query', schema: { type: 'string' } },
+          { name: 'mrn', in: 'query', schema: { type: 'string' } }
+        ],
+        responses: { '200': { description: 'Patient search results' } }
+      }
+    },
+    '/patients/{patientId}': {
+      get: {
+        tags: ['Patients'],
+        summary: 'Retrieve comprehensive patient profile and clinical baseline',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'patientId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Patient profile' }, '404': { description: 'Patient not found' } }
+      },
+      patch: {
+        tags: ['Patients'],
+        summary: 'Update non-critical patient demographic fields',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'patientId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Patient updated' } }
+      }
+    },
+    '/patients/{patientId}/corrections': {
+      post: {
+        tags: ['Patients'],
+        summary: 'Submit formal demographic correction with supervisory audit trail',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'patientId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Correction logged and applied' } }
+      }
+    },
+    '/patients/{patientId}/history': {
+      get: {
+        tags: ['Patients'],
+        summary: 'Retrieve historical audit log of demographic corrections',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'patientId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Correction history log' } }
+      }
+    },
+    '/referrals': {
+      get: {
+        tags: ['Referrals'],
+        summary: 'List incoming or outgoing referrals filtered by facility and status',
+        security: [{ BearerAuth: [] }, { FacilityHeader: [] }],
+        parameters: [
+          { name: 'direction', in: 'query', schema: { type: 'string', enum: ['inbound', 'outbound'] } },
+          { name: 'status', in: 'query', schema: { type: 'string' } },
+          { name: 'priority', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: { '200': { description: 'Referral collection' } }
+      },
+      post: {
+        tags: ['Referrals'],
+        summary: 'Draft or submit electronic healthcare referral',
+        security: [{ BearerAuth: [] }, { FacilityHeader: [] }],
+        responses: { '201': { description: 'Referral created' } }
+      }
+    },
+    '/referrals/{referralId}': {
+      get: {
+        tags: ['Referrals'],
+        summary: 'Retrieve complete referral record, clinical notes, and attachments',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral details' }, '404': { description: 'Referral not found' } }
+      },
+      patch: {
+        tags: ['Referrals'],
+        summary: 'Update draft referral details prior to submission',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral updated' } }
+      }
+    },
+    '/referrals/{referralId}/submit': {
+      post: {
+        tags: ['Referrals'],
+        summary: 'Transition draft referral to SUBMITTED state',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral submitted' } }
+      }
+    },
+    '/referrals/{referralId}/review': {
+      post: {
+        tags: ['Referrals'],
+        summary: 'Mark referral as UNDER_REVIEW by receiving hospital clinician',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral placed under review' } }
+      }
+    },
+    '/referrals/{referralId}/accept': {
+      post: {
+        tags: ['Referrals'],
+        summary: 'Accept clinical referral and reserve facility bed/appointment',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral accepted' } }
+      }
+    },
+    '/referrals/{referralId}/reject': {
+      post: {
+        tags: ['Referrals'],
+        summary: 'Reject referral with required clinical justification and rerouting guidance',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral rejected' } }
+      }
+    },
+    '/referrals/{referralId}/cancel': {
+      post: {
+        tags: ['Referrals'],
+        summary: 'Cancel referral from originating facility before hospital acceptance',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral cancelled' } }
+      }
+    },
+    '/referrals/{referralId}/info-requested': {
+      post: {
+        tags: ['Referrals'],
+        summary: 'Request supplementary clinical findings or diagnostic imaging from sender',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Additional information requested' } }
+      }
+    },
+    '/referrals/{referralId}/timeline': {
+      get: {
+        tags: ['Referral Coordination'],
+        summary: 'Retrieve chronological lifecycle history with role-based privacy redaction',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Audited timeline entries' } }
+      }
+    },
+    '/referrals/{referralId}/messages': {
+      get: {
+        tags: ['Referral Coordination'],
+        summary: 'Retrieve secure inter-facility coordination messages for referral',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Messages list' } }
+      },
+      post: {
+        tags: ['Referral Coordination'],
+        summary: 'Send inter-facility coordination message regarding referral',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'Message sent' } }
+      }
+    },
+    '/referrals/{referralId}/escalate': {
+      post: {
+        tags: ['Referral Coordination'],
+        summary: 'Escalate stagnant or critical referral to regional coordination authority',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'referralId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Referral escalated' } }
+      }
+    },
+    '/documents': {
+      post: {
+        tags: ['Documents & Attachments'],
+        summary: 'Upload and attach a validated medical document (PDF, JPEG, PNG)',
+        security: [{ BearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                properties: {
+                  file: { type: 'string', format: 'binary' },
+                  referralId: { type: 'string', format: 'uuid' },
+                  patientId: { type: 'string', format: 'uuid' },
+                  documentCategory: { type: 'string', example: 'REFERRAL_LETTER' }
+                },
+                required: ['file', 'referralId']
+              }
+            }
+          }
+        },
+        responses: {
+          '201': { description: 'Document uploaded and persisted safely' },
+          '400': { description: 'Invalid upload metadata' },
+          '413': { description: 'File size exceeds maximum threshold' },
+          '415': { description: 'Unsupported media type or disallowed extension' }
+        }
+      }
+    },
+    '/documents/{documentId}': {
+      get: {
+        tags: ['Documents & Attachments'],
+        summary: 'Retrieve sanitized document metadata',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Document metadata' }, '404': { description: 'Document not found' } }
+      },
+      delete: {
+        tags: ['Documents & Attachments'],
+        summary: 'Soft-delete a document with mandatory justification',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Document soft-deleted' } }
+      }
+    },
+    '/documents/{documentId}/download': {
+      get: {
+        tags: ['Documents & Attachments'],
+        summary: 'Authorized binary download with secure disposition headers',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': {
+            description: 'Binary stream attachment',
+            content: { 'application/octet-stream': { schema: { type: 'string', format: 'binary' } } }
+          }
+        }
+      }
+    },
+    '/documents/{documentId}/preview': {
+      get: {
+        tags: ['Documents & Attachments'],
+        summary: 'Authorized inline preview with anti-sniffing headers',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: {
+          '200': {
+            description: 'Inline binary preview',
+            content: { 'application/pdf': { schema: { type: 'string', format: 'binary' } } }
+          }
+        }
+      }
+    },
+    '/documents/{documentId}/replace': {
+      post: {
+        tags: ['Documents & Attachments'],
+        summary: 'Upload replacement version with optimistic concurrency check',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'New version created' } }
+      }
+    },
+    '/documents/{documentId}/versions': {
+      get: {
+        tags: ['Documents & Attachments'],
+        summary: 'Query complete version history lineage for a document group',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'List of historical versions' } }
+      }
+    },
+    '/documents/{documentId}/verify': {
+      post: {
+        tags: ['Documents & Attachments'],
+        summary: 'Record human procedural review outcome (VERIFIED, REJECTED, REQUIRES_CORRECTION)',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Verification status updated' } }
+      }
+    },
+    '/documents/{documentId}/archive': {
+      post: {
+        tags: ['Documents & Attachments'],
+        summary: 'Transition document to ARCHIVED lifecycle state',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Document archived' } }
+      }
+    },
+    '/documents/{documentId}/processing': {
+      get: {
+        tags: ['Documents & Attachments'],
+        summary: 'Inspect asynchronous AI/OCR processing preparation status',
+        security: [{ BearerAuth: [] }],
+        parameters: [{ name: 'documentId', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '200': { description: 'Processing pipeline status' } }
+      }
+    },
+    '/audit/logs': {
+      get: {
+        tags: ['Audit & Security Logs'],
+        summary: 'Query system security audit logs (Administrator only)',
+        security: [{ BearerAuth: [] }],
+        parameters: [
+          { name: 'category', in: 'query', schema: { type: 'string' } },
+          { name: 'severity', in: 'query', schema: { type: 'string' } },
+          { name: 'startDate', in: 'query', schema: { type: 'string', format: 'date' } },
+          { name: 'endDate', in: 'query', schema: { type: 'string', format: 'date' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'limit', in: 'query', schema: { type: 'integer', default: 20 } }
+        ],
+        responses: { '200': { description: 'Audited log events collection' } }
+      }
+    },
+    '/transport/requests': {
+      get: {
+        tags: ['Transport'],
+        summary: 'List pending ambulance transport dispatch requests',
+        security: [{ BearerAuth: [] }],
+        responses: { '200': { description: 'Transport requests' } }
+      }
+    },
+    '/ai/recommend': {
+      post: {
+        tags: ['AI & Triage'],
+        summary: 'Compute multi-criteria hospital matching and ranking scores',
+        security: [{ BearerAuth: [] }],
+        responses: { '200': { description: 'Ranked hospital recommendations' } }
+      }
+    }
+  }
+};
+
+fs.writeFileSync(outputPath, JSON.stringify(spec, null, 2) + '\n');
+console.log(`OpenAPI specification written successfully to ${outputPath}`);
