@@ -5,16 +5,17 @@ import SharedHeader from './SharedHeader.jsx';
 import SharedSidebar from './SharedSidebar.jsx';
 import SharedMobileNav from './SharedMobileNav.jsx';
 import Breadcrumbs from './Breadcrumbs.jsx';
+import SkipToContent from './SkipToContent.jsx';
 
 /**
  * CareConnect Ethiopia - Unified Portal Application Layout
- * Provides responsive shell for Health Centre, Hospital, Transport, and Admin portals.
+ * Features full WCAG 2.1 AA accessibility (landmarks, skip link, mobile drawer focus).
  */
 export function PortalLayout({
   portalId = 'health-centre',
   portalName = 'CareConnect Ethiopia',
   portalSubtitle = 'Portal',
-  portalAccent = 'emerald', // emerald, sky, purple, navy
+  portalAccent = 'emerald',
   portalIcon,
   navItems = [],
   facilityName = 'Health Facility',
@@ -51,6 +52,9 @@ export function PortalLayout({
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 font-sans transition-colors duration-150">
+      {/* Keyboard Accessibility Skip Link */}
+      <SkipToContent targetId="main-content" />
+
       {/* Desktop Collapsible Sidebar */}
       <SharedSidebar
         portalName={portalName}
@@ -95,7 +99,12 @@ export function PortalLayout({
         />
 
         {/* Breadcrumbs & Viewport Main */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl w-full mx-auto">
+        <main
+          id="main-content"
+          role="main"
+          tabIndex={-1}
+          className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl w-full mx-auto focus:outline-none"
+        >
           <div className="mb-4">
             <Breadcrumbs />
           </div>

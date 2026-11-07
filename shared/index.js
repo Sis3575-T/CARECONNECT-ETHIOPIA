@@ -47,6 +47,7 @@ export * from './components/feedback/Spinner.jsx';
 export * from './components/feedback/Skeleton.jsx';
 export * from './components/feedback/Modal.jsx';
 export * from './components/feedback/Toast.jsx';
+export * from './components/feedback/LiveAnnouncer.jsx';
 
 // Layout & Navigation Components
 export * from './components/layout/SharedHeader.jsx';
@@ -54,3 +55,4 @@ export * from './components/layout/SharedSidebar.jsx';
 export * from './components/layout/SharedMobileNav.jsx';
 export * from './components/layout/Breadcrumbs.jsx';
 export * from './components/layout/PortalLayout.jsx';
+export * from './components/layout/SkipToContent.jsx';
