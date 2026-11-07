@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { DbService } from '../../services/dbService.js';
 import config from '../../config/env.js';
+import { sanitizeConnectionString } from '../../config/database.js';
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.get('/', async (req, res) => {
 
   const isHealthy = dbHealth.connected;
   const statusCode = isHealthy ? 200 : 503;
+  const sanitizedError = dbHealth.error ? sanitizeConnectionString(dbHealth.error) : null;
 
   res.status(statusCode).json({
     status: isHealthy ? 'HEALTHY' : 'DEGRADED',
@@ -27,14 +29,15 @@ router.get('/', async (req, res) => {
       database: {
         status: dbHealth.connected ? 'UP' : 'DOWN',
         latencyMs: dbHealth.latencyMs || 0,
-        details: dbHealth.connected ? { database: dbHealth.database } : { error: dbHealth.error }
+        details: dbHealth.connected ? { database: dbHealth.database } : { error: sanitizedError }
       },
       memory: {
         heapUsedMb: Math.round(memory.heapUsed / 1024 / 1024),
         heapTotalMb: Math.round(memory.heapTotal / 1024 / 1024),
         rssMb: Math.round(memory.rss / 1024 / 1024)
       }
-    }
+    },
+    ...(req.requestId ? { requestId: req.requestId } : {})
   });
 });
 
@@ -49,7 +52,9 @@ router.get(['/readiness', '/ready'], async (req, res) => {
   if (dbHealth.connected) {
     return res.status(200).json({ status: 'READY', database: 'CONNECTED' });
   }
-  return res.status(503).json({ status: 'NOT_READY', database: 'DISCONNECTED', error: dbHealth.error });
+  const sanitizedError = dbHealth.error ? sanitizeConnectionString(dbHealth.error) : 'Database unreachable';
+  return res.status(503).json({ status: 'NOT_READY', database: 'DISCONNECTED', error: sanitizedError });
 });
 
 export default router;
+

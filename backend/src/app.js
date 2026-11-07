@@ -10,6 +10,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { configureSecurity, enforceContentType } from './middleware/security.js';
+import { idempotency } from './middleware/idempotency.js';
 import requestIdMiddleware from './middleware/requestId.js';
 import { requestLogger } from './middleware/requestLogger.js';
 import { apiRateLimiter } from './middleware/rateLimit.js';
@@ -44,6 +45,9 @@ const HOST = process.env.HOST || '0.0.0.0';
 // Basic JSON & URL-encoded parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Idempotent Request Processing
+app.use(idempotency);
 
 // Cloud Orchestrator Root Health Probes
 app.use('/health', healthRouter);
