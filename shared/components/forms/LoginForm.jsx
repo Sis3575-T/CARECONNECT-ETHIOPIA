@@ -121,15 +121,17 @@ export function LoginForm({
 
   return (
     <div className={cn('w-full flex flex-col gap-4', className)}>
-      {/* Server Error Alert */}
-      {serverError && (
-        <Alert
-          variant="error"
-          title="Authentication Failed"
-          description={serverError}
-          className="mb-2"
-        />
-      )}
+      {/* Accessible Live Error Alert */}
+      <div aria-live="polite" aria-atomic="true">
+        {serverError && (
+          <Alert
+            variant="error"
+            title="Authentication Failed"
+            description={serverError}
+            className="mb-2"
+          />
+        )}
+      </div>
 
       {/* Main Form */}
       <form onSubmit={handleSubmit} noValidate className="space-y-4 text-xs">
@@ -140,6 +142,7 @@ export function LoginForm({
           label="Official Email Address"
           type="email"
           autoComplete="username"
+          autoFocus={!initialEmail}
           required
           value={email}
           onChange={handleEmailChange}
