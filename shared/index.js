@@ -17,6 +17,7 @@ export * from './hooks/useAuth.js';
 
 // Services
 export * from './services/apiClient.js';
+export * from './services/authService.js';
 
 // Router & Guards
 export * from './router/index.js';
