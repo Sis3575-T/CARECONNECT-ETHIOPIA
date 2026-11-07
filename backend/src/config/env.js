@@ -82,6 +82,19 @@ export const config = {
   uploads: {
     dir: path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads')),
     maxFileSizeBytes: getInt(process.env.MAX_FILE_SIZE_MB, 10) * 1024 * 1024
+  },
+
+  storage: {
+    provider: process.env.STORAGE_PROVIDER || 'local',
+    localDir: path.resolve(process.env.STORAGE_LOCAL_DIR || process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads/private_documents')),
+    s3: {
+      endpoint: process.env.S3_ENDPOINT || null,
+      bucket: process.env.S3_BUCKET || 'careconnect-documents-private',
+      region: process.env.S3_REGION || 'us-east-1',
+      accessKeyId: process.env.S3_ACCESS_KEY_ID || null,
+      secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || null,
+      forcePathStyle: process.env.S3_FORCE_PATH_STYLE === 'true'
+    }
   }
 };
 
