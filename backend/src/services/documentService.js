@@ -130,10 +130,12 @@ export class DocumentService {
   /**
    * Upload and persist a medical document
    */
-  async uploadDocument({ file, metadata, user }) {
+  async uploadDocument({ file, metadata, user, context = {} }) {
     if (!user) {
       throw new ForbiddenError('Authentication required to upload documents');
     }
+
+    const { ipAddress = '127.0.0.1', userAgent = 'Unknown', requestId = null } = context;
 
     // Transport staff cannot upload clinical attachments
     if (user.roleId === 4 || user.roleId === 5 || user.roleName === ROLES.TRANSPORT_COORDINATOR) {
@@ -184,21 +186,31 @@ export class DocumentService {
       user
     });
 
+    // Record access log
+    await this.repo.recordAccessLog({
+      document_id: document.id,
+      accessed_by_user_id: user?.userId || user?.id,
+      access_type: DOCUMENT_ACCESS_TYPE.UPLOAD,
+      ip_address: ipAddress,
+      user_agent: userAgent
+    });
+
     // Record audit event
-    await this.audit.recordEvent({
+    await this.audit.recordDocumentAccess({
       eventName: SECURITY_EVENTS.DOCUMENT_UPLOADED,
-      category: 'DOCUMENT_MANAGEMENT',
-      severity: 'INFO',
+      documentId: document.id,
+      documentUuid: document.uuid,
       userId: user.userId || user.id,
       facilityId: document.facility_id || user.facilityId,
+      referralId: document.referral_id,
+      patientId: document.patient_id,
+      ipAddress,
+      userAgent,
+      requestId,
       details: {
-        documentId: document.id,
-        documentUuid: document.uuid,
         category: document.document_category,
         fileName: document.file_name,
         fileSizeBytes: document.file_size_bytes,
-        referralId: document.referral_id,
-        patientId: document.patient_id,
         version: document.version_number
       }
     });
@@ -209,7 +221,7 @@ export class DocumentService {
   /**
    * Get document metadata with authorization check
    */
-  async getDocument(documentId, user) {
+  async getDocument(documentId, user, context = {}) {
     const document = await this.repo.findById(documentId);
     if (!document || document.deleted_at) {
       throw new NotFoundError(`Document not found: ${documentId}`);
@@ -217,11 +229,33 @@ export class DocumentService {
 
     await this.checkDocumentAccess(user, document, 'VIEW');
 
+    const { ipAddress = '127.0.0.1', userAgent = 'Unknown', requestId = null } = context;
+
     // Record access log
     await this.repo.recordAccessLog({
       document_id: document.id,
       accessed_by_user_id: user?.userId || user?.id,
-      access_type: DOCUMENT_ACCESS_TYPE.VIEW
+      access_type: DOCUMENT_ACCESS_TYPE.VIEW,
+      ip_address: ipAddress,
+      user_agent: userAgent
+    });
+
+    // Record audit event
+    await this.audit.recordDocumentAccess({
+      eventName: SECURITY_EVENTS.DOCUMENT_VIEWED,
+      documentId: document.id,
+      documentUuid: document.uuid,
+      userId: user?.userId || user?.id,
+      facilityId: user?.facilityId || document.facility_id,
+      referralId: document.referral_id,
+      patientId: document.patient_id,
+      ipAddress,
+      userAgent,
+      requestId,
+      details: {
+        category: document.document_category,
+        fileName: document.file_name
+      }
     });
 
     // Strip sensitive internal storage details from response
@@ -231,7 +265,7 @@ export class DocumentService {
   /**
    * Download or preview document binary with authorization check and streaming
    */
-  async getDocumentContent(documentId, user, isPreview = false) {
+  async getDocumentContent(documentId, user, isPreview = false, context = {}) {
     const document = await this.repo.findById(documentId);
     if (!document || document.deleted_at) {
       throw new NotFoundError(`Document not found: ${documentId}`);
@@ -240,28 +274,32 @@ export class DocumentService {
     await this.checkDocumentAccess(user, document, isPreview ? 'PREVIEW' : 'DOWNLOAD');
 
     const fileData = await this.storage.getFileBufferForDocument(document.id);
+    const { ipAddress = '127.0.0.1', userAgent = 'Unknown', requestId = null } = context;
 
     // Record access log
     await this.repo.recordAccessLog({
       document_id: document.id,
       accessed_by_user_id: user?.userId || user?.id,
-      access_type: isPreview ? DOCUMENT_ACCESS_TYPE.PREVIEW : DOCUMENT_ACCESS_TYPE.DOWNLOAD
+      access_type: isPreview ? DOCUMENT_ACCESS_TYPE.PREVIEW : DOCUMENT_ACCESS_TYPE.DOWNLOAD,
+      ip_address: ipAddress,
+      user_agent: userAgent
     });
 
     // Record security audit
-    await this.audit.recordEvent({
+    await this.audit.recordDocumentAccess({
       eventName: isPreview ? SECURITY_EVENTS.DOCUMENT_PREVIEWED : SECURITY_EVENTS.DOCUMENT_DOWNLOADED,
-      category: 'DOCUMENT_MANAGEMENT',
-      severity: 'INFO',
+      documentId: document.id,
+      documentUuid: document.uuid,
       userId: user?.userId || user?.id,
       facilityId: user?.facilityId || document.facility_id,
+      referralId: document.referral_id,
+      patientId: document.patient_id,
+      ipAddress,
+      userAgent,
+      requestId,
       details: {
-        documentId: document.id,
-        documentUuid: document.uuid,
         fileName: document.file_name,
         category: document.document_category,
-        referralId: document.referral_id,
-        patientId: document.patient_id,
         accessType: isPreview ? 'PREVIEW' : 'DOWNLOAD'
       }
     });
@@ -391,17 +429,21 @@ export class DocumentService {
     });
 
     // Record audit event
-    await this.audit.recordEvent({
+    await this.audit.recordDocumentAccess({
       eventName: SECURITY_EVENTS.DOCUMENT_REPLACED,
-      category: 'DOCUMENT_MANAGEMENT',
-      severity: 'INFO',
+      documentId: newVersion.id,
+      documentUuid: newVersion.uuid,
       userId: user?.userId || user?.id,
       facilityId: existingDoc.facility_id || user.facilityId,
+      referralId: existingDoc.referral_id,
+      patientId: existingDoc.patient_id,
+      ipAddress: context?.ipAddress,
+      userAgent: context?.userAgent,
+      requestId: context?.requestId,
       details: {
         documentGroupId: existingDoc.document_group_id,
         previousDocumentId: existingDoc.id,
         previousVersion: existingDoc.version_number,
-        newDocumentId: newVersion.id,
         newVersion: newVersion.version_number,
         replacementReason: validatedRepl.replacement_reason
       }
@@ -413,7 +455,7 @@ export class DocumentService {
   /**
    * Retrieve version history for a document group
    */
-  async getVersionHistory(documentId, user) {
+  async getVersionHistory(documentId, user, context = {}) {
     const doc = await this.repo.findById(documentId);
     if (!doc || doc.deleted_at) {
       throw new NotFoundError(`Document not found: ${documentId}`);
@@ -428,7 +470,7 @@ export class DocumentService {
   /**
    * Human-controlled document verification transition
    */
-  async verifyDocument({ documentId, payload = {}, user }) {
+  async verifyDocument({ documentId, payload = {}, user, context = {} }) {
     if (!user) {
       throw new ForbiddenError('Authentication required to verify document');
     }
@@ -468,15 +510,19 @@ export class DocumentService {
       eventName = SECURITY_EVENTS.DOCUMENT_CORRECTION_REQUESTED;
     }
 
-    await this.audit.recordEvent({
+    await this.audit.recordDocumentAccess({
       eventName,
-      category: 'DOCUMENT_MANAGEMENT',
-      severity: validated.status === DOCUMENT_VERIFICATION_STATUS.REJECTED ? 'WARNING' : 'INFO',
+      documentId: doc.id,
+      documentUuid: doc.uuid,
       userId: user?.userId || user?.id,
       facilityId: doc.facility_id || user.facilityId,
+      referralId: doc.referral_id,
+      patientId: doc.patient_id,
+      ipAddress: context?.ipAddress,
+      userAgent: context?.userAgent,
+      requestId: context?.requestId,
+      severity: validated.status === DOCUMENT_VERIFICATION_STATUS.REJECTED ? 'WARNING' : 'INFO',
       details: {
-        documentId: doc.id,
-        documentUuid: doc.uuid,
         verificationStatus: validated.status,
         rejectionReason: validated.rejection_reason,
         verificationNotes: validated.verification_notes

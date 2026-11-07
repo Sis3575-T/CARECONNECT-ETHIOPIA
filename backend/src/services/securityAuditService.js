@@ -15,7 +15,19 @@ export class SecurityAuditService {
   static sanitizeDetails(details = {}) {
     if (!details || typeof details !== 'object') return {};
     const sanitized = {};
-    const BLACKLIST_PATTERNS = [/password/i, /token/i, /secret/i, /hash/i, /credential/i];
+    const BLACKLIST_PATTERNS = [
+      /password/i,
+      /token/i,
+      /secret/i,
+      /hash/i,
+      /credential/i,
+      /buffer/i,
+      /file_content/i,
+      /extracted_text/i,
+      /ocr_text/i,
+      /clinical_summary/i,
+      /diagnosis_notes/i
+    ];
 
     for (const [key, val] of Object.entries(details)) {
       const isBlacklisted = BLACKLIST_PATTERNS.some((pat) => pat.test(key));
@@ -97,6 +109,44 @@ export class SecurityAuditService {
     }
 
     return logEntry;
+  }
+
+  /**
+   * Dedicated helper for recording document audit events while guaranteeing privacy
+   */
+  static async recordDocumentAccess(options) {
+    const {
+      eventName,
+      documentId,
+      documentUuid = null,
+      userId = null,
+      facilityId = null,
+      referralId = null,
+      patientId = null,
+      ipAddress = '127.0.0.1',
+      userAgent = 'Unknown',
+      requestId = null,
+      severity = 'INFO',
+      details = {}
+    } = options;
+
+    return this.recordEvent({
+      eventName,
+      category: 'DOCUMENT_MANAGEMENT',
+      severity,
+      userId,
+      facilityId,
+      ipAddress,
+      userAgent,
+      details: {
+        documentId,
+        documentUuid,
+        referralId,
+        patientId,
+        requestId,
+        ...details
+      }
+    });
   }
 
   /**

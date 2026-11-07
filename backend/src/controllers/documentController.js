@@ -7,13 +7,22 @@ import documentService from '../services/documentService.js';
 import { successResponse } from '../utils/response.js';
 import { HTTP_STATUS } from '../constants/index.js';
 
+function extractRequestContext(req) {
+  return {
+    ipAddress: req.ip || req.socket?.remoteAddress || '127.0.0.1',
+    userAgent: req.headers['user-agent'] || 'Unknown',
+    requestId: req.requestId || req.headers['x-request-id'] || null
+  };
+}
+
 export async function uploadDocument(req, res, next) {
   try {
     const file = req.file;
     const metadata = req.body;
     const user = req.user;
+    const context = extractRequestContext(req);
 
-    const document = await documentService.uploadDocument({ file, metadata, user });
+    const document = await documentService.uploadDocument({ file, metadata, user, context });
 
     return successResponse(res, document, 'Medical document uploaded and attached successfully', HTTP_STATUS.CREATED);
   } catch (err) {
@@ -25,8 +34,9 @@ export async function getDocument(req, res, next) {
   try {
     const { documentId } = req.params;
     const user = req.user;
+    const context = extractRequestContext(req);
 
-    const document = await documentService.getDocument(documentId, user);
+    const document = await documentService.getDocument(documentId, user, context);
 
     return successResponse(res, document, 'Document metadata retrieved successfully', HTTP_STATUS.OK);
   } catch (err) {
@@ -38,11 +48,13 @@ export async function downloadDocument(req, res, next) {
   try {
     const { documentId } = req.params;
     const user = req.user;
+    const context = extractRequestContext(req);
 
     const { buffer, mimeType, fileName, fileSizeBytes } = await documentService.getDocumentContent(
       documentId,
       user,
-      false
+      false,
+      context
     );
 
     // Set secure download headers
@@ -64,11 +76,13 @@ export async function previewDocument(req, res, next) {
   try {
     const { documentId } = req.params;
     const user = req.user;
+    const context = extractRequestContext(req);
 
     const { buffer, mimeType, fileName, fileSizeBytes } = await documentService.getDocumentContent(
       documentId,
       user,
-      true
+      true,
+      context
     );
 
     // Set secure preview headers
@@ -133,12 +147,14 @@ export async function replaceVersion(req, res, next) {
     const file = req.file;
     const payload = req.body;
     const user = req.user;
+    const context = extractRequestContext(req);
 
     const newVersion = await documentService.replaceDocumentVersion({
       documentId,
       file,
       payload,
-      user
+      user,
+      context
     });
 
     return successResponse(res, newVersion, 'Document version replaced successfully', HTTP_STATUS.CREATED);
@@ -151,8 +167,9 @@ export async function getVersionHistory(req, res, next) {
   try {
     const { documentId } = req.params;
     const user = req.user;
+    const context = extractRequestContext(req);
 
-    const history = await documentService.getVersionHistory(documentId, user);
+    const history = await documentService.getVersionHistory(documentId, user, context);
 
     return successResponse(res, history, `Found ${history.length} version(s)`, HTTP_STATUS.OK);
   } catch (err) {
@@ -165,11 +182,13 @@ export async function verifyDocument(req, res, next) {
     const { documentId } = req.params;
     const payload = req.body;
     const user = req.user;
+    const context = extractRequestContext(req);
 
     const updated = await documentService.verifyDocument({
       documentId,
       payload,
-      user
+      user,
+      context
     });
 
     return successResponse(res, updated, 'Document verification outcome recorded', HTTP_STATUS.OK);
