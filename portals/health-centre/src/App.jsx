@@ -12,24 +12,32 @@ import TrackingPage from './pages/TrackingPage';
 import ReportsPage from './pages/ReportsPage';
 import AIAssistantPage from './pages/AIAssistantPage';
 import SettingsPage from './pages/SettingsPage';
-import { ProtectedRoute, UnauthorizedPage, NotFoundPage } from '@shared/router/index.js';
+import { ProtectedRoute, RoleRoute, UnauthorizedPage, NotFoundPage } from '@shared/router/index.js';
+import { PORTALS } from '@shared/constants/portals.js';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public Authentication Route */}
         <Route path="/login" element={<LoginPage />} />
+        
+        {/* Access Denied Route */}
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         
+        {/* Protected Health Centre Workspace */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <HealthCentreLayout />
+              <RoleRoute allowedRoles={PORTALS.HEALTH_CENTRE.allowedRoles}>
+                <HealthCentreLayout />
+              </RoleRoute>
             </ProtectedRoute>
           }
         >
           <Route index element={<DashboardPage />} />
+          <Route path="dashboard" element={<Navigate to="/" replace />} />
           <Route path="patients" element={<PatientsPage />} />
           <Route path="create-referral" element={<CreateReferralPage />} />
           <Route path="referrals" element={<AllReferralsPage />} />
