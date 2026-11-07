@@ -252,6 +252,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 13 OF 50: IN-APP NOTIFICATION CENTER, NOTIFICATION PREFERENCES, READ/UNREAD MANAGEMENT AND USER COMMUNICATION APIS
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 13 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-07T11:10:00.000Z  
+
+### Part 13 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **097** | `backend: establish notification center data architecture` | ✅ COMMITTED | `de34e30` | Authored `docs/architecture/part13-notification-center-assessment.md`, migration `036_in_app_notifications_and_preferences_schema.sql`, `notifications.js` constants, `notificationRepository.js`; test `backend/tests/notificationDataArchitecture.test.js` (6/6 pass). | None |
+| **098** | `backend: implement secure notification recipient resolution` | ✅ COMMITTED | `c4f229e` | `notificationRecipientResolver.js` resolving recipients via facility tenancy (`facility_staff_assignments`), user roles, and active account status; test `backend/tests/notificationRecipientResolution.test.js` (6/6 pass). | None |
+| **099** | `backend: implement notification templates and event integration` | ✅ COMMITTED | `d84b335` | `notificationTemplateService.js` (non-PII, XSS-safe escaping, role deep links), `notificationEventSubscriber.js` with outbox event consumption and deduplication; test `backend/tests/notificationTemplatesAndEvents.test.js` (5/5 pass). | None |
+| **100** | `backend: implement notification preferences and channel policies` | ✅ COMMITTED | `3e6d85f` | `notificationPreferenceService.js` supporting user channel prefs, mandatory category protection (`SECURITY`, `ESCALATION`), audit logging; test `backend/tests/notificationPreferences.test.js` (6/6 pass). | None |
+| **101** | `backend: implement notification read and unread management` | ✅ COMMITTED | `0daed15` | `notificationService.js` with idempotent `markAsRead`, `markAsUnread`, `markAllAsRead`, `dismissNotification`, strict ownership checks; test `backend/tests/notificationReadUnread.test.js` (7/7 pass). | None |
+| **102** | `backend: implement notification center APIs` | ✅ COMMITTED | `5795b64` | `notifications.js` routes, `/unread-count`, `/unread`, `/preferences`, `/read-all`, updated `openapi.json`; test `backend/tests/notificationCenterApis.test.js` (8/8 pass). | None |
+| **103** | `backend: implement notification history and delivery tracking` | ✅ COMMITTED | `b87b13c` | `notificationHistoryService.js` tracking multi-channel deliveries, safe retention cleanup protecting escalations and referrals; test `backend/tests/notificationDeliveryHistory.test.js` (4/4 pass). | None |
+| **104** | `test: verify notification center security and reliability` | ✅ COMMITTED | `b9ef7ef` | Comprehensive 24-scenario test suite `backend/tests/part13Comprehensive.test.js` (24/24 pass), full regression verification, `docs/PART_13_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
