@@ -59,4 +59,16 @@ describe('Schema Hardening & Integrity Suite — Commit 073', () => {
     assert.ok(sql.includes('source_patient_id <> target_patient_id'), 'Source and target patients must differ');
     assert.ok(sql.includes("'PENDING', 'APPROVED', 'REJECTED'"), 'Merge status must be PENDING, APPROVED, or REJECTED');
   });
+
+  it('Migration 032 defines uniqueness constraints and explicit foreign keys for concurrency safety', () => {
+    const m32Path = path.join(__dirname, '..', 'migrations', '032_data_integrity_and_uniqueness.sql');
+    const sql32 = fs.readFileSync(m32Path, 'utf-8');
+
+    assert.ok(sql32.includes('uq_active_facility_staff'), 'Must define unique active staff assignment index');
+    assert.ok(sql32.includes('uq_document_group_version'), 'Must define unique document group version index');
+    assert.ok(sql32.includes('uq_facility_priority_active_policy'), 'Must define unique active facility SLA policy index');
+    assert.ok(sql32.includes('uq_referral_active_pending_info_request'), 'Must define unique pending info request index');
+    assert.ok(sql32.includes('uq_patient_active_merge_request'), 'Must define unique pending patient merge request index');
+    assert.ok(sql32.includes('fk_documents_parent'), 'Must define parent document foreign key');
+  });
 });

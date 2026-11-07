@@ -32,11 +32,21 @@ export class DbService {
 
   /**
    * Execute a series of operations atomically inside an isolated transaction
+   * Supports isolation levels, read-only mode, and automated rollback
    */
-  static async transaction(callback) {
+  static async transaction(callback, options = {}) {
+    const { isolationLevel = null, readOnly = false } = options;
     const client = await pool.connect();
     try {
-      await client.query('BEGIN');
+      let beginSql = 'BEGIN';
+      if (isolationLevel) {
+        beginSql += ` ISOLATION LEVEL ${isolationLevel}`;
+      }
+      if (readOnly) {
+        beginSql += ' READ ONLY';
+      }
+      await client.query(beginSql);
+
       const result = await callback(client);
       await client.query('COMMIT');
       return result;
@@ -47,6 +57,33 @@ export class DbService {
     } finally {
       client.release();
     }
+  }
+
+  /**
+   * Execute operations within a named savepoint (nested atomic unit)
+   */
+  static async withSavepoint(client, savepointName, callback) {
+    const sanitizedName = savepointName.replace(/[^a-zA-Z0-9_]/g, '');
+    try {
+      await client.query(`SAVEPOINT ${sanitizedName}`);
+      const result = await callback(client);
+      await client.query(`RELEASE SAVEPOINT ${sanitizedName}`);
+      return result;
+    } catch (err) {
+      await client.query(`ROLLBACK TO SAVEPOINT ${sanitizedName}`);
+      const safeError = sanitizeConnectionString(err.message || 'Savepoint aborted');
+      throw new Error(`[CareConnect DB Savepoint Failed]: ${safeError}`);
+    }
+  }
+
+  /**
+   * Acquires a row-level lock on a record to guarantee sequential consistency
+   */
+  static async acquireLock(client, tableName, id, lockMode = 'FOR UPDATE') {
+    const validModes = ['FOR UPDATE', 'FOR NO KEY UPDATE', 'FOR SHARE', 'FOR KEY SHARE'];
+    const mode = validModes.includes(lockMode) ? lockMode : 'FOR UPDATE';
+    const queryText = `SELECT id FROM ${tableName} WHERE id = $1 ${mode}`;
+    return client.query(queryText, [id]);
   }
 
   /**

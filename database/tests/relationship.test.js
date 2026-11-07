@@ -13,7 +13,7 @@ test('Database Migrations and Seeds Integrity Test', async (t) => {
     const migrationsDir = path.join(ROOT_DIR, 'database', 'migrations');
     const files = fs.readdirSync(migrationsDir).filter(f => f.endsWith('.sql')).sort();
 
-    assert.equal(files.length, 31, 'Expected 31 migration scripts to exist');
+    assert.equal(files.length, 32, 'Expected 32 migration scripts to exist');
 
     const expectedPrefixes = [
       '001_initial_migration_tracker',
@@ -46,7 +46,8 @@ test('Database Migrations and Seeds Integrity Test', async (t) => {
       '028_referral_tracking_and_corrections',
       '029_referral_coordination_and_escalation',
       '030_secure_document_management',
-      '031_schema_hardening_and_integrity'
+      '031_schema_hardening_and_integrity',
+      '032_data_integrity_and_uniqueness'
     ];
 
     for (let i = 0; i < expectedPrefixes.length; i++) {
