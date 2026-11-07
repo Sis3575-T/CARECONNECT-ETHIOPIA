@@ -10,6 +10,7 @@ import { connectionRegistry } from './connectionRegistry.js';
 import { WS_CLOSE_CODES, SERVER_MESSAGE_TYPES, CLIENT_MESSAGE_TYPES } from '../constants/realtime.js';
 import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
 import { subscriptionManager } from './subscriptionManager.js';
+import { eventRecoveryService, RECONNECT_POLICY } from './eventRecoveryService.js';
 
 export class RealtimeServer {
   constructor(options = {}) {
@@ -23,15 +24,17 @@ export class RealtimeServer {
     this.registry = options.registry || connectionRegistry;
     this.subscriptionManager = options.subscriptionManager || subscriptionManager;
     this.subscriptionManager.setRegistry(this.registry);
+    this.recoveryService = options.recoveryService || eventRecoveryService;
 
     this.wss = null;
     this.heartbeatTimer = null;
     this.isShuttingDown = false;
     this.messageHandlers = new Set();
 
-    // Register core authentication and subscription message handlers
+    // Register core authentication, subscription, and event recovery message handlers
     this.addMessageHandler(createAuthMessageHandler(this.registry, this.subscriptionManager));
     this.addMessageHandler(this._createSubscriptionMessageHandler());
+    this.addMessageHandler(this._createSyncMessageHandler());
   }
 
   /**
@@ -74,6 +77,41 @@ export class RealtimeServer {
           channel: res.channel
         });
         return;
+      }
+    };
+  }
+
+  /**
+   * Generates handler for missed-event synchronization requests
+   */
+  _createSyncMessageHandler() {
+    return async (ws, meta, message) => {
+      if (message.type === CLIENT_MESSAGE_TYPES.SYNC) {
+        if (!meta.authenticated || !meta.user) {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.ERROR,
+            code: 'AUTHENTICATION_REQUIRED',
+            error: 'Authentication required before syncing missed events'
+          });
+          return;
+        }
+
+        try {
+          const result = await this.recoveryService.recoverMissedEvents(meta.user, message);
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.SYNC_RESPONSE,
+            replayedCount: result.replayedCount,
+            events: result.events,
+            syncTimestamp: result.syncTimestamp,
+            reconnectPolicy: result.reconnectPolicy
+          });
+        } catch (err) {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.ERROR,
+            code: 'SYNC_ERROR',
+            error: err.message || 'Failed to sync missed events'
+          });
+        }
       }
     };
   }
@@ -180,7 +218,8 @@ export class RealtimeServer {
       serverTime: new Date().toISOString(),
       heartbeatIntervalMs: this.heartbeatIntervalMs,
       authRequired: true,
-      authTimeoutMs: this.authTimeoutMs
+      authTimeoutMs: this.authTimeoutMs,
+      reconnectPolicy: RECONNECT_POLICY
     });
 
     // Immediate handshake authentication if token present in request headers/cookie

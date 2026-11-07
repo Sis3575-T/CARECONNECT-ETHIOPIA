@@ -17,6 +17,7 @@ import coordinationRouter from './coordination.js';
 import documentsRouter from './documents.js';
 import jobsRouter from './jobs.js';
 import notificationsRouter from './notifications.js';
+import realtimeRouter from './realtime.js';
 
 const router = Router();
 
@@ -57,6 +58,7 @@ router.use('/referrals', referralsRouter);
 router.use('/documents', documentsRouter);
 router.use('/jobs', jobsRouter);
 router.use('/notifications', notificationsRouter);
+router.use('/realtime', realtimeRouter);
 router.use('/notification-preferences', (req, res, next) => {
   req.url = '/preferences' + (req.url === '/' ? '' : req.url);
   notificationsRouter(req, res, next);

@@ -8,6 +8,7 @@ import { subscriptionManager, SubscriptionManager } from './subscriptionManager.
 import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
 import { eventBroadcaster, EventBroadcaster } from './eventBroadcaster.js';
 import { referralRealtimeService, ReferralRealtimeService } from './referralRealtimeService.js';
+import { eventRecoveryService, EventRecoveryService, RECONNECT_POLICY } from './eventRecoveryService.js';
 import {
   REALTIME_EVENT_TYPES,
   validateEventEnvelope,
@@ -25,6 +26,9 @@ export {
   EventBroadcaster,
   referralRealtimeService,
   ReferralRealtimeService,
+  eventRecoveryService,
+  EventRecoveryService,
+  RECONNECT_POLICY,
   extractAuthToken,
   authenticateConnection,
   createAuthMessageHandler,
