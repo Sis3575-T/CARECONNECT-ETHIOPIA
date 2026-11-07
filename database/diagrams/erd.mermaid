@@ -28,6 +28,7 @@ erDiagram
     healthcare_facilities ||--o{ referrals : "destined_for"
     users ||--o{ referrals : "referred_by"
     users ||--o{ referrals : "received_by"
+    referral_response_policies ||--o{ referrals : "governs_sla"
     referrals ||--o{ referral_events : "transitions_through"
     referrals ||--o{ referral_status_history : "records_milestone"
     referrals ||--o{ referral_decisions : "evaluated_by"
@@ -114,11 +115,13 @@ erDiagram
     referrals {
         string id PK
         uuid uuid UK
+        string reference_number UK
         string patient_id FK
         string origin_facility_id FK
         string destination_facility_id FK
         int referring_clinician_id FK
         int receiving_clinician_id FK
+        int policy_id FK
         string priority
         string status
         text primary_diagnosis

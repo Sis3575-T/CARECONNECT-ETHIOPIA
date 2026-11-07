@@ -10,7 +10,8 @@ Data integrity in CareConnect Ethiopia is enforced at the database persistence t
 | Constraint Name | Table | Rule Definition | Business Justification |
 |---|---|---|---|
 | `chk_referral_priority` | `referrals` | `priority IN ('ROUTINE', 'URGENT', 'EMERGENCY')` | Enforces triage priority categories aligned with Ethiopian referral guidelines. |
-| `chk_referral_status` | `referrals` | Valid status transitions only | Enforces the 11-step referral state machine. |
+| `chk_referral_status` | `referrals` | 16-state lifecycle (`DRAFT` through `CLOSED`) | Enforces the complete 16-step referral state machine without illegal states. |
+| `chk_patient_status` | `patients` | `status IN ('ACTIVE', 'DECEASED', 'MERGED', 'SUSPENDED')` | Enforces controlled patient lifecycle transitions. |
 | `chk_patient_gender` | `patients` | `gender IN ('MALE', 'FEMALE', 'OTHER')` | Standardizes demographic classification. |
 | `chk_facility_tier` | `healthcare_facilities`| `tier IN ('PRIMARY', 'SECONDARY', 'TERTIARY')` | Governs appropriate clinical referral routing. |
 | `chk_capacity_reporting_bounds`| `facility_capacity_reports`| Non-negative integers for all bed counts | Prevents erroneous negative bed/ICU occupancy values. |
@@ -19,6 +20,12 @@ Data integrity in CareConnect Ethiopia is enforced at the database persistence t
 | `chk_ai_jobs_status` | `ai_processing_jobs` | `status IN ('QUEUED', 'PROCESSING', 'COMPLETED', 'FAILED', 'RETRYING')` | Governs asynchronous AI task state transitions. |
 | `chk_notif_pref_channel` | `notification_preferences` | `channel IN ('IN_APP', 'SMS', 'EMAIL')` | Restricts delivery to supported notification channels. |
 | `feedback_rating_bounds` | `referral_feedback` | `rating >= 1 AND rating <= 5` | Standardizes 5-point Likert clinical quality feedback. |
+| `chk_document_verification_status` | `referral_documents` | `status IN ('UPLOADED', 'PENDING_REVIEW', 'VERIFIED', 'REJECTED', 'REQUIRES_CORRECTION', 'ARCHIVED')` | Enforces human-verified document workflow states. |
+| `chk_document_processing_status` | `referral_documents` | `status IN ('PENDING', 'IN_PROGRESS', 'COMPLETED', 'FAILED')` | Governs background OCR and document analysis jobs. |
+| `chk_document_version_positive` | `referral_documents` | `version_number > 0` | Guarantees strictly positive version numbering. |
+| `chk_escalation_level` | `referral_escalations` | `escalation_level IN (1, 2, 3)` | Restricts escalations to defined operational hierarchy. |
+| `chk_merge_different_patients` | `patient_merge_requests` | `source_patient_id <> target_patient_id` | Prevents reflexive duplicate merge cycles. |
+| `chk_sla_ack_positive` | `referral_response_policies` | `acknowledgement_deadline_minutes > 0` | Enforces strictly positive response SLAs. |
 
 ---
 
