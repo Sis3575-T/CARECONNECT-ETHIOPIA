@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { cn } from '../../utils/cn.js';
 import SharedHeader from './SharedHeader.jsx';
@@ -6,6 +6,8 @@ import SharedSidebar from './SharedSidebar.jsx';
 import SharedMobileNav from './SharedMobileNav.jsx';
 import Breadcrumbs from './Breadcrumbs.jsx';
 import SkipToContent from './SkipToContent.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { Alert } from '../feedback/Alert.jsx';
 
 /**
  * CareConnect Ethiopia - Unified Portal Application Layout
@@ -20,31 +22,40 @@ export function PortalLayout({
   navItems = [],
   facilityName = 'Health Facility',
   facilityRegion = 'Addis Ababa',
-  currentUser = {
-    firstName: 'Clinician',
-    lastName: 'User',
-    role: 'Clinical Officer'
-  },
+  currentUser,
   notificationCount = 0,
   onNotificationClick,
   customHeaderRight,
   children
 }) {
+  const { user: authUser, logout: authLogout } = useAuth();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [language, setLanguage] = useState('en');
+  const [sessionExpiredNotice, setSessionExpiredNotice] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    try {
-      localStorage.removeItem('careconnect_access_token');
-      localStorage.removeItem('careconnect_user');
-      localStorage.removeItem('careconnect_token');
-    } catch {
-      // ignore
-    }
+  const activeUser = currentUser || authUser || {
+    firstName: 'Clinician',
+    lastName: 'User',
+    role: 'Clinical Officer'
+  };
+
+  const handleLogout = async () => {
+    await authLogout();
     navigate('/login');
   };
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      setSessionExpiredNotice(true);
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    }
+    window.addEventListener('careconnect:session_expired', handleSessionExpired);
+    return () => window.removeEventListener('careconnect:session_expired', handleSessionExpired);
+  }, [navigate]);
 
   const toggleLanguage = () => {
     setLanguage(prev => (prev === 'en' ? 'am' : 'en'));
@@ -89,7 +100,7 @@ export function PortalLayout({
           portalColor={portalAccent}
           facilityName={facilityName}
           facilityRegion={facilityRegion}
-          user={currentUser}
+          user={activeUser}
           notificationCount={notificationCount}
           onNotificationClick={onNotificationClick}
           onLogout={handleLogout}
@@ -97,6 +108,16 @@ export function PortalLayout({
           language={language}
           onToggleLanguage={toggleLanguage}
         />
+
+        {sessionExpiredNotice && (
+          <div className="px-4 sm:px-6 pt-3">
+            <Alert
+              variant="warning"
+              title="Session Expired"
+              description="Your healthcare session has ended for clinical data privacy. Redirecting to sign in..."
+            />
+          </div>
+        )}
 
         {/* Breadcrumbs & Viewport Main */}
         <main

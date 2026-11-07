@@ -35,6 +35,7 @@ export const AuthContext = createContext({
   loading: true,
   login: async () => {},
   logout: async () => {},
+  logoutAll: async () => {},
   refreshSession: async () => {},
   isSessionValid: () => false,
   hasRole: () => false,
@@ -196,6 +197,18 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const logoutAll = useCallback(async () => {
+    try {
+      await authService.logoutAll();
+    } catch {
+      // Backend may be unreachable
+    } finally {
+      authService.clearSessionStorage();
+      setToken(null);
+      setUser(null);
+    }
+  }, []);
+
   const refreshSession = useCallback(async () => {
     try {
       const refreshed = await authService.refreshToken();
@@ -247,6 +260,7 @@ export function AuthProvider({ children }) {
     loading,
     login,
     logout,
+    logoutAll,
     refreshSession,
     isSessionValid,
     hasRole,
