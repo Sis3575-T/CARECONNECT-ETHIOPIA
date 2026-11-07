@@ -9,13 +9,23 @@ import MapTrackingPage from './pages/MapTrackingPage';
 import TransportResourcesPage from './pages/TransportResourcesPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import { ProtectedRoute, UnauthorizedPage, NotFoundPage } from '@shared/router/index.js';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<TransportLayout />}>
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <TransportLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardPage />} />
           <Route path="requests" element={<TransportRequestsPage />} />
           <Route path="in-transit" element={<InTransitPage />} />
@@ -23,7 +33,7 @@ export default function App() {
           <Route path="resources" element={<TransportResourcesPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage portalName="Transport" />} />
         </Route>
       </Routes>
     </BrowserRouter>

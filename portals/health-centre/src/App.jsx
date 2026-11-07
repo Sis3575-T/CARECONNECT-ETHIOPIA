@@ -12,13 +12,23 @@ import TrackingPage from './pages/TrackingPage';
 import ReportsPage from './pages/ReportsPage';
 import AIAssistantPage from './pages/AIAssistantPage';
 import SettingsPage from './pages/SettingsPage';
+import { ProtectedRoute, UnauthorizedPage, NotFoundPage } from '@shared/router/index.js';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<HealthCentreLayout />}>
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HealthCentreLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardPage />} />
           <Route path="patients" element={<PatientsPage />} />
           <Route path="create-referral" element={<CreateReferralPage />} />
@@ -29,7 +39,7 @@ export default function App() {
           <Route path="reports" element={<ReportsPage />} />
           <Route path="ai-assistant" element={<AIAssistantPage />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage portalName="Health Centre" />} />
         </Route>
       </Routes>
     </BrowserRouter>

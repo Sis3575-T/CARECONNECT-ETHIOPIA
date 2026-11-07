@@ -13,13 +13,23 @@ import CapacityManagementPage from './pages/CapacityManagementPage';
 import FeedbackPage from './pages/FeedbackPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import { ProtectedRoute, UnauthorizedPage, NotFoundPage } from '@shared/router/index.js';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<HospitalLayout />}>
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <HospitalLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<DashboardPage />} />
           <Route path="incoming" element={<IncomingReferralsPage />} />
           <Route path="pending" element={<PendingReferralsPage />} />
@@ -31,7 +41,7 @@ export default function App() {
           <Route path="feedback" element={<FeedbackPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage portalName="Hospital" />} />
         </Route>
       </Routes>
     </BrowserRouter>
