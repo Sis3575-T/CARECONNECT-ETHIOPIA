@@ -61,3 +61,33 @@ export class UnsupportedMediaTypeError extends AppError {
     super(message, 415, 'UNSUPPORTED_MEDIA_TYPE');
   }
 }
+
+export class RateLimitError extends AppError {
+  constructor(message = 'Rate limit exceeded. Please retry after the cooldown period') {
+    super(message, 429, 'RATE_LIMIT_EXCEEDED');
+  }
+}
+
+export class DatabaseError extends AppError {
+  constructor(message = 'A database persistence error occurred') {
+    super(message, 500, 'DATABASE_ERROR');
+  }
+}
+
+export class ServiceUnavailableError extends AppError {
+  constructor(message = 'Service temporarily unavailable. Please retry shortly') {
+    super(message, 503, 'SERVICE_UNAVAILABLE');
+  }
+}
+
+export class UnprocessableEntityError extends AppError {
+  constructor(message = 'Unable to process the contained clinical instructions', details = null) {
+    super(message, 422, 'UNPROCESSABLE_ENTITY', details);
+  }
+}
+
+export class MethodNotAllowedError extends AppError {
+  constructor(message = 'HTTP method not allowed on this endpoint') {
+    super(message, 405, 'METHOD_NOT_ALLOWED');
+  }
+}
