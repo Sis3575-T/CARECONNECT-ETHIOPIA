@@ -4,7 +4,15 @@
  * latency profiling, and resilient offline/healthcheck detection.
  */
 
-import { pool, query, testConnection, sanitizeConnectionString } from '../config/database.js';
+import {
+  pool,
+  query,
+  testConnection,
+  sanitizeConnectionString,
+  getPoolMetrics,
+  executeWithRetry,
+  closePool
+} from '../config/database.js';
 
 export class DbService {
   /**
@@ -28,6 +36,20 @@ export class DbService {
   static async queryMany(text, params = []) {
     const res = await query(text, params);
     return res.rows || [];
+  }
+
+  /**
+   * Execute an idempotent query with exponential backoff retry for transient network faults
+   */
+  static async queryWithRetry(text, params = [], options = {}) {
+    return executeWithRetry(() => query(text, params), { ...options, isIdempotent: true });
+  }
+
+  /**
+   * Returns current pool utilization metrics
+   */
+  static getPoolMetrics() {
+    return getPoolMetrics();
   }
 
   /**
@@ -101,12 +123,10 @@ export class DbService {
   }
 
   /**
-   * Safe pool drain on application shutdown
+   * Safe pool drain on application shutdown with timeout protection
    */
-  static async closePool() {
-    if (pool && typeof pool.end === 'function') {
-      await pool.end();
-    }
+  static async closePool(timeoutMs = 5000) {
+    return closePool(timeoutMs);
   }
 }
 
