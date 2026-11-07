@@ -1,5 +1,26 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ROLES } from '../constants/roles.js';
+import { authService } from '../services/authService.js';
+
+/**
+ * Normalize user payload from backend or storage
+ */
+function normalizeUser(rawUser) {
+  if (!rawUser) return null;
+  const role = rawUser.role || rawUser.roleName || rawUser.role_name || 'HEALTH_CENTRE_REFERRAL_CLINICIAN';
+  const name =
+    rawUser.name ||
+    [rawUser.firstName || rawUser.first_name, rawUser.lastName || rawUser.last_name].filter(Boolean).join(' ') ||
+    rawUser.email ||
+    'Healthcare Clinician';
+
+  return {
+    ...rawUser,
+    role,
+    roleName: role,
+    name
+  };
+}
 
 /**
  * CareConnect Ethiopia - Authentication & User Context
@@ -12,8 +33,8 @@ export const AuthContext = createContext({
   token: null,
   isAuthenticated: false,
   loading: true,
-  login: () => {},
-  logout: () => {},
+  login: async () => {},
+  logout: async () => {},
   hasRole: () => false,
   hasPermission: () => false
 });
@@ -23,20 +44,17 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Load initial session from localStorage
+  // Load initial session from storage
   useEffect(() => {
     try {
-      const storedToken =
-        localStorage.getItem('careconnect_access_token') ||
-        localStorage.getItem('careconnect_token');
-      const storedUser = localStorage.getItem('careconnect_user');
+      const storedToken = authService.getStoredAccessToken();
+      const storedUser = authService.getStoredUser();
 
       if (storedToken && storedUser) {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        setUser(normalizeUser(storedUser));
       } else if (storedUser) {
-        // Demo mode without token
-        setUser(JSON.parse(storedUser));
+        setUser(normalizeUser(storedUser));
       }
     } catch (e) {
       console.warn('[CareConnect Auth] Failed to restore session from storage:', e);
@@ -48,16 +66,20 @@ export function AuthProvider({ children }) {
   // Synchronize across browser tabs via storage events
   useEffect(() => {
     function handleStorageChange(e) {
-      if (e.key === 'careconnect_access_token' || e.key === 'careconnect_user') {
-        const updatedToken = localStorage.getItem('careconnect_access_token') || localStorage.getItem('careconnect_token');
-        const updatedUser = localStorage.getItem('careconnect_user');
+      if (
+        e.key === 'careconnect_access_token' ||
+        e.key === 'careconnect_user' ||
+        e.key === 'careconnect_token'
+      ) {
+        const updatedToken = authService.getStoredAccessToken();
+        const updatedUser = authService.getStoredUser();
 
         if (!updatedToken && !updatedUser) {
           setToken(null);
           setUser(null);
         } else {
           setToken(updatedToken);
-          setUser(updatedUser ? JSON.parse(updatedUser) : null);
+          setUser(normalizeUser(updatedUser));
         }
       }
     }
@@ -76,31 +98,44 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const login = useCallback((accessToken, userData) => {
+  const login = useCallback(async (credentialsOrToken, maybeUser) => {
     try {
-      if (accessToken) {
-        localStorage.setItem('careconnect_access_token', accessToken);
+      // Form credentials pattern: login({ email, password, rememberMe })
+      if (typeof credentialsOrToken === 'object' && credentialsOrToken !== null && credentialsOrToken.email) {
+        const result = await authService.login(credentialsOrToken);
+        const accessToken = result.accessToken || result.data?.accessToken;
+        const rawUser = result.user || result.data?.user || { email: credentialsOrToken.email };
+        const refreshToken = result.refreshToken || result.data?.refreshToken;
+        const normalized = normalizeUser(rawUser);
+
+        authService.setSessionStorage({ accessToken, refreshToken, user: normalized });
         setToken(accessToken);
+        setUser(normalized);
+        return { user: normalized, accessToken, refreshToken };
       }
-      if (userData) {
-        localStorage.setItem('careconnect_user', JSON.stringify(userData));
-        setUser(userData);
-      }
-    } catch (e) {
-      console.warn('[CareConnect Auth] Failed to save session:', e);
+
+      // Legacy direct token/user pattern: login(accessToken, userData)
+      const accessToken = credentialsOrToken;
+      const normalized = normalizeUser(maybeUser);
+      authService.setSessionStorage({ accessToken, user: normalized });
+      if (accessToken) setToken(accessToken);
+      if (normalized) setUser(normalized);
+      return { user: normalized, accessToken };
+    } catch (err) {
+      throw err;
     }
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     try {
-      localStorage.removeItem('careconnect_access_token');
-      localStorage.removeItem('careconnect_token');
-      localStorage.removeItem('careconnect_user');
+      await authService.logout();
     } catch {
-      // Storage unavailable
+      // Backend may be unreachable or session already expired
+    } finally {
+      authService.clearSessionStorage();
+      setToken(null);
+      setUser(null);
     }
-    setToken(null);
-    setUser(null);
   }, []);
 
   const hasRole = useCallback((roles) => {
