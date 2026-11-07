@@ -49,3 +49,15 @@ export class BadRequestError extends AppError {
     super(message, 400, 'BAD_REQUEST', details);
   }
 }
+
+export class PayloadTooLargeError extends AppError {
+  constructor(message = 'Uploaded file exceeds allowed size limit') {
+    super(message, 413, 'PAYLOAD_TOO_LARGE');
+  }
+}
+
+export class UnsupportedMediaTypeError extends AppError {
+  constructor(message = 'Unsupported file media type or invalid file signature') {
+    super(message, 415, 'UNSUPPORTED_MEDIA_TYPE');
+  }
+}
