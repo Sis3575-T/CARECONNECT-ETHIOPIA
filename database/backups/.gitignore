@@ -1,0 +1,7 @@
+# Ignore all SQL dumps and backup files in backups folder
+*.sql
+*.dump
+*.tar
+*.gz
+*.manifest.json
+!.gitkeep
