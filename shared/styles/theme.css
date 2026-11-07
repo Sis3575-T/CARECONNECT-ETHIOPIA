@@ -1,36 +1,231 @@
 /**
- * CareConnect Ethiopia - Shared Design Tokens & Theme Variables
- * Common CSS variables for colors, typography, and layout across all four portals.
+ * CareConnect Ethiopia - Unified Healthcare Design Tokens & Theme Variables
+ * Comprehensive CSS custom properties for colors, typography, elevation, spacing,
+ * and high-contrast WCAG 2.1 AA accessible theme modes across all portals.
  */
 
 :root {
-  /* Brand Primary - Ethiopian Healthcare Emerald & Sky */
+  /* =========================================================================
+     1. BRAND COLORS - ETHIOPIAN HEALTHCARE EMERALD & PRIMARY PALETTE
+     ========================================================================= */
   --cc-primary-50: #ecfdf5;
   --cc-primary-100: #d1fae5;
+  --cc-primary-200: #a7f3d0;
+  --cc-primary-300: #6ee7b7;
+  --cc-primary-400: #34d399;
   --cc-primary-500: #10b981;
   --cc-primary-600: #059669;
   --cc-primary-700: #047857;
+  --cc-primary-800: #065f46;
+  --cc-primary-900: #064e3b;
 
-  /* Secondary Clinical Blue */
-  --cc-clinical-50: #eff6ff;
-  --cc-clinical-500: #3b82f6;
-  --cc-clinical-600: #2563eb;
-  --cc-clinical-700: #1d4ed8;
+  /* Clinical Sky Blue (Health Centre Accent) */
+  --cc-sky-50: #f0f9ff;
+  --cc-sky-100: #e0f2fe;
+  --cc-sky-200: #bae6fd;
+  --cc-sky-500: #0ea5e9;
+  --cc-sky-600: #0284c7;
+  --cc-sky-700: #0369a1;
 
-  /* Priority & Triage Severity */
-  --cc-triage-emergency: #ef4444;
-  --cc-triage-urgent: #f59e0b;
-  --cc-triage-priority: #3b82f6;
-  --cc-triage-routine: #10b981;
+  /* Royal Purple (Transport Coordinator Accent) */
+  --cc-purple-50: #faf5ff;
+  --cc-purple-100: #f3e8ff;
+  --cc-purple-200: #e9d5ff;
+  --cc-purple-500: #a855f7;
+  --cc-purple-600: #9333ea;
+  --cc-purple-700: #7e22ce;
 
-  /* Surface & Neutrals */
+  /* Deep Admin Navy (Administrator Accent) */
+  --cc-navy-50: #f8fafc;
+  --cc-navy-100: #f1f5f9;
+  --cc-navy-800: #1e293b;
+  --cc-navy-900: #0f172a;
+  --cc-navy-950: #020617;
+
+  /* =========================================================================
+     2. CLINICAL TRIAGE SEVERITY TOKENS (National Referral Guidelines)
+     ========================================================================= */
+  --cc-triage-emergency: #e11d48; /* Red - Immediate < 15 min */
+  --cc-triage-urgent: #d97706;    /* Amber - Urgent < 2 hrs */
+  --cc-triage-priority: #2563eb;  /* Blue - Priority < 6 hrs */
+  --cc-triage-routine: #059669;   /* Green - Routine < 24 hrs */
+
+  /* =========================================================================
+     3. SEMANTIC FEEDBACK COLORS
+     ========================================================================= */
+  --cc-success-bg: #ecfdf5;
+  --cc-success-border: #a7f3d0;
+  --cc-success-text: #065f46;
+
+  --cc-warning-bg: #fffbeb;
+  --cc-warning-border: #fde68a;
+  --cc-warning-text: #92400e;
+
+  --cc-error-bg: #fff1f2;
+  --cc-error-border: #fecdd3;
+  --cc-error-text: #9f1239;
+
+  --cc-info-bg: #f0f9ff;
+  --cc-info-border: #bae6fd;
+  --cc-info-text: #075985;
+
+  /* =========================================================================
+     4. SURFACE & BACKGROUND TOKENS (LIGHT MODE DEFAULT)
+     ========================================================================= */
   --cc-bg-page: #f8fafc;
-  --cc-bg-card: #ffffff;
+  --cc-bg-canvas: #f1f5f9;
+  --cc-bg-surface: #ffffff;
+  --cc-bg-surface-raised: #ffffff;
+  --cc-bg-muted: #f1f5f9;
+  --cc-bg-hover: #f8fafc;
+
+  /* Borders & Dividers */
   --cc-border-subtle: #e2e8f0;
-  --cc-text-main: #0f172a;
+  --cc-border-default: #cbd5e1;
+  --cc-border-strong: #94a3b8;
+  --cc-border-focus: #059669;
+
+  /* Text & Typography */
+  --cc-text-primary: #0f172a;
+  --cc-text-secondary: #334155;
   --cc-text-muted: #64748b;
+  --cc-text-inverse: #ffffff;
+
+  /* =========================================================================
+     5. TYPOGRAPHY SCALE
+     ========================================================================= */
+  --cc-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --cc-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --cc-text-xs: 0.75rem;    /* 12px */
+  --cc-text-sm: 0.875rem;   /* 14px */
+  --cc-text-base: 1rem;     /* 16px */
+  --cc-text-lg: 1.125rem;   /* 18px */
+  --cc-text-xl: 1.25rem;    /* 20px */
+  --cc-text-2xl: 1.5rem;    /* 24px */
+  --cc-text-3xl: 1.875rem;  /* 30px */
+
+  --cc-leading-tight: 1.25;
+  --cc-leading-snug: 1.375;
+  --cc-leading-normal: 1.5;
+  --cc-leading-relaxed: 1.625;
+
+  --cc-font-normal: 400;
+  --cc-font-medium: 500;
+  --cc-font-semibold: 600;
+  --cc-font-bold: 700;
+  --cc-font-extrabold: 800;
+
+  /* =========================================================================
+     6. SPACING SCALE
+     ========================================================================= */
+  --cc-space-1: 0.25rem;  /* 4px */
+  --cc-space-2: 0.5rem;   /* 8px */
+  --cc-space-3: 0.75rem;  /* 12px */
+  --cc-space-4: 1rem;     /* 16px */
+  --cc-space-5: 1.25rem;  /* 20px */
+  --cc-space-6: 1.5rem;   /* 24px */
+  --cc-space-8: 2rem;     /* 32px */
+  --cc-space-10: 2.5rem;  /* 40px */
+  --cc-space-12: 3rem;    /* 48px */
+  --cc-space-16: 4rem;    /* 64px */
+
+  /* =========================================================================
+     7. ELEVATION & SHADOWS
+     ========================================================================= */
+  --cc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --cc-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --cc-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+  --cc-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  --cc-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+
+  /* =========================================================================
+     8. BORDER RADIUS SCALE
+     ========================================================================= */
+  --cc-radius-xs: 0.25rem;  /* 4px */
+  --cc-radius-sm: 0.375rem; /* 6px */
+  --cc-radius-md: 0.5rem;   /* 8px */
+  --cc-radius-lg: 0.75rem;  /* 12px */
+  --cc-radius-xl: 1rem;     /* 16px */
+  --cc-radius-2xl: 1.5rem;  /* 24px */
+  --cc-radius-full: 9999px;
+
+  /* =========================================================================
+     9. Z-INDEX LEVELS
+     ========================================================================= */
+  --cc-z-drawer-backdrop: 40;
+  --cc-z-sidebar: 30;
+  --cc-z-header: 20;
+  --cc-z-dropdown: 50;
+  --cc-z-modal-backdrop: 60;
+  --cc-z-modal: 70;
+  --cc-z-toast: 80;
+  --cc-z-tooltip: 90;
+
+  /* =========================================================================
+     10. FOCUS RING & ACCESSIBILITY
+     ========================================================================= */
+  --cc-focus-ring: 0 0 0 3px rgba(5, 150, 105, 0.35);
+  --cc-transition-speed: 150ms;
+  --cc-transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* Layout Constants */
-  --cc-sidebar-width: 260px;
-  --cc-topbar-height: 64px;
+  --cc-sidebar-width-expanded: 260px;
+  --cc-sidebar-width-collapsed: 72px;
+  --cc-header-height: 64px;
+}
+
+/* =========================================================================
+   11. DARK MODE TOKEN OVERRIDES (.dark class on root)
+   ========================================================================= */
+.dark {
+  --cc-bg-page: #0b1120;
+  --cc-bg-canvas: #0f172a;
+  --cc-bg-surface: #1e293b;
+  --cc-bg-surface-raised: #334155;
+  --cc-bg-muted: #1e293b;
+  --cc-bg-hover: #334155;
+
+  --cc-border-subtle: #334155;
+  --cc-border-default: #475569;
+  --cc-border-strong: #64748b;
+  --cc-border-focus: #10b981;
+
+  --cc-text-primary: #f8fafc;
+  --cc-text-secondary: #cbd5e1;
+  --cc-text-muted: #94a3b8;
+  --cc-text-inverse: #0f172a;
+
+  --cc-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --cc-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --cc-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  --cc-shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4);
+
+  --cc-success-bg: rgba(6, 78, 59, 0.3);
+  --cc-success-border: #065f46;
+  --cc-success-text: #6ee7b7;
+
+  --cc-warning-bg: rgba(120, 53, 15, 0.3);
+  --cc-warning-border: #92400e;
+  --cc-warning-text: #fcd34d;
+
+  --cc-error-bg: rgba(136, 19, 55, 0.3);
+  --cc-error-border: #9f1239;
+  --cc-error-text: #fda4af;
+
+  --cc-info-bg: rgba(12, 74, 110, 0.3);
+  --cc-info-border: #075985;
+  --cc-info-text: #7dd3fc;
+
+  --cc-focus-ring: 0 0 0 3px rgba(16, 185, 129, 0.45);
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,28 +1,92 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
+import { ThemeContext, THEME_MODES } from '../context/ThemeContext.jsx';
 
+/**
+ * CareConnect Ethiopia - useTheme Hook
+ * Provides theme controls (theme, resolvedTheme, isDark, toggleTheme, setTheme).
+ * Consumes ThemeContext if available, or falls back to local component-level state.
+ */
 export function useTheme(portalKey = 'health_centre') {
+  const context = useContext(ThemeContext);
+
+  // If inside ThemeProvider, return the context value
+  if (context && context.setTheme) {
+    return context;
+  }
+
+  // Standalone fallback if outside ThemeProvider
   const storageKey = `careconnect_${portalKey}_theme`;
-  
-  const [theme, setTheme] = useState(() => {
+
+  const [theme, setThemeState] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem(storageKey) || 'light';
+      try {
+        return localStorage.getItem(storageKey) || THEME_MODES.LIGHT;
+      } catch {
+        return THEME_MODES.LIGHT;
+      }
     }
-    return 'light';
+    return THEME_MODES.LIGHT;
+  });
+
+  const [systemIsDark, setSystemIsDark] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    return false;
   });
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => setSystemIsDark(e.matches);
+
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, []);
+
+  const resolvedTheme = theme === THEME_MODES.SYSTEM 
+    ? (systemIsDark ? THEME_MODES.DARK : THEME_MODES.LIGHT)
+    : theme;
+
+  const isDark = resolvedTheme === THEME_MODES.DARK;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     const root = document.documentElement;
-    if (theme === 'dark') {
+    if (isDark) {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem(storageKey, theme);
-  }, [theme, storageKey]);
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch {
+      // safe fallback
+    }
+  }, [isDark, theme, storageKey]);
 
-  const toggleTheme = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  const toggleTheme = useCallback(() => {
+    setThemeState((current) => {
+      const active = current === THEME_MODES.SYSTEM 
+        ? (systemIsDark ? THEME_MODES.DARK : THEME_MODES.LIGHT)
+        : current;
+      return active === THEME_MODES.DARK ? THEME_MODES.LIGHT : THEME_MODES.DARK;
+    });
+  }, [systemIsDark]);
+
+  const setTheme = useCallback((newTheme) => {
+    setThemeState(newTheme);
+  }, []);
+
+  return {
+    theme,
+    resolvedTheme,
+    isDark,
+    toggleTheme,
+    setTheme
   };
-
-  return { theme, toggleTheme, isDark: theme === 'dark' };
 }
+
+export default useTheme;
