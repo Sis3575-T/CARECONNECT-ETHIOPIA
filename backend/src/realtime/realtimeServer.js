@@ -9,6 +9,7 @@ import config from '../config/env.js';
 import { connectionRegistry } from './connectionRegistry.js';
 import { WS_CLOSE_CODES, SERVER_MESSAGE_TYPES, CLIENT_MESSAGE_TYPES } from '../constants/realtime.js';
 import { extractAuthToken, authenticateConnection, createAuthMessageHandler } from './websocketAuth.js';
+import { subscriptionManager } from './subscriptionManager.js';
 
 export class RealtimeServer {
   constructor(options = {}) {
@@ -20,14 +21,61 @@ export class RealtimeServer {
     this.maxPayloadBytes = options.maxPayloadBytes || config.realtime?.maxPayloadBytes || 16384;
     this.allowedOrigins = options.allowedOrigins || config.cors?.allowedOrigins || [];
     this.registry = options.registry || connectionRegistry;
+    this.subscriptionManager = options.subscriptionManager || subscriptionManager;
+    this.subscriptionManager.setRegistry(this.registry);
 
     this.wss = null;
     this.heartbeatTimer = null;
     this.isShuttingDown = false;
     this.messageHandlers = new Set();
 
-    // Register core authentication message handler
-    this.addMessageHandler(createAuthMessageHandler(this.registry));
+    // Register core authentication and subscription message handlers
+    this.addMessageHandler(createAuthMessageHandler(this.registry, this.subscriptionManager));
+    this.addMessageHandler(this._createSubscriptionMessageHandler());
+  }
+
+  /**
+   * Generates handler for subscription and unsubscription client commands
+   */
+  _createSubscriptionMessageHandler() {
+    return async (ws, meta, message) => {
+      if (message.type === CLIENT_MESSAGE_TYPES.SUBSCRIBE) {
+        if (!meta.authenticated) {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.ERROR,
+            code: 'AUTHENTICATION_REQUIRED',
+            error: 'Authentication required before subscribing to channels'
+          });
+          return;
+        }
+
+        const res = await this.subscriptionManager.subscribe(meta, message.channel);
+        if (res.success) {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.SUBSCRIBED,
+            channel: res.channel,
+            duplicate: Boolean(res.duplicate)
+          });
+        } else {
+          this._send(ws, {
+            type: SERVER_MESSAGE_TYPES.ERROR,
+            code: 'FORBIDDEN_CHANNEL',
+            channel: message.channel,
+            error: res.error
+          });
+        }
+        return;
+      }
+
+      if (message.type === CLIENT_MESSAGE_TYPES.UNSUBSCRIBE) {
+        const res = this.subscriptionManager.unsubscribe(meta, message.channel);
+        this._send(ws, {
+          type: SERVER_MESSAGE_TYPES.UNSUBSCRIBED,
+          channel: res.channel
+        });
+        return;
+      }
+    };
   }
 
   /**
@@ -147,8 +195,13 @@ export class RealtimeServer {
     }
 
     if (initialToken) {
-      authenticateConnection(meta, initialToken, this.registry).then((result) => {
+      authenticateConnection(meta, initialToken, this.registry).then(async (result) => {
         if (result.success && ws.readyState === WebSocket.OPEN) {
+          try {
+            await this.subscriptionManager.autoSubscribe(meta);
+          } catch {
+            // Ignore auto-subscribe errors
+          }
           this._send(ws, {
             type: SERVER_MESSAGE_TYPES.AUTH_SUCCESS,
             user: result.user
@@ -193,12 +246,13 @@ export class RealtimeServer {
 
     // Error handling
     ws.on('error', (err) => {
-      // Clean up silently or log to diagnostic
+      this.subscriptionManager.cleanupConnection(meta.connectionId);
       this.registry.unregister(meta.connectionId);
     });
 
     // Disconnect cleanup
     ws.on('close', (code, reason) => {
+      this.subscriptionManager.cleanupConnection(meta.connectionId);
       this.registry.unregister(meta.connectionId);
     });
   }

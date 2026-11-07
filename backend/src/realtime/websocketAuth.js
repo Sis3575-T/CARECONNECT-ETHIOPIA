@@ -198,7 +198,7 @@ export async function authenticateConnection(meta, token, registry = null) {
 /**
  * Creates authentication message handler for RealtimeServer
  */
-export function createAuthMessageHandler(registry) {
+export function createAuthMessageHandler(registry, subscriptionManager = null) {
   return async (ws, meta, message) => {
     if (message.type === CLIENT_MESSAGE_TYPES.AUTH) {
       if (meta.authenticated) {
@@ -214,6 +214,13 @@ export function createAuthMessageHandler(registry) {
 
       const result = await authenticateConnection(meta, message.token, registry);
       if (result.success) {
+        if (subscriptionManager) {
+          try {
+            await subscriptionManager.autoSubscribe(meta);
+          } catch {
+            // Non-critical auto-subscribe failure
+          }
+        }
         if (ws.readyState === 1) {
           ws.send(JSON.stringify({
             type: SERVER_MESSAGE_TYPES.AUTH_SUCCESS,
