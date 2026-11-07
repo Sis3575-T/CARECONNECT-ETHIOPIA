@@ -32,6 +32,7 @@ export * from './components/ui/Button.jsx';
 // Form Components
 export * from './components/forms/TextInput.jsx';
 export * from './components/forms/PasswordInput.jsx';
+export * from './components/forms/LoginForm.jsx';
 export * from './components/forms/Select.jsx';
 export * from './components/forms/Textarea.jsx';
 export * from './components/forms/Checkbox.jsx';
