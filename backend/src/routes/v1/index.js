@@ -15,6 +15,7 @@ import patientsRouter from './patients.js';
 import referralsRouter from './referrals.js';
 import coordinationRouter from './coordination.js';
 import documentsRouter from './documents.js';
+import jobsRouter from './jobs.js';
 
 const router = Router();
 
@@ -33,6 +34,7 @@ router.get('/', (req, res) => {
       patients: '/api/v1/patients',
       referrals: '/api/v1/referrals',
       documents: '/api/v1/documents',
+      jobs: '/api/v1/jobs',
       transport: '/api/v1/transport',
       notifications: '/api/v1/notifications',
       analytics: '/api/v1/analytics',
@@ -52,6 +54,7 @@ router.use('/audit', auditRouter);
 router.use('/patients', patientsRouter);
 router.use('/referrals', referralsRouter);
 router.use('/documents', documentsRouter);
+router.use('/jobs', jobsRouter);
 router.use('/coordination', coordinationRouter);
 router.use('/', coordinationRouter);
 
