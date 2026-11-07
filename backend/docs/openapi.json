@@ -62,6 +62,10 @@
       "description": "Immutable security event logging and regulatory compliance audits"
     },
     {
+      "name": "Notifications & Communication",
+      "description": "In-app notification center, read/unread states, unread badge metrics, and user channel preferences"
+    },
+    {
       "name": "Transport",
       "description": "Emergency ambulance request and vehicle dispatch tracking"
     },
@@ -2650,6 +2654,294 @@
         "responses": {
           "200": {
             "description": "Transport requests"
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "List paginated notifications for authenticated user with category/read filters",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isRead",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated user notifications"
+          }
+        }
+      }
+    },
+    "/notifications/unread-count": {
+      "get": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Retrieve instantaneous count of unread and active notifications for UI badge",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unread notification count object"
+          }
+        }
+      }
+    },
+    "/notifications/unread": {
+      "get": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Retrieve dedicated unread notifications inbox view",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated unread notifications"
+          }
+        }
+      }
+    },
+    "/notifications/{notificationId}": {
+      "get": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Retrieve single notification details with strict recipient ownership guard",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification details"
+          },
+          "403": {
+            "description": "Cross-user access denied"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Soft-dismiss notification from active notification center",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification dismissed"
+          }
+        }
+      }
+    },
+    "/notifications/{notificationId}/read": {
+      "patch": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Mark notification as read (idempotent)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marked as read"
+          }
+        }
+      }
+    },
+    "/notifications/{notificationId}/unread": {
+      "patch": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Mark notification as unread (idempotent)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marked as unread"
+          }
+        }
+      }
+    },
+    "/notifications/read-all": {
+      "patch": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Mark all eligible unread notifications as read (with optional category filter)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All notifications marked as read"
+          }
+        }
+      }
+    },
+    "/notifications/preferences": {
+      "get": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Retrieve authenticated user notification channel and category preferences",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User notification preferences"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Notifications & Communication"
+        ],
+        "summary": "Update notification preferences (enforces non-negotiable security and escalation mandates)",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Preferences updated"
+          },
+          "400": {
+            "description": "Mandatory category cannot be disabled"
           }
         }
       }
