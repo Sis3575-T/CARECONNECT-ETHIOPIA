@@ -197,6 +197,79 @@ export async function verifyDocument(req, res, next) {
   }
 }
 
+export async function archiveDocument(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const { reason } = req.body || {};
+    const user = req.user;
+    const context = extractRequestContext(req);
+
+    const archived = await documentService.archiveDocument(documentId, user, reason, context);
+
+    return successResponse(res, archived, 'Document archived successfully', HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteDocument(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const reason = req.body?.reason || req.query?.reason;
+    const user = req.user;
+    const context = extractRequestContext(req);
+
+    const result = await documentService.deleteDocument(documentId, user, reason, context);
+
+    return successResponse(res, result, 'Document record soft-deleted safely', HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function queueProcessing(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const options = req.body || {};
+    const user = req.user;
+    const context = extractRequestContext(req);
+
+    const result = await documentService.queueDocumentProcessing(documentId, user, options, context);
+
+    return successResponse(res, result, 'Document processing pipeline status updated', HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getProcessingStatus(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const user = req.user;
+
+    const status = await documentService.getProcessingStatus(documentId, user);
+
+    return successResponse(res, status, 'Document processing status retrieved', HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function recordProcessingResult(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const result = req.body || {};
+    const user = req.user;
+    const context = extractRequestContext(req);
+
+    const updated = await documentService.recordProcessingResult(documentId, user, result, context);
+
+    return successResponse(res, updated, 'Document processing outcome recorded', HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export default {
   uploadDocument,
   getDocument,
@@ -207,5 +280,10 @@ export default {
   getDocumentAccessLogs,
   replaceVersion,
   getVersionHistory,
-  verifyDocument
+  verifyDocument,
+  archiveDocument,
+  deleteDocument,
+  queueProcessing,
+  getProcessingStatus,
+  recordProcessingResult
 };

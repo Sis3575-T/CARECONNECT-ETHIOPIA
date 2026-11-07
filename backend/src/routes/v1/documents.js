@@ -14,7 +14,12 @@ import {
   getDocumentAccessLogs,
   replaceVersion,
   getVersionHistory,
-  verifyDocument
+  verifyDocument,
+  archiveDocument,
+  deleteDocument,
+  queueProcessing,
+  getProcessingStatus,
+  recordProcessingResult
 } from '../../controllers/documentController.js';
 
 const router = Router();
@@ -45,5 +50,20 @@ router.get('/:documentId/versions', getVersionHistory);
 
 // 8. Human-controlled document verification review
 router.post('/:documentId/verify', verifyDocument);
+
+// 9. Document Archival (non-destructive lifecycle transition)
+router.post('/:documentId/archive', archiveDocument);
+
+// 10. Document Soft Deletion (requires reason and permission)
+router.delete('/:documentId', deleteDocument);
+
+// 11. AI/OCR Processing Preparation: Query pipeline status
+router.get('/:documentId/processing', getProcessingStatus);
+
+// 12. AI/OCR Processing Preparation: Queue processing job (idempotent)
+router.post('/:documentId/processing/queue', queueProcessing);
+
+// 13. AI/OCR Processing Preparation: Record processing result
+router.post('/:documentId/processing/complete', recordProcessingResult);
 
 export default router;

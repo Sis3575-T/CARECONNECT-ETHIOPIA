@@ -13,7 +13,7 @@ export function request(app) {
     post: (url, body, options = {}) => executeRequest(app, 'POST', url, body, options),
     put: (url, body, options = {}) => executeRequest(app, 'PUT', url, body, options),
     patch: (url, body, options = {}) => executeRequest(app, 'PATCH', url, body, options),
-    delete: (url, options = {}) => executeRequest(app, 'DELETE', url, null, options)
+    delete: (url, options = {}) => executeRequest(app, 'DELETE', url, options?.body || null, options)
   };
 }
 

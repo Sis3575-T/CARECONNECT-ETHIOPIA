@@ -537,6 +537,257 @@ export class DocumentService {
   }
 
   /**
+   * Archive document (controlled non-destructive lifecycle state)
+   */
+  async archiveDocument(documentId, user, reason = 'Administrative archival', context = {}) {
+    if (!user) {
+      throw new ForbiddenError('Authentication required to archive document');
+    }
+
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    // Tenancy check: user must belong to originating facility or be system admin
+    if (user.roleId !== 6 && user.roleId !== 7 && user.facilityId !== doc.facility_id) {
+      throw new ForbiddenError('Only originating facility staff or administrators can archive documents');
+    }
+
+    const archived = await this.repo.archive(doc.id, user.userId || user.id);
+
+    await this.audit.recordDocumentAccess({
+      eventName: SECURITY_EVENTS.DOCUMENT_ARCHIVED,
+      documentId: doc.id,
+      documentUuid: doc.uuid,
+      userId: user.userId || user.id,
+      facilityId: doc.facility_id,
+      referralId: doc.referral_id,
+      patientId: doc.patient_id,
+      ipAddress: context?.ipAddress,
+      userAgent: context?.userAgent,
+      requestId: context?.requestId,
+      details: {
+        reason,
+        previousStatus: doc.verification_status
+      }
+    });
+
+    return this.sanitizeDocumentResponse(archived);
+  }
+
+  /**
+   * Soft-delete document with mandatory deletion reason
+   */
+  async deleteDocument(documentId, user, reason, context = {}) {
+    if (!user) {
+      throw new ForbiddenError('Authentication required to delete document');
+    }
+
+    if (!reason || typeof reason !== 'string' || reason.trim().length < 5) {
+      throw new ValidationError('A specific deletion reason is required (minimum 5 characters)', [
+        { field: 'reason', message: 'deletion_reason is required' }
+      ]);
+    }
+
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    // Role check: Only system administrators or facility supervisors can soft delete clinical documents
+    const isAuthorizedRole = user.roleId === 6 || user.roleId === 7 || (user.roleId === 1 && user.facilityId === doc.facility_id);
+    if (!isAuthorizedRole) {
+      throw new ForbiddenError('You do not have permission to delete clinical documents');
+    }
+
+    // Do not delete underlying disk file if other versions reference the same file_path
+    const versions = await this.repo.getVersionHistory(doc.document_group_id || doc.uuid);
+    const otherActiveVersions = versions.filter(v => v.id !== doc.id && !v.deleted_at);
+
+    // Soft delete metadata in repository
+    const deleted = await this.repo.softDelete(doc.id, reason.trim(), user.userId || user.id);
+
+    // Record audit event
+    await this.audit.recordDocumentAccess({
+      eventName: SECURITY_EVENTS.DOCUMENT_DELETED,
+      documentId: doc.id,
+      documentUuid: doc.uuid,
+      userId: user.userId || user.id,
+      facilityId: doc.facility_id,
+      referralId: doc.referral_id,
+      patientId: doc.patient_id,
+      ipAddress: context?.ipAddress,
+      userAgent: context?.userAgent,
+      requestId: context?.requestId,
+      severity: 'WARNING',
+      details: {
+        reason: reason.trim(),
+        versionNumber: doc.version_number,
+        otherActiveVersionsRemaining: otherActiveVersions.length
+      }
+    });
+
+    return {
+      success: true,
+      documentId: doc.id,
+      deleted_at: deleted.deleted_at,
+      deletion_reason: deleted.deletion_reason
+    };
+  }
+
+  /**
+   * Queue document for future OCR and AI processing pipeline (preparation stage)
+   */
+  async queueDocumentProcessing(documentId, user, processingOptions = {}, context = {}) {
+    if (!user) {
+      throw new ForbiddenError('Authentication required to queue document processing');
+    }
+
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    await this.checkDocumentAccess(user, doc, 'VIEW');
+
+    // Duplicate Job Prevention / Idempotency check:
+    // If job is already PROCESSING and updated within the last 5 minutes, prevent duplicate queuing
+    const lockWindowMs = 5 * 60 * 1000;
+    if (doc.processing_status === DOCUMENT_PROCESSING_STATUS.PROCESSING) {
+      const lastUpdated = new Date(doc.updated_at).getTime();
+      const isStillLocked = (Date.now() - lastUpdated) < lockWindowMs;
+      if (isStillLocked) {
+        return {
+          status: 'ALREADY_ACTIVE',
+          message: 'Document processing is already actively in progress',
+          document: this.sanitizeDocumentResponse(doc)
+        };
+      }
+    }
+
+    const attempts = (Number(doc.processing_attempts) || 0) + 1;
+    const now = new Date().toISOString();
+
+    const processingMetadata = {
+      ...(doc.processing_metadata || {}),
+      pipelineVersion: 'careconnect-ocr-prep-v1',
+      plannedStages: [
+        '1.file_validation',
+        '2.document_classification',
+        '3.ocr_extraction',
+        '4.text_normalization',
+        '5.structured_information_extraction',
+        '6.human_review'
+      ],
+      currentStage: '1.file_validation',
+      queuedAt: now,
+      options: processingOptions
+    };
+
+    const updated = await this.repo.update(doc.id, {
+      processing_status: DOCUMENT_PROCESSING_STATUS.PROCESSING,
+      processing_attempts: attempts,
+      processing_metadata: processingMetadata,
+      last_processed_at: now
+    });
+
+    await this.audit.recordDocumentAccess({
+      eventName: SECURITY_EVENTS.DOCUMENT_PROCESSING_QUEUED,
+      documentId: doc.id,
+      documentUuid: doc.uuid,
+      userId: user.userId || user.id,
+      facilityId: doc.facility_id,
+      referralId: doc.referral_id,
+      patientId: doc.patient_id,
+      ipAddress: context?.ipAddress,
+      userAgent: context?.userAgent,
+      requestId: context?.requestId,
+      details: {
+        attempts,
+        plannedStages: processingMetadata.plannedStages
+      }
+    });
+
+    return {
+      status: 'QUEUED',
+      document: this.sanitizeDocumentResponse(updated)
+    };
+  }
+
+  /**
+   * Get AI and OCR processing status metadata
+   */
+  async getProcessingStatus(documentId, user) {
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    await this.checkDocumentAccess(user, doc, 'VIEW');
+
+    return {
+      documentId: doc.id,
+      documentUuid: doc.uuid,
+      versionNumber: doc.version_number,
+      processingStatus: doc.processing_status,
+      processingAttempts: doc.processing_attempts,
+      processingError: doc.processing_error,
+      lastProcessedAt: doc.last_processed_at,
+      metadata: doc.processing_metadata,
+      ocrStatus: doc.ocr_status,
+      disclaimer: 'Preparation interface for asynchronous AI/OCR extraction. Clinical decision making remains strictly human-led.'
+    };
+  }
+
+  /**
+   * Record worker processing outcome (callback interface)
+   */
+  async recordProcessingResult(documentId, user, result = {}, context = {}) {
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    const { status, error = null, metadata = {} } = result;
+    const now = new Date().toISOString();
+
+    const mergedMetadata = {
+      ...(doc.processing_metadata || {}),
+      ...metadata,
+      completedAt: now
+    };
+
+    const updated = await this.repo.update(doc.id, {
+      processing_status: status || DOCUMENT_PROCESSING_STATUS.COMPLETED,
+      processing_error: error || null,
+      processing_metadata: mergedMetadata,
+      last_processed_at: now
+    });
+
+    const isFailure = status === DOCUMENT_PROCESSING_STATUS.FAILED;
+    await this.audit.recordDocumentAccess({
+      eventName: isFailure ? SECURITY_EVENTS.DOCUMENT_PROCESSING_FAILED : SECURITY_EVENTS.DOCUMENT_PROCESSING_COMPLETED,
+      documentId: doc.id,
+      documentUuid: doc.uuid,
+      userId: user?.userId || user?.id,
+      facilityId: doc.facility_id,
+      referralId: doc.referral_id,
+      patientId: doc.patient_id,
+      ipAddress: context?.ipAddress,
+      userAgent: context?.userAgent,
+      requestId: context?.requestId,
+      severity: isFailure ? 'WARNING' : 'INFO',
+      details: {
+        status,
+        hasError: Boolean(error)
+      }
+    });
+
+    return this.sanitizeDocumentResponse(updated);
+  }
+
+  /**
    * Sanitize document object before returning to client (hide absolute disk paths)
    */
   sanitizeDocumentResponse(doc) {
