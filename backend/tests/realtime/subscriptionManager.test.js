@@ -215,8 +215,14 @@ describe('Authorized Real-Time Subscriptions Suite — Commit 107', () => {
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${thirdToken}` }
     });
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
     rtServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     const errorPromise = new Promise((resolve) => {
       clientWs.on('message', (data) => {
@@ -241,8 +247,14 @@ describe('Authorized Real-Time Subscriptions Suite — Commit 107', () => {
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${hcToken}` }
     });
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
     rtServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     const errors = [];
     clientWs.on('message', (data) => {
@@ -267,8 +279,14 @@ describe('Authorized Real-Time Subscriptions Suite — Commit 107', () => {
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${hcToken}` }
     });
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
     rtServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     const responses = [];
     clientWs.on('message', (data) => {
@@ -277,10 +295,10 @@ describe('Authorized Real-Time Subscriptions Suite — Commit 107', () => {
     });
 
     clientWs.send(JSON.stringify({ type: CLIENT_MESSAGE_TYPES.SUBSCRIBE, channel: `referral:${referral.id}` }));
-    await new Promise((r) => setTimeout(r, 30));
+    await new Promise((r) => setTimeout(r, 40));
 
     clientWs.send(JSON.stringify({ type: CLIENT_MESSAGE_TYPES.SUBSCRIBE, channel: `referral:${referral.id}` }));
-    await new Promise((r) => setTimeout(r, 30));
+    await new Promise((r) => setTimeout(r, 40));
 
     assert.equal(responses.length, 2);
     assert.equal(responses[0].duplicate, false);
@@ -293,8 +311,14 @@ describe('Authorized Real-Time Subscriptions Suite — Commit 107', () => {
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${hcToken}` }
     });
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
     rtServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     // Limit is 5. Already has user and facility (2). Add 3 more, then 4th should fail.
     const meta = registry.getByUserId(hcStaff.id)[0];
@@ -321,8 +345,14 @@ describe('Authorized Real-Time Subscriptions Suite — Commit 107', () => {
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${hcToken}` }
     });
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
     rtServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     // Unsubscribe from facility
     const unsubPromise = new Promise((resolve) => {

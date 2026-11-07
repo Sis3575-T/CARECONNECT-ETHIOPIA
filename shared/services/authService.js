@@ -1,6 +1,7 @@
 import { apiClient } from './apiClient.js';
 import { PORTALS } from '../constants/portals.js';
 import { ROLES } from '../constants/roles.js';
+import { storage } from '../utils/storage.js';
 
 /**
  * CareConnect Ethiopia - Authentication & Session Service
@@ -142,60 +143,34 @@ export async function revokeSession(sessionId) {
 // ============================================================================
 
 export function getStoredAccessToken() {
-  if (typeof window === 'undefined') return null;
-  try {
-    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN) || localStorage.getItem('careconnect_token');
-  } catch {
-    return null;
-  }
+  return storage.get(STORAGE_KEYS.ACCESS_TOKEN) || storage.get('careconnect_token') || null;
 }
 
 export function getStoredRefreshToken() {
-  if (typeof window === 'undefined') return null;
-  try {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-  } catch {
-    return null;
-  }
+  return storage.get(STORAGE_KEYS.REFRESH_TOKEN) || null;
 }
 
 export function getStoredUser() {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = localStorage.getItem(STORAGE_KEYS.USER);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  return storage.get(STORAGE_KEYS.USER) || null;
 }
 
 export function setSessionStorage({ accessToken, refreshToken, user }) {
-  if (typeof window === 'undefined') return;
-  try {
-    if (accessToken) {
-      localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-    }
-    if (refreshToken) {
-      localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
-    }
-    if (user) {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-    }
-  } catch (e) {
-    console.warn('[CareConnect AuthService] Storage write error:', e);
+  if (accessToken) {
+    storage.set(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
+  }
+  if (refreshToken) {
+    storage.set(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+  }
+  if (user) {
+    storage.set(STORAGE_KEYS.USER, user);
   }
 }
 
 export function clearSessionStorage() {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.USER);
-    localStorage.removeItem('careconnect_token');
-  } catch (e) {
-    console.warn('[CareConnect AuthService] Storage clear error:', e);
-  }
+  storage.remove(STORAGE_KEYS.ACCESS_TOKEN);
+  storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+  storage.remove(STORAGE_KEYS.USER);
+  storage.remove('careconnect_token');
 }
 
 // ============================================================================

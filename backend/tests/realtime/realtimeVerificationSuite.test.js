@@ -287,8 +287,16 @@ describe('Real-Time Security, Reliability and Event Delivery Verification Suite 
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${hcToken}` }
     });
+
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
+
     realtimeServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     const eventPromise = new Promise((resolve) => {
       clientWs.on('message', (d) => {
@@ -313,8 +321,16 @@ describe('Real-Time Security, Reliability and Event Delivery Verification Suite 
     const { clientWs, serverWs, req } = createMockWebSocketPair({
       headers: { authorization: `Bearer ${hcToken}` }
     });
+
+    const authPromise = new Promise((resolve) => {
+      clientWs.on('message', (d) => {
+        const parsed = JSON.parse(d.toString());
+        if (parsed.type === SERVER_MESSAGE_TYPES.AUTH_SUCCESS) resolve(parsed);
+      });
+    });
+
     realtimeServer._handleConnection(serverWs, req);
-    await new Promise((r) => setTimeout(r, 40));
+    await authPromise;
 
     const notifPromise = new Promise((resolve) => {
       clientWs.on('message', (d) => {

@@ -315,6 +315,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 16 OF 50: AUTHENTICATION FRONTEND, FOUR PORTAL LOGIN EXPERIENCES, SESSION MANAGEMENT AND PROTECTED USER ACCESS
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 16 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-07T21:45:00.000Z  
+
+### Part 16 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **121** | `frontend: audit and establish authentication experience architecture` | ✅ COMMITTED | `3baffd9` | Authored `docs/architecture/part16-frontend-authentication-assessment.md`, created `shared/services/authService.js` with all 11 auth endpoints, role-to-portal authorization matrix, and re-exported from `shared/index.js`. | None |
+| **122** | `frontend: implement shared authentication forms and validation` | ✅ COMMITTED | `e655533` | Built `shared/components/forms/LoginForm.jsx` with real-time validation, accessible labels, password toggle, remember me, loading states, portal accent styling, and quick-fill demo presets. | None |
+| **123** | `frontend: implement four portal-specific login experiences` | ✅ COMMITTED | `2ea249f` | Implemented 4 portal-specific login pages with server-authoritative role verification, graceful role mismatch banners with cross-portal redirection, and specific branding for Health Centre, Hospital, Transport, and Admin. | None |
+| **124** | `frontend: implement secure session and refresh lifecycle` | ✅ COMMITTED | `cfe0e80` | Implemented auto-refresh request queueing on 401 in `apiClient.js`, session restoration via `/api/v1/auth/me`, silent token rotation, and `refreshSession()` / `isSessionValid()` in `AuthContext.jsx`. | None |
+| **125** | `frontend: implement protected routes and role-aware portal access` | ✅ COMMITTED | `5796e9f` | Enhanced `ProtectedRoute.jsx` with accessible loading splash during session restoration, `RoleRoute.jsx` with strict RBAC checking, and `UnauthorizedPage.jsx` with user/facility context and role switch buttons. | None |
+| **126** | `frontend: implement logout and session expiry handling` | ✅ COMMITTED | `d3f0ee2` | Enhanced `logout()` and `logoutAll()` calling backend revocation, integrated `handleLogout` into `PortalLayout.jsx` and `SharedHeader.jsx`, and multi-tab session expiration listener with user notice. | None |
+| **127** | `frontend: improve authentication security accessibility and usability` | ✅ COMMITTED | `37eba15` | WCAG 2.1 AA focus rings, `aria-live` error announcements, 44x44px touch targets on toggles, responsive padding (`p-6 sm:p-8`), and zero raw credential logging. | None |
+| **128** | `test: verify portal authentication session and authorization flows` | 🔄 STAGED | Pending | Verified 42 frontend tests (`shared/tests/*.test.js`), 760 backend tests, 38 DB tests, standards check, and production build of all 4 independent portals. Authored `docs/PART_16_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
