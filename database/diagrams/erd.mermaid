@@ -34,6 +34,8 @@ erDiagram
     referrals ||--o{ referral_feedback : "counter_referred_with"
 
     %% Documents Domain
+    patients ||--o{ referral_documents : "contains"
+    healthcare_facilities ||--o{ referral_documents : "originates_from"
     referrals ||--o{ referral_documents : "attaches"
     users ||--o{ referral_documents : "uploaded_by"
     referral_documents ||--o{ document_access_logs : "accessed_via"
@@ -130,12 +132,19 @@ erDiagram
         int id PK
         uuid uuid UK
         string referral_id FK
-        string document_type
+        string patient_id FK
+        string facility_id FK
+        string document_category
         string file_name
         string storage_uri
         string mime_type
         bigint file_size_bytes
-        string ocr_status
+        string sha256_checksum
+        int version_number
+        uuid document_group_id
+        boolean is_latest
+        string verification_status
+        string processing_status
     }
 
     transport_records {
