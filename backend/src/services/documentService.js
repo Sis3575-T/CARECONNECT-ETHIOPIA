@@ -12,7 +12,8 @@ import {
   ForbiddenError,
   NotFoundError,
   BadRequestError,
-  ValidationError
+  ValidationError,
+  ConflictError
 } from '../utils/errors.js';
 import {
   ROLES,
@@ -21,6 +22,8 @@ import {
   DOCUMENT_VERIFICATION_STATUS,
   DOCUMENT_PROCESSING_STATUS
 } from '../constants/index.js';
+import { validateDocumentReplacement, validateDocumentVerification } from '../validators/documentValidator.js';
+import { validateUploadedFile } from '../validators/fileValidator.js';
 
 export class DocumentService {
   constructor(
@@ -336,6 +339,155 @@ export class DocumentService {
     }
 
     return this.repo.getAccessLogs(doc.id);
+  }
+
+  /**
+   * Replace document version with optimistic concurrency check
+   */
+  async replaceDocumentVersion({ documentId, file, payload = {}, user }) {
+    if (!user) {
+      throw new ForbiddenError('Authentication required to upload replacement document');
+    }
+
+    const existingDoc = await this.repo.findById(documentId);
+    if (!existingDoc || existingDoc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    // Tenancy / permission check
+    await this.checkDocumentAccess(user, existingDoc, 'UPLOAD');
+
+    // Optimistic Concurrency Check: Only the latest version can be replaced
+    if (!existingDoc.is_latest) {
+      throw new ConflictError(
+        `Concurrent replacement conflict: Document version ${existingDoc.version_number} has already been replaced by a newer version.`
+      );
+    }
+
+    // Validate replacement parameters
+    const validatedRepl = validateDocumentReplacement(payload);
+
+    // Validate uploaded file
+    const validatedFile = validateUploadedFile(file);
+
+    // Save to private storage
+    const storageResult = await this.storage.storage.saveFile(validatedFile.storageKey, file.buffer, {
+      mimeType: validatedFile.mimeType,
+      originalFilename: validatedFile.originalFilename
+    });
+
+    // Create new version in repository
+    const newVersion = await this.repo.replaceVersion(existingDoc, {
+      file_name: validatedFile.originalFilename,
+      file_path: storageResult.storageKey,
+      storage_uri: storageResult.storageUri,
+      mime_type: validatedFile.mimeType,
+      file_size_bytes: validatedFile.fileSizeBytes,
+      sha256_checksum: validatedFile.sha256Checksum,
+      uploaded_by_user_id: user?.userId || user?.id,
+      replacement_reason: validatedRepl.replacement_reason,
+      document_category: validatedRepl.document_category || existingDoc.document_category,
+      verification_status: DOCUMENT_VERIFICATION_STATUS.UPLOADED
+    });
+
+    // Record audit event
+    await this.audit.recordEvent({
+      eventName: SECURITY_EVENTS.DOCUMENT_REPLACED,
+      category: 'DOCUMENT_MANAGEMENT',
+      severity: 'INFO',
+      userId: user?.userId || user?.id,
+      facilityId: existingDoc.facility_id || user.facilityId,
+      details: {
+        documentGroupId: existingDoc.document_group_id,
+        previousDocumentId: existingDoc.id,
+        previousVersion: existingDoc.version_number,
+        newDocumentId: newVersion.id,
+        newVersion: newVersion.version_number,
+        replacementReason: validatedRepl.replacement_reason
+      }
+    });
+
+    return this.sanitizeDocumentResponse(newVersion);
+  }
+
+  /**
+   * Retrieve version history for a document group
+   */
+  async getVersionHistory(documentId, user) {
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    await this.checkDocumentAccess(user, doc, 'VIEW');
+
+    const history = await this.repo.getVersionHistory(doc.document_group_id || doc.uuid);
+    return history.map(d => this.sanitizeDocumentResponse(d));
+  }
+
+  /**
+   * Human-controlled document verification transition
+   */
+  async verifyDocument({ documentId, payload = {}, user }) {
+    if (!user) {
+      throw new ForbiddenError('Authentication required to verify document');
+    }
+
+    const doc = await this.repo.findById(documentId);
+    if (!doc || doc.deleted_at) {
+      throw new NotFoundError(`Document not found: ${documentId}`);
+    }
+
+    // Transport staff cannot perform clinical verification
+    if (user.roleId === 4 || user.roleId === 5 || user.roleName === ROLES.TRANSPORT_COORDINATOR) {
+      throw new ForbiddenError('Transport coordinators are not authorized to verify medical documents');
+    }
+
+    // Check document access
+    await this.checkDocumentAccess(user, doc, 'VERIFY');
+
+    // Validate review payload
+    const validated = validateDocumentVerification(payload);
+
+    const now = new Date().toISOString();
+    const updates = {
+      verification_status: validated.status,
+      verified_by_user_id: user?.userId || user?.id,
+      verified_at: now,
+      verification_notes: validated.verification_notes || null,
+      rejection_reason: validated.rejection_reason || null
+    };
+
+    const updated = await this.repo.update(doc.id, updates);
+
+    // Map security event
+    let eventName = SECURITY_EVENTS.DOCUMENT_VERIFIED;
+    if (validated.status === DOCUMENT_VERIFICATION_STATUS.REJECTED) {
+      eventName = SECURITY_EVENTS.DOCUMENT_REJECTED;
+    } else if (validated.status === DOCUMENT_VERIFICATION_STATUS.REQUIRES_CORRECTION) {
+      eventName = SECURITY_EVENTS.DOCUMENT_CORRECTION_REQUESTED;
+    }
+
+    await this.audit.recordEvent({
+      eventName,
+      category: 'DOCUMENT_MANAGEMENT',
+      severity: validated.status === DOCUMENT_VERIFICATION_STATUS.REJECTED ? 'WARNING' : 'INFO',
+      userId: user?.userId || user?.id,
+      facilityId: doc.facility_id || user.facilityId,
+      details: {
+        documentId: doc.id,
+        documentUuid: doc.uuid,
+        verificationStatus: validated.status,
+        rejectionReason: validated.rejection_reason,
+        verificationNotes: validated.verification_notes
+      }
+    });
+
+    const response = this.sanitizeDocumentResponse(updated);
+    response.verification_disclaimer =
+      'Administrative review confirmation only. Verification confirms procedural review compliance, not definitive clinical diagnosis.';
+
+    return response;
   }
 
   /**

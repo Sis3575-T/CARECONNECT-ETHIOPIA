@@ -127,6 +127,57 @@ export async function getDocumentAccessLogs(req, res, next) {
   }
 }
 
+export async function replaceVersion(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const file = req.file;
+    const payload = req.body;
+    const user = req.user;
+
+    const newVersion = await documentService.replaceDocumentVersion({
+      documentId,
+      file,
+      payload,
+      user
+    });
+
+    return successResponse(res, newVersion, 'Document version replaced successfully', HTTP_STATUS.CREATED);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getVersionHistory(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const user = req.user;
+
+    const history = await documentService.getVersionHistory(documentId, user);
+
+    return successResponse(res, history, `Found ${history.length} version(s)`, HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function verifyDocument(req, res, next) {
+  try {
+    const { documentId } = req.params;
+    const payload = req.body;
+    const user = req.user;
+
+    const updated = await documentService.verifyDocument({
+      documentId,
+      payload,
+      user
+    });
+
+    return successResponse(res, updated, 'Document verification outcome recorded', HTTP_STATUS.OK);
+  } catch (err) {
+    next(err);
+  }
+}
+
 export default {
   uploadDocument,
   getDocument,
@@ -134,5 +185,8 @@ export default {
   previewDocument,
   listReferralDocuments,
   listPatientDocuments,
-  getDocumentAccessLogs
+  getDocumentAccessLogs,
+  replaceVersion,
+  getVersionHistory,
+  verifyDocument
 };

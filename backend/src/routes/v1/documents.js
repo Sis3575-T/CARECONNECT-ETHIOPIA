@@ -11,7 +11,10 @@ import {
   getDocument,
   downloadDocument,
   previewDocument,
-  getDocumentAccessLogs
+  getDocumentAccessLogs,
+  replaceVersion,
+  getVersionHistory,
+  verifyDocument
 } from '../../controllers/documentController.js';
 
 const router = Router();
@@ -33,5 +36,14 @@ router.get('/:documentId/preview', previewDocument);
 
 // 5. Query document access logs
 router.get('/:documentId/logs', getDocumentAccessLogs);
+
+// 6. Replace document version
+router.post('/:documentId/replace', uploadSingleDocument('file'), replaceVersion);
+
+// 7. Get document version history
+router.get('/:documentId/versions', getVersionHistory);
+
+// 8. Human-controlled document verification review
+router.post('/:documentId/verify', verifyDocument);
 
 export default router;
