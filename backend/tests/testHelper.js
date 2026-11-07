@@ -72,6 +72,7 @@ function executeRequest(app, method, url, body = null, options = {}) {
 
       resolve({
         status: res.statusCode,
+        statusCode: res.statusCode,
         headers: res.headers,
         body: json || responseBody,
         text: responseBody

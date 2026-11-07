@@ -41,6 +41,11 @@ import {
   getReferralDelays,
   getReferralTimeline
 } from '../../controllers/coordinationController.js';
+import {
+  listReferralDocuments,
+  uploadDocument
+} from '../../controllers/documentController.js';
+import { uploadSingleDocument } from '../../middleware/upload.js';
 
 const router = Router();
 
@@ -114,5 +119,13 @@ router.get('/:referralId/escalations', getReferralEscalations);
 // 18. Delays Measurement & Unified Coordination Timeline
 router.get('/:referralId/delays', getReferralDelays);
 router.get('/:referralId/timeline', getReferralTimeline);
+
+// 19. Referral Medical Attachments
+router.get('/:referralId/documents', listReferralDocuments);
+router.post('/:referralId/documents', uploadSingleDocument('file'), (req, res, next) => {
+  req.body = req.body || {};
+  req.body.referral_id = req.params.referralId;
+  return uploadDocument(req, res, next);
+});
 
 export default router;

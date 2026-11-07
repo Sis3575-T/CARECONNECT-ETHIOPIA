@@ -22,6 +22,11 @@ import {
   updateEmergencyContact,
   deleteEmergencyContact
 } from '../../controllers/patientController.js';
+import {
+  listPatientDocuments,
+  uploadDocument
+} from '../../controllers/documentController.js';
+import { uploadSingleDocument } from '../../middleware/upload.js';
 
 const router = Router();
 
@@ -74,5 +79,13 @@ router.get('/:patientId/emergency-contacts', getEmergencyContacts);
 router.post('/:patientId/emergency-contacts', addEmergencyContact);
 router.patch('/:patientId/emergency-contacts/:contactId', updateEmergencyContact);
 router.delete('/:patientId/emergency-contacts/:contactId', deleteEmergencyContact);
+
+// 13. Patient Medical Documents
+router.get('/:patientId/documents', listPatientDocuments);
+router.post('/:patientId/documents', uploadSingleDocument('file'), (req, res, next) => {
+  req.body = req.body || {};
+  req.body.patient_id = req.params.patientId;
+  return uploadDocument(req, res, next);
+});
 
 export default router;
