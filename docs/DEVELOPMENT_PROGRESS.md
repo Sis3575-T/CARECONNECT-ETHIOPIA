@@ -332,7 +332,28 @@
 | **125** | `frontend: implement protected routes and role-aware portal access` | ✅ COMMITTED | `5796e9f` | Enhanced `ProtectedRoute.jsx` with accessible loading splash during session restoration, `RoleRoute.jsx` with strict RBAC checking, and `UnauthorizedPage.jsx` with user/facility context and role switch buttons. | None |
 | **126** | `frontend: implement logout and session expiry handling` | ✅ COMMITTED | `d3f0ee2` | Enhanced `logout()` and `logoutAll()` calling backend revocation, integrated `handleLogout` into `PortalLayout.jsx` and `SharedHeader.jsx`, and multi-tab session expiration listener with user notice. | None |
 | **127** | `frontend: improve authentication security accessibility and usability` | ✅ COMMITTED | `37eba15` | WCAG 2.1 AA focus rings, `aria-live` error announcements, 44x44px touch targets on toggles, responsive padding (`p-6 sm:p-8`), and zero raw credential logging. | None |
-| **128** | `test: verify portal authentication session and authorization flows` | 🔄 STAGED | Pending | Verified 42 frontend tests (`shared/tests/*.test.js`), 760 backend tests, 38 DB tests, standards check, and production build of all 4 independent portals. Authored `docs/PART_16_REPORT.md`. | None |
+| **128** | `test: verify portal authentication session and authorization flows` | ✅ COMMITTED | `33762be` | Verified 42 frontend tests (`shared/tests/*.test.js`), 760 backend tests, 38 DB tests, standards check, and production build of all 4 independent portals. Authored `docs/PART_16_REPORT.md`. | None |
+
+---
+
+## 50-PART PRODUCTION ROADMAP — PART 17 OF 50: HEALTH CENTRE PORTAL DASHBOARD, NAVIGATION, OVERVIEW AND OPERATIONAL WORKSPACE
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 17 of 50 | Minimum Target: 250 Total Commits  
+**Last Updated:** 2026-11-07T22:10:00.000Z  
+
+### Part 17 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **129** | `frontend: establish health centre portal architecture` | ✅ COMMITTED | `9d5e7bc` | Configured `App.jsx` with `ProtectedRoute` & `RoleRoute` allowing `PORTALS.HEALTH_CENTRE.allowedRoles`, canonical `/` and `/dashboard` alias routes, and created `healthCentreService.js`. | None |
+| **130** | `frontend: implement health centre layout and navigation` | ✅ COMMITTED | `a69c442` | Dynamically connected `HealthCentreLayout.jsx` to `useAuth()` session, facility metadata loading, unread badge counter, and 10 navigation items with Sky accent theme. | None |
+| **131** | `frontend: implement health centre dashboard statistics` | ✅ COMMITTED | `ab1694a` | Created `HealthCentreStats.jsx` with 6 operational cards, skeleton loaders, retry action on error, and zero-value safe calculations. | None |
+| **132** | `frontend: implement health centre referral overview` | ✅ COMMITTED | `54ae1aa` | Built `RecentReferralsTable.jsx` with privacy-preserving patient identifier masking, triage priority badges, interactive filter tabs, and responsive layout. | None |
+| **133** | `frontend: implement health centre pending actions overview` | ✅ COMMITTED | `8626f66` | Created `PendingActionsSection.jsx` categorizing clinical revisions, pending hospital triage queues, active ambulance transfers, and an all-clear state. | None |
+| **134** | `frontend: integrate health centre notifications and quick actions` | ✅ COMMITTED | `3d5f83d` | Built `DashboardQuickActions.jsx` and `RecentNotificationsWidget.jsx`, integrating both into `DashboardPage.jsx` with real-time mark-as-read functionality. | None |
+| **135** | `frontend: optimize health centre dashboard usability and performance` | ✅ COMMITTED | `91518bd` | Added network offline alert, debounced manual refresh, memoized calculations, and WCAG 2.1 AA focus rings and semantic landmarks. | None |
+| **136** | `test: verify health centre portal dashboard functionality` | ✅ COMMITTED | `03e2852` | Verified 51 frontend tests (including 8 new Part 17 tests), 760 backend tests, 38 DB tests, standards check, and production build of all 4 independent portals. Authored `docs/PART_17_REPORT.md`. | None |
 
 ---
 

@@ -4,7 +4,55 @@
  * and resilient communication for Health Centre clinicians and nurses.
  */
 
-import { apiClient } from '@shared/services/apiClient.js';
+import { apiClient } from '../../../../shared/services/apiClient.js';
+
+/**
+ * Pure calculation of operational status tallies and rates from referrals list
+ */
+export function calculateOperationalMetrics(referrals = [], totalPatients = 0, unreadNotifications = 0) {
+  let pendingCount = 0;
+  let acceptedCount = 0;
+  let inTransitCount = 0;
+  let completedCount = 0;
+  let rejectedCount = 0;
+  let draftCount = 0;
+
+  for (const ref of referrals) {
+    const s = (ref?.status || '').toUpperCase();
+    if (s === 'PENDING' || s === 'SUBMITTED' || s === 'ACKNOWLEDGED') {
+      pendingCount++;
+    } else if (s === 'ACCEPTED') {
+      acceptedCount++;
+    } else if (s === 'IN_TRANSIT' || s === 'DISPATCHED') {
+      inTransitCount++;
+    } else if (s === 'COMPLETED' || s === 'ARRIVED') {
+      completedCount++;
+    } else if (s === 'REJECTED') {
+      rejectedCount++;
+    } else if (s === 'DRAFT') {
+      draftCount++;
+    }
+  }
+
+  const activeReferrals = pendingCount + acceptedCount + inTransitCount;
+  const closedTotal = completedCount + rejectedCount;
+  const acceptanceRate = closedTotal > 0 ? Math.round((completedCount / closedTotal) * 100) : 100;
+
+  return {
+    totalPatients: Number(totalPatients) || 0,
+    totalReferrals: referrals.length,
+    activeReferrals,
+    pendingCount,
+    acceptedCount,
+    inTransitCount,
+    completedCount,
+    rejectedCount,
+    draftCount,
+    acceptanceRate,
+    unreadNotifications: Number(unreadNotifications) || 0,
+    referrals
+  };
+}
 
 export const healthCentreService = {
   /**
@@ -38,65 +86,12 @@ export const healthCentreService = {
         ? unreadRes.value.data.data.unread_count
         : 0;
 
-      // Calculate operational status counts from real referral list
-      let pendingCount = 0;
-      let acceptedCount = 0;
-      let inTransitCount = 0;
-      let completedCount = 0;
-      let rejectedCount = 0;
-      let draftCount = 0;
-
-      for (const ref of referrals) {
-        const s = (ref.status || '').toUpperCase();
-        if (s === 'PENDING' || s === 'SUBMITTED' || s === 'ACKNOWLEDGED') {
-          pendingCount++;
-        } else if (s === 'ACCEPTED') {
-          acceptedCount++;
-        } else if (s === 'IN_TRANSIT' || s === 'DISPATCHED') {
-          inTransitCount++;
-        } else if (s === 'COMPLETED' || s === 'ARRIVED') {
-          completedCount++;
-        } else if (s === 'REJECTED') {
-          rejectedCount++;
-        } else if (s === 'DRAFT') {
-          draftCount++;
-        }
-      }
-
-      const activeReferrals = pendingCount + acceptedCount + inTransitCount;
-      const closedTotal = completedCount + rejectedCount;
-      const acceptanceRate = closedTotal > 0 ? Math.round((completedCount / closedTotal) * 100) : 100;
-
-      return {
-        totalPatients,
-        totalReferrals,
-        activeReferrals,
-        pendingCount,
-        acceptedCount,
-        inTransitCount,
-        completedCount,
-        rejectedCount,
-        draftCount,
-        acceptanceRate,
-        unreadNotifications,
-        referrals
-      };
+      const metrics = calculateOperationalMetrics(referrals, totalPatients, unreadNotifications);
+      metrics.totalReferrals = totalReferrals;
+      return metrics;
     } catch (err) {
       console.error('[HealthCentreService] Failed to load dashboard summary:', err);
-      return {
-        totalPatients: 0,
-        totalReferrals: 0,
-        activeReferrals: 0,
-        pendingCount: 0,
-        acceptedCount: 0,
-        inTransitCount: 0,
-        completedCount: 0,
-        rejectedCount: 0,
-        draftCount: 0,
-        acceptanceRate: 0,
-        unreadNotifications: 0,
-        referrals: []
-      };
+      return calculateOperationalMetrics([], 0, 0);
     }
   },
 
