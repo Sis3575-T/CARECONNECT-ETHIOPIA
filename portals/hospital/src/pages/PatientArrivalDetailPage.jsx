@@ -23,6 +23,7 @@ import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
 import ArrivalStatusBadge from '../components/arrival/ArrivalStatusBadge.jsx';
 import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import ArrivalSkeleton from '../components/arrival/ArrivalSkeleton.jsx';
+import PatientIdentityVerification from '../components/arrival/PatientIdentityVerification.jsx';
 
 export default function PatientArrivalDetailPage() {
   const { referralId } = useParams();
@@ -39,6 +40,12 @@ export default function PatientArrivalDetailPage() {
 
   // Active step / modal views for arrival workflow
   const [activeModal, setActiveModal] = useState(null); // 'ARRIVE' | 'HANDOVER' | 'CONFIRM_RECEIPT' | null
+  const [verificationState, setVerificationState] = useState({
+    isVerified: false,
+    hasMismatch: false,
+    mismatchNotes: '',
+    checklist: {}
+  });
 
   const fetchArrivalDossier = useCallback(async (isSilent = false) => {
     if (!referralId) return;
@@ -303,38 +310,13 @@ export default function PatientArrivalDetailPage() {
 
       {/* Main Content Workspace Container */}
       <div id="arrival-workflow-content" className="space-y-6">
-        {/* Dynamic components will be rendered here */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs p-5 text-xs">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-emerald-600" />
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                Patient & Transfer Baseline Record
-              </h3>
-            </div>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">
-              Allocated Ward: <strong className="text-slate-800 dark:text-slate-200">{referral?.allocated_ward_department || 'General Inpatient'}</strong>
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
-            <div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Patient Full Name</span>
-              <p className="font-bold text-slate-900 dark:text-white mt-0.5">{referral?.patient_name || referral?.patientName || 'Unnamed Patient'}</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">{referral?.patient_gender || '—'}, {referral?.patient_age ? `${referral.patient_age} yrs` : 'Age N/A'}</p>
-            </div>
-            <div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Assigned Bed Classification</span>
-              <p className="font-bold text-slate-900 dark:text-white mt-0.5">{referral?.assigned_bed_type || 'STANDARD'}</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Reserved during clinical review</p>
-            </div>
-            <div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Referring Facility</span>
-              <p className="font-bold text-slate-900 dark:text-white mt-0.5">{referral?.origin_facility_name || 'Referring Health Centre'}</p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Contact: {referral?.referring_clinician_phone || 'Facility Dispatch'}</p>
-            </div>
-          </div>
-        </div>
+        {/* Step 1: Patient Identity Verification Protocol */}
+        <PatientIdentityVerification
+          referral={referral}
+          onVerificationChange={setVerificationState}
+          isVerified={verificationState.isVerified}
+          mismatchReported={verificationState.hasMismatch}
+        />
       </div>
     </div>
   );
