@@ -24,6 +24,7 @@ import { AdmissionStatusBadge } from '../components/admission/AdmissionStatusBad
 import { AdmissionSkeleton } from '../components/admission/AdmissionSkeleton.jsx';
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
 import { DepartmentAssignmentModal } from '../components/admission/DepartmentAssignmentModal.jsx';
+import { AdmissionRecordCard } from '../components/admission/AdmissionRecordCard.jsx';
 
 export default function AdmissionDetailPage() {
   const { referralId, id } = useParams();
@@ -305,61 +306,13 @@ export default function AdmissionDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Admission & Department Cards */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Operational Inpatient Status Card */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-                <Bed className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                <span>Inpatient Ward & Bed Placement</span>
-              </h2>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Allocated Department</span>
-                  <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-slate-100">
-                    <Building2 className="w-4 h-4 text-slate-500" />
-                    <span>{referral.allocated_ward_department || 'Pending Department Assignment'}</span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Bed Classification</span>
-                  <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-slate-100">
-                    <Layers className="w-4 h-4 text-slate-500" />
-                    <span>{referral.assigned_bed_type || 'Standard Inpatient Ward'}</span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Physical Arrival Time</span>
-                  <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-slate-100">
-                    <Clock className="w-4 h-4 text-slate-500" />
-                    <span>{referral.arrived_at ? formatClinicalDate(referral.arrived_at) : 'Arrival Confirmed'}</span>
-                  </div>
-                </div>
-
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                  <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Attending Clinician / Staff</span>
-                  <div className="flex items-center gap-2 font-medium text-slate-900 dark:text-slate-100">
-                    <User className="w-4 h-4 text-slate-500" />
-                    <span>
-                      {referral.receiving_clinician_first_name
-                        ? `Dr. ${referral.receiving_clinician_first_name} ${referral.receiving_clinician_last_name || ''}`
-                        : 'Assigned Hospital Specialist Team'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Latest Clinical Progress Notes */}
-              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-2">
-                  Current Operational Care Status & Progress
-                </span>
-                <p className="text-sm text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-lg border border-slate-100 dark:border-slate-700/50 leading-relaxed">
-                  {referral.current_progress_notes || 'Patient received at tertiary facility. Inpatient clinical evaluation and specialist management underway.'}
-                </p>
-              </div>
-            </div>
+            {/* Operational Inpatient Status & Admission Stepper */}
+            <AdmissionRecordCard
+              referral={referral}
+              onAdmitPatient={handleQuickAdmit}
+              onReassignDepartment={() => setShowAssignModal(true)}
+              disabled={refreshing}
+            />
 
             {/* Referring Clinical Background (Read-Only) */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
