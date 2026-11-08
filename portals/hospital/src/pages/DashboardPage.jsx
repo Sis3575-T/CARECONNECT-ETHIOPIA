@@ -1,285 +1,471 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Inbox,
   CheckCircle2,
   XCircle,
-  Bed,
-  Check,
-  ArrowRight,
-  AlertCircle,
   Clock,
-  Layers,
+  AlertTriangle,
+  Building2,
+  ArrowRight,
+  RefreshCw,
+  HelpCircle,
+  FileText,
   Activity,
-  BedDouble
+  Layers,
+  Flame,
+  ShieldCheck
 } from 'lucide-react';
-import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { useCareConnectData } from '@shared/hooks/useCareConnectData';
+import { useAuth } from '@shared/context/AuthContext.jsx';
+import { ROLE_LABELS } from '@shared/constants/roles.js';
+import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
+import { hospitalService } from '../services/hospitalService.js';
+import HospitalStatusBadge from '../components/HospitalStatusBadge.jsx';
+import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
+import HospitalDashboardSkeleton from '../components/HospitalDashboardSkeleton.jsx';
+import HospitalErrorState from '../components/HospitalErrorState.jsx';
+import HospitalEmptyState from '../components/HospitalEmptyState.jsx';
 
-const sourceData = [
-  { name: 'Health Centres', value: 65, color: '#059669' },
-  { name: 'District Hospitals', value: 25, color: '#0284c7' },
-  { name: 'Emergency Clinic Transfers', value: 10, color: '#f59e0b' }
-];
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function formatCurrentDate() {
+  return new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+}
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { referrals, facilities } = useCareConnectData();
+  const { user } = useAuth();
 
-  const currentHospital = facilities.find(f => f.name.includes('Tikur')) || facilities[0];
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+  const [metrics, setMetrics] = useState(null);
+  const [hospitalProfile, setHospitalProfile] = useState(null);
+  const [recentReferrals, setRecentReferrals] = useState([]);
+  const [pendingActions, setPendingActions] = useState([]);
 
-  const newReferralsCount = referrals.filter(r => r.status === 'Pending').length;
-  const acceptedCount = referrals.filter(r => r.status === 'Accepted' || r.status === 'In Transit').length;
-  const rejectedCount = referrals.filter(r => r.status === 'Rejected').length;
-  const arrivedCount = referrals.filter(r => r.status === 'Arrived' || r.status === 'Completed').length;
+  const clinicianName = useMemo(() => {
+    return (
+      user?.name ||
+      [user?.firstName || user?.first_name, user?.lastName || user?.last_name].filter(Boolean).join(' ') ||
+      'Hospital Specialist'
+    );
+  }, [user]);
 
-  const recentIncoming = referrals.slice(0, 5);
+  const clinicianRole = useMemo(() => {
+    return ROLE_LABELS[user?.role] || user?.roleName || user?.role || 'Hospital Triage Clinician';
+  }, [user]);
+
+  const hospitalName = useMemo(() => {
+    return (
+      hospitalProfile?.name ||
+      user?.facilityName ||
+      user?.facility_name ||
+      'Specialized Hospital'
+    );
+  }, [hospitalProfile, user]);
+
+  const loadDashboardData = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    else setRefreshing(true);
+    setError(null);
+
+    try {
+      // Load summary, hospital profile, and pending actions concurrently
+      const [summaryData, actionsData] = await Promise.all([
+        hospitalService.getDashboardSummary(),
+        hospitalService.getPendingActions()
+      ]);
+
+      setMetrics(summaryData);
+      setPendingActions(actionsData || []);
+      setRecentReferrals((summaryData?.referrals || []).slice(0, 7));
+
+      if (user?.facilityId) {
+        const facProfile = await hospitalService.getHospitalProfile(user.facilityId);
+        if (facProfile) setHospitalProfile(facProfile);
+      }
+    } catch (err) {
+      console.error('[HospitalDashboard] Data loading error:', err);
+      setError(err?.message || 'Failed to retrieve hospital dashboard metrics');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [user?.facilityId]);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
+
+  if (loading) {
+    return <HospitalDashboardSkeleton />;
+  }
+
+  if (error && !metrics) {
+    return <HospitalErrorState message={error} onRetry={() => loadDashboardData()} />;
+  }
+
+  const pendingCount = metrics?.pendingTriageCount || 0;
+  const inReviewCount = metrics?.inReviewCount || 0;
+  const acceptedCount = metrics?.acceptedCount || 0;
+  const infoRequestedCount = metrics?.infoRequestedCount || 0;
+  const emergencyCount = metrics?.emergencyCount || 0;
 
   return (
-    <div className="space-y-5 max-w-7xl mx-auto text-xs">
-      {/* Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-            Welcome, Dr. Fitsum!
+    <div className="space-y-6 max-w-7xl mx-auto text-xs pb-10">
+      {/* Top Welcome & Hospital Context Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              <Building2 className="w-3 h-3" />
+              <span>{hospitalName}</span>
+            </span>
+            <span className="text-slate-400 dark:text-slate-500">•</span>
+            <span className="text-slate-500 dark:text-slate-400 text-[11px] font-medium">{formatCurrentDate()}</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            {getGreeting()}, {clinicianName}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-            Manage incoming triage requests and acute bed allocations for Tikur Anbessa Specialized Hospital
+          <p className="text-slate-600 dark:text-slate-400">
+            {clinicianRole} — Specialized Inpatient Referral Intake & Clinical Triage Workspace
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
-            onClick={() => navigate('/pending')}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold shadow-xs flex items-center gap-1.5 cursor-pointer"
+            onClick={() => loadDashboardData(true)}
+            disabled={refreshing}
+            className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500"
+            title="Refresh dashboard data"
+            aria-label="Refresh dashboard data"
           >
-            <Clock className="w-4 h-4" />
-            <span>Triage Pending ({newReferralsCount})</span>
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-emerald-600' : ''}`} />
           </button>
           <button
-            onClick={() => navigate('/capacity')}
-            className="px-3.5 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-bold hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer shadow-xs"
+            onClick={() => navigate('/incoming')}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs flex items-center gap-2 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500"
           >
-            <BedDouble className="w-4 h-4 text-emerald-600" />
-            <span>Capacity ({currentHospital?.availableBeds || 42} free)</span>
+            <Inbox className="w-4 h-4" />
+            <span>Incoming Queue</span>
+            {pendingCount > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full bg-emerald-800 text-[10px] font-bold">
+                {pendingCount}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => navigate('/pending')}
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 font-bold transition-all flex items-center gap-1.5 cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500"
+          >
+            <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <span>Pending Triage</span>
           </button>
         </div>
       </div>
 
-      {/* 4 Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+      {/* Emergency Triage Attention Banner */}
+      {emergencyCount > 0 && (
         <div
-          onClick={() => navigate('/pending')}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-emerald-500 transition-all"
+          className="bg-rose-50 dark:bg-rose-950/50 border-l-4 border-rose-600 p-4 rounded-xl flex items-center justify-between gap-3 shadow-xs"
+          role="alert"
+          aria-live="assertive"
         >
-          <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-rose-100 dark:bg-rose-900/60 text-rose-600 flex items-center justify-center shrink-0">
+              <Flame className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-rose-900 dark:text-rose-200">
+                Critical Emergency Cases Awaiting Immediate Hospital Triage
+              </h2>
+              <p className="text-xs text-rose-700 dark:text-rose-300 mt-0.5">
+                There {emergencyCount === 1 ? 'is 1 incoming emergency referral' : `are ${emergencyCount} incoming emergency referrals`} requiring rapid resuscitation bed assessment and specialist response.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/incoming?priority=EMERGENCY')}
+            className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer shadow-xs flex items-center gap-1"
+          >
+            <span>Review Emergency Cases</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* 4 Primary Operational Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: New Incoming */}
+        <div
+          onClick={() => navigate('/incoming?status=SUBMITTED')}
+          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500 transition-all group"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate('/incoming?status=SUBMITTED')}
+        >
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900 group-hover:scale-105 transition-transform">
             <Inbox className="w-6 h-6" />
           </div>
           <div>
             <span className="text-xs font-medium text-slate-500 dark:text-slate-400">New Incoming</span>
-            <p className="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">{newReferralsCount}</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{pendingCount}</p>
+            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Awaiting acknowledgement</span>
           </div>
         </div>
 
+        {/* Card 2: Pending Triage Review */}
+        <div
+          onClick={() => navigate('/pending')}
+          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-amber-500 dark:hover:border-amber-500 transition-all group"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate('/pending')}
+        >
+          <div className="w-12 h-12 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 flex items-center justify-center shrink-0 border border-amber-100 dark:border-amber-900 group-hover:scale-105 transition-transform">
+            <Clock className="w-6 h-6" />
+          </div>
+          <div>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">In Triage Review</span>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{inReviewCount}</p>
+            <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Specialist review active</span>
+          </div>
+        </div>
+
+        {/* Card 3: Accepted Referrals */}
         <div
           onClick={() => navigate('/accepted')}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-emerald-500 transition-all"
+          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-teal-500 dark:hover:border-teal-500 transition-all group"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate('/accepted')}
         >
-          <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 dark:border-emerald-900">
+          <div className="w-12 h-12 rounded-xl bg-teal-50 dark:bg-teal-950/60 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100 dark:border-teal-900 group-hover:scale-105 transition-transform">
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Accepted Referrals</span>
-            <p className="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">{acceptedCount}</p>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Accepted Cases</span>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{acceptedCount}</p>
+            <span className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">Beds allocated</span>
           </div>
         </div>
 
+        {/* Card 4: Additional Info Requested */}
         <div
-          onClick={() => navigate('/rejected')}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-rose-400 transition-all"
+          onClick={() => navigate('/pending')}
+          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-orange-500 dark:hover:border-orange-500 transition-all group"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate('/pending')}
         >
-          <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center shrink-0 border border-rose-100 dark:border-rose-900">
-            <XCircle className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-orange-50 dark:bg-orange-950/60 text-orange-600 flex items-center justify-center shrink-0 border border-orange-100 dark:border-orange-900 group-hover:scale-105 transition-transform">
+            <HelpCircle className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Declined (FR-22)</span>
-            <p className="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">{rejectedCount}</p>
-          </div>
-        </div>
-
-        <div
-          onClick={() => navigate('/arrivals')}
-          className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-200/80 dark:border-slate-700 shadow-xs flex items-center gap-3.5 cursor-pointer hover:border-blue-400 transition-all"
-        >
-          <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 dark:border-blue-900">
-            <Bed className="w-6 h-6" />
-          </div>
-          <div>
-            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Patients Arrived</span>
-            <p className="text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5">{arrivedCount}</p>
+            <span className="text-xs font-medium text-slate-500 dark:text-slate-400">Info Requested</span>
+            <p className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{infoRequestedCount}</p>
+            <span className="text-[10px] text-orange-600 dark:text-orange-400 font-semibold">Awaiting health centre</span>
           </div>
         </div>
       </div>
 
-      {/* Charts & Triage Priority Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Referral Sources Donut Chart */}
-        <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs flex flex-col justify-between">
-          <div>
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm">Referrals by Source Facility</h3>
-            <p className="text-slate-400 mt-0.5">Primary health centres vs regional transfers</p>
-            <div className="h-48 w-full mt-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={sourceData}
-                    innerRadius={50}
-                    outerRadius={75}
-                    paddingAngle={4}
-                    dataKey="value"
-                  >
-                    {sourceData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', color: '#fff', borderRadius: '8px', fontSize: '11px' }} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <div className="space-y-1.5 pt-3 border-t border-slate-100 dark:border-slate-700">
-            {sourceData.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-slate-600 dark:text-slate-300">{item.name}</span>
-                </span>
-                <span className="font-bold">{item.value}%</span>
-              </div>
-            ))}
-          </div>
+      {/* Secondary Operational Telemetry Bar */}
+      <div className="bg-slate-50 dark:bg-slate-900/60 rounded-xl p-3 border border-slate-200 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+        <div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">Total Referrals Received</span>
+          <p className="text-base font-extrabold text-slate-800 dark:text-slate-200 mt-0.5">
+            {metrics?.totalIncoming || 0}
+          </p>
         </div>
+        <div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">Active Pipeline Cases</span>
+          <p className="text-base font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">
+            {metrics?.activeCases || 0}
+          </p>
+        </div>
+        <div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">Admitted / Arrived</span>
+          <p className="text-base font-extrabold text-teal-600 dark:text-teal-400 mt-0.5">
+            {(metrics?.arrivedCount || 0) + (metrics?.completedCount || 0)}
+          </p>
+        </div>
+        <div>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">Triage Acceptance Rate</span>
+          <p className="text-base font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">
+            {metrics?.acceptanceRate || 100}%
+          </p>
+        </div>
+      </div>
 
-        {/* Live Workload & Capacity Gauge */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs space-y-4">
+      {/* Main Grid: Recent Incoming Queue (Left) & Pending Actions / Hospital Status (Right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column (Wide, 2 cols): Recent Incoming Referrals Table */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-bold text-slate-900 dark:text-white text-sm">Hospital Workload & Bed Availability Status</h3>
-              <p className="text-slate-400">Live bed telemetry updated from Tikur Anbessa Hospital wards</p>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Recent Incoming Referrals</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-[11px]">
+                Latest patient transfer requests submitted to this hospital
+              </p>
             </div>
             <button
-              onClick={() => navigate('/capacity')}
-              className="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
+              onClick={() => navigate('/incoming')}
+              className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center gap-1 cursor-pointer"
             >
-              Update Telemetry →
+              <span>View All Inbox</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-700">
-              <span className="text-slate-400 block text-[10px] uppercase font-bold">Total Approved Beds</span>
-              <span className="text-xl font-extrabold text-slate-900 dark:text-white mt-1 block">{currentHospital?.beds || 800}</span>
-            </div>
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/60">
-              <span className="text-emerald-700 dark:text-emerald-400 block text-[10px] uppercase font-bold">General Beds Free</span>
-              <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1 block">{currentHospital?.availableBeds || 42}</span>
-            </div>
-            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-100 dark:border-rose-900/60">
-              <span className="text-rose-700 dark:text-rose-400 block text-[10px] uppercase font-bold">ICU Free Beds</span>
-              <span className="text-xl font-extrabold text-rose-600 dark:text-rose-400 mt-1 block">{currentHospital?.availableIcuBeds || 3}</span>
-            </div>
-            <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-100 dark:border-sky-900/60">
-              <span className="text-sky-700 dark:text-sky-400 block text-[10px] uppercase font-bold">Oxygen Reserves</span>
-              <span className="text-base font-extrabold text-sky-700 dark:text-sky-300 mt-1 block">{currentHospital?.oxygenLevel || '94%'}</span>
-            </div>
-          </div>
+          {recentReferrals.length === 0 ? (
+            <HospitalEmptyState
+              title="No incoming referrals yet"
+              description="Referrals directed to this hospital from regional health centres will appear here."
+            />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                    <th scope="col" className="py-2.5 px-3">Referral Ref</th>
+                    <th scope="col" className="py-2.5 px-3">Patient</th>
+                    <th scope="col" className="py-2.5 px-3">Origin Facility</th>
+                    <th scope="col" className="py-2.5 px-3">Priority</th>
+                    <th scope="col" className="py-2.5 px-3">Status</th>
+                    <th scope="col" className="py-2.5 px-3">Received</th>
+                    <th scope="col" className="py-2.5 px-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                  {recentReferrals.map((ref) => {
+                    const patientName = ref.patient_name || ref.patientName || 'Unnamed Patient';
+                    const refCode = ref.reference_number || ref.id?.slice(0, 8);
+                    const originName = ref.origin_facility_name || ref.referringFacility || 'Health Centre';
+                    const timeReceived = ref.submitted_at || ref.created_at;
 
-          {/* Pending Triage Action Alert */}
-          {newReferralsCount > 0 && (
-            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
-                <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
-                <span><b>Action Required:</b> {newReferralsCount} incoming referrals require triage acknowledgement within 30 minutes.</span>
-              </div>
-              <button
-                onClick={() => navigate('/pending')}
-                className="px-3 py-1 bg-amber-600 text-white font-bold rounded-lg shrink-0 cursor-pointer"
-              >
-                Triage Now
-              </button>
+                    return (
+                      <tr
+                        key={ref.id}
+                        className="hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors cursor-pointer group"
+                        onClick={() => navigate(`/referrals/${ref.id}`)}
+                      >
+                        <td className="py-3 px-3 font-mono font-bold text-slate-900 dark:text-white">
+                          {refCode}
+                        </td>
+                        <td className="py-3 px-3">
+                          <p className="font-semibold text-slate-900 dark:text-white">{patientName}</p>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                            {ref.patient_gender || ref.gender || '—'}, {ref.patient_age ? `${ref.patient_age} yrs` : 'Age unrecorded'}
+                          </p>
+                        </td>
+                        <td className="py-3 px-3 text-slate-600 dark:text-slate-300">
+                          {originName}
+                        </td>
+                        <td className="py-3 px-3">
+                          <HospitalPriorityBadge priority={ref.priority} />
+                        </td>
+                        <td className="py-3 px-3">
+                          <HospitalStatusBadge status={ref.status} />
+                        </td>
+                        <td className="py-3 px-3 text-slate-500 dark:text-slate-400 whitespace-nowrap text-[11px]">
+                          {timeReceived ? formatRelativeTime(timeReceived) : 'Recently'}
+                        </td>
+                        <td className="py-3 px-3 text-right">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/referrals/${ref.id}`);
+                            }}
+                            className="px-2.5 py-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/60 rounded-lg transition-colors cursor-pointer"
+                          >
+                            Review
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Recent Incoming Referrals Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs p-5">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-bold text-slate-900 dark:text-white text-base">Incoming Referral Triage Feed</h3>
-            <p className="text-slate-400">Chronological triage queue from health centres</p>
+        {/* Right Column (1 col): Pending Actions Work Queue */}
+        <div className="space-y-5">
+          {/* Action Center Card */}
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">Pending Work Queue</h2>
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 text-[10px] font-bold border border-amber-200 dark:border-amber-800">
+                {pendingActions.length} Pending
+              </span>
+            </div>
+
+            {pendingActions.length === 0 ? (
+              <div className="py-6 text-center text-slate-500 dark:text-slate-400">
+                <ShieldCheck className="w-8 h-8 mx-auto text-emerald-500 mb-2" />
+                <p className="font-semibold text-slate-700 dark:text-slate-300">All referrals reviewed</p>
+                <p className="text-[11px] mt-0.5">No immediate triage responses pending.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {pendingActions.slice(0, 5).map((act) => (
+                  <div
+                    key={act.id}
+                    onClick={() => navigate(`/referrals/${act.id}`)}
+                    className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/60 hover:bg-slate-100/60 dark:hover:bg-slate-900 transition-all cursor-pointer space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-slate-900 dark:text-white text-[11px]">
+                        {act.reference_number || act.id?.slice(0, 8)}
+                      </span>
+                      <HospitalPriorityBadge priority={act.priority} />
+                    </div>
+                    <p className="font-medium text-slate-800 dark:text-slate-200 text-xs truncate">
+                      {act.patient_name || act.patientName || 'Patient'}
+                    </p>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400">
+                      <span className="text-amber-600 dark:text-amber-400 font-semibold">{act.actionRequired}</span>
+                      <span>{act.submitted_at ? formatRelativeTime(act.submitted_at) : 'Active'}</span>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  onClick={() => navigate('/pending')}
+                  className="w-full py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-xl font-bold transition-all text-xs flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>Open Complete Pending Queue</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
-          <button
-            onClick={() => navigate('/incoming')}
-            className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <span>Full Queue</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
-              <tr>
-                <th className="py-2.5 px-3">Referral ID</th>
-                <th className="py-2.5 px-3">Patient</th>
-                <th className="py-2.5 px-3">Origin Facility</th>
-                <th className="py-2.5 px-3">Service</th>
-                <th className="py-2.5 px-3">Priority</th>
-                <th className="py-2.5 px-3">Status</th>
-                <th className="py-2.5 px-3 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-              {recentIncoming.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/20">
-                  <td className="py-3 px-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">{r.id}</td>
-                  <td className="py-3 px-3 font-bold text-slate-900 dark:text-white">{r.patientName}</td>
-                  <td className="py-3 px-3 text-slate-600 dark:text-slate-300">{r.referringFacility}</td>
-                  <td className="py-3 px-3 font-semibold">{r.service}</td>
-                  <td className="py-3 px-3">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      r.urgency === 'Emergency' ? 'bg-rose-100 text-rose-700' :
-                      r.urgency === 'Urgent' ? 'bg-amber-100 text-amber-700' :
-                      'bg-emerald-100 text-emerald-700'
-                    }`}>
-                      {r.urgency}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                      r.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' :
-                      r.status === 'In Transit' ? 'bg-violet-100 text-violet-700' :
-                      r.status === 'Rejected' ? 'bg-rose-100 text-rose-700' :
-                      'bg-amber-100 text-amber-700'
-                    }`}>
-                      {r.status}
-                    </span>
-                  </td>
-                  <td className="py-3 px-3 text-right">
-                    <button
-                      onClick={() => navigate('/incoming')}
-                      className="px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold hover:bg-emerald-100 cursor-pointer"
-                    >
-                      Triage
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* Hospital Readiness & Clinical Guidance Notice */}
+          <div className="bg-emerald-50/60 dark:bg-emerald-950/30 rounded-2xl border border-emerald-200/80 dark:border-emerald-900/50 p-4 space-y-2">
+            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>National Referral Guideline Compliance</span>
+            </div>
+            <p className="text-[11px] text-emerald-700 dark:text-emerald-400 leading-relaxed">
+              All clinical admissions and triage decisions must comply with Ethiopian Federal Ministry of Health referral protocol. Emergency cases must be acknowledged within 15 minutes of receipt.
+            </p>
+          </div>
         </div>
       </div>
     </div>
