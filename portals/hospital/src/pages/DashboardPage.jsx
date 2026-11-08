@@ -20,6 +20,7 @@ import { useAuth } from '@shared/context/AuthContext.jsx';
 import { ROLE_LABELS } from '@shared/constants/roles.js';
 import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
 import { hospitalService } from '../services/hospitalService.js';
+import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 import HospitalStatusBadge from '../components/HospitalStatusBadge.jsx';
 import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
 import HospitalDashboardSkeleton from '../components/HospitalDashboardSkeleton.jsx';
@@ -108,6 +109,15 @@ export default function DashboardPage() {
     loadDashboardData();
   }, [loadDashboardData]);
 
+  // Real-time synchronization hook with 30s polling fallback
+  const { isLiveConnected, triggerSync: triggerLiveSync } = useHospitalRealtime({
+    onEventReceived: () => {
+      loadDashboardData(true);
+    },
+    pollingIntervalMs: 30000,
+    enabled: true
+  });
+
   if (loading) {
     return <HospitalDashboardSkeleton />;
   }
@@ -144,8 +154,16 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+            isLiveConnected
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${isLiveConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <span>{isLiveConnected ? 'Live Triage Sync' : 'Polling Sync'}</span>
+          </span>
           <button
-            onClick={() => loadDashboardData(true)}
+            onClick={() => triggerLiveSync(true)}
             disabled={refreshing}
             className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-500"
             title="Refresh dashboard data"

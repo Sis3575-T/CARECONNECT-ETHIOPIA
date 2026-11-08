@@ -22,6 +22,7 @@ import {
   XCircle
 } from 'lucide-react';
 import { hospitalService } from '../services/hospitalService.js';
+import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
 import HospitalStatusBadge from '../components/HospitalStatusBadge.jsx';
 import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
@@ -67,6 +68,16 @@ export default function ReferralDetailPage() {
   useEffect(() => {
     fetchReferralDetails();
   }, [fetchReferralDetails]);
+
+  // Real-time synchronization hook for this referral
+  const { isLiveConnected, triggerSync: triggerLiveSync } = useHospitalRealtime({
+    referralId,
+    onEventReceived: () => {
+      fetchReferralDetails(true);
+    },
+    pollingIntervalMs: 30000,
+    enabled: Boolean(referralId)
+  });
 
   if (loading) {
     return <HospitalDashboardSkeleton />;
@@ -135,8 +146,16 @@ export default function ReferralDetailPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+            isLiveConnected
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+          }`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${isLiveConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <span>{isLiveConnected ? 'Live' : 'Polling'}</span>
+          </span>
           <button
-            onClick={() => fetchReferralDetails(true)}
+            onClick={() => triggerLiveSync(true)}
             disabled={refreshing}
             className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
           >
