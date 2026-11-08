@@ -26,6 +26,7 @@ import { DischargeSkeleton } from '../components/discharge/DischargeSkeleton.jsx
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
 import { DischargeDocumentationModal } from '../components/discharge/DischargeDocumentationModal.jsx';
 import { InterFacilityTransferModal } from '../components/discharge/InterFacilityTransferModal.jsx';
+import { ReturnToReferrerModal } from '../components/discharge/ReturnToReferrerModal.jsx';
 import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 export default function DischargeDetailPage() {
@@ -496,6 +497,18 @@ export default function DischargeDetailPage() {
         onSuccess={(updated) => {
           if (updated) setReferral(prev => ({ ...prev, ...updated, status: 'TRANSFERRED' }));
           setActionSuccess('Inter-facility transfer authorized and initiated successfully.');
+          fetchDischargeDetails(true);
+        }}
+      />
+
+      {/* Return to Referrer Modal */}
+      <ReturnToReferrerModal
+        isOpen={showReturnModal}
+        onClose={() => setShowReturnModal(false)}
+        referral={referral}
+        onSuccess={(updated) => {
+          if (updated) setReferral(prev => ({ ...prev, ...updated, status: 'COMPLETED', completion_reason: 'RETURNED_TO_REFERRING_FACILITY' }));
+          setActionSuccess('Counter-referral authorized; patient returned to primary health centre with care plan.');
           fetchDischargeDetails(true);
         }}
       />
