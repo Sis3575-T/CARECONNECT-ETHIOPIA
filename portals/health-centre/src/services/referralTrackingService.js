@@ -5,7 +5,7 @@
  * follow-up interactions, and operational escalations.
  */
 
-import { apiClient } from '@shared/services/apiClient.js';
+import { apiClient } from '../../../../shared/services/apiClient.js';
 
 class ReferralTrackingService {
   /**

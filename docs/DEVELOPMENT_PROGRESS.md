@@ -399,6 +399,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 20 OF 50: HEALTH CENTRE REFERRAL TRACKING, STATUS TIMELINE, HOSPITAL RESPONSES AND FOLLOW-UP WORKSPACE
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 20 of 50 | Commits 153–160  
+**Last Updated:** 2026-11-08T20:15:00.000Z  
+
+### Part 20 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **153** | `frontend: establish health centre referral tracking architecture` | ✅ COMMITTED | `059434b` | Created `referralTrackingService.js` client gateway, status & priority badges (`ReferralStatusBadge.jsx`, `ReferralPriorityBadge.jsx`), skeleton loader, error state, and mounted `/referrals/:referralId` and `/tracking/:referralId` routes in `App.jsx`. | None |
+| **154** | `frontend: implement health centre referral tracking workspace` | ✅ COMMITTED | `a23ea4e` | Implemented `ReferralTrackingTable.jsx` with responsive table/card views, debounced search, status and priority filters, "Action Required" toggle, server-side pagination, and CSV export. | None |
+| **155** | `frontend: implement referral detail and status timeline` | ✅ COMMITTED | `09efae2` | Implemented `ReferralStatusTimeline.jsx` with chronological audit timeline from backend history; implemented `ReferralDetailPage.jsx` displaying patient demographics, clinical diagnosis, structured vitals table, and transport requirements. | None |
+| **156** | `frontend: implement hospital response visibility and referral decisions` | ✅ COMMITTED | `ec6fdac` | Built `HospitalResponseCard.jsx` supporting `ACCEPTED`, `REJECTED` (with transparent rejection reason and alternative referral flow), `INFO_REQUESTED`, `ACKNOWLEDGED`, and `SUBMITTED` triage states. | None |
+| **157** | `frontend: implement referral information request and response workflow` | ✅ COMMITTED | `2064a91` | Built `ReferralInfoRequestsSection.jsx` supporting pending/responded states, clinician response notes with 5-character validation, supporting document upload, and duplicate submission locking. | None |
+| **158** | `frontend: implement referral follow-up and coordination workspace` | ✅ COMMITTED | `cb7316b` | Built `ReferralFollowUpSection.jsx` supporting communication channels (`PHONE_CALL`, `SMS`, `EMAIL`, `IN_PLATFORM`, `MANUAL`), outcome and notes validation, and operational SLA escalation and delay monitoring. | None |
+| **159** | `frontend: integrate referral tracking notifications and real-time updates` | ✅ COMMITTED | `ca3efb0` | Implemented `useReferralRealtimeTracking.js` hook with missed-events recovery via `/api/v1/realtime/missed-events`, event deduplication, resilient 30-second polling fallback, manual sync trigger, and live connectivity badge. | None |
+| **160** | `test: verify health centre referral tracking and follow-up workflows` | ✅ COMMITTED | `13cf4b7` | Automated test suite in `shared/tests/healthCentreReferralTracking.test.js` (10/10 tests passing), verified standards, and authored `docs/PART_20_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
