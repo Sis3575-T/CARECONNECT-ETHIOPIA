@@ -27,6 +27,7 @@ import { DepartmentAssignmentModal } from '../components/admission/DepartmentAss
 import { AdmissionRecordCard } from '../components/admission/AdmissionRecordCard.jsx';
 import { ProgressUpdateModal } from '../components/admission/ProgressUpdateModal.jsx';
 import { CareProgressWorkspace } from '../components/admission/CareProgressWorkspace.jsx';
+import { ReferralCompletionModal } from '../components/admission/ReferralCompletionModal.jsx';
 
 export default function AdmissionDetailPage() {
   const { referralId, id } = useParams();
@@ -459,6 +460,20 @@ export default function AdmissionDetailPage() {
           referral={referral}
           onSuccess={(updated, msg) => {
             setActionSuccess(msg || 'Care progress update recorded successfully.');
+            fetchReferralDetails(true);
+            setTimeout(() => setActionSuccess(null), 5000);
+          }}
+        />
+      )}
+
+      {/* Referral Completion Modal */}
+      {showCompleteModal && (
+        <ReferralCompletionModal
+          isOpen={showCompleteModal}
+          onClose={() => setShowCompleteModal(false)}
+          referral={referral}
+          onSuccess={(updated, msg) => {
+            setActionSuccess(msg || 'Referral completed successfully.');
             fetchReferralDetails(true);
             setTimeout(() => setActionSuccess(null), 5000);
           }}
