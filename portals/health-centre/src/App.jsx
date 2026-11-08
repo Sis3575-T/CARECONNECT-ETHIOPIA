@@ -4,6 +4,9 @@ import HealthCentreLayout from './layouts/HealthCentreLayout';
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
 import PatientsPage from './pages/PatientsPage';
+import PatientRegisterPage from './pages/PatientRegisterPage';
+import PatientDetailPage from './pages/PatientDetailPage';
+import PatientEditPage from './pages/PatientEditPage';
 import CreateReferralPage from './pages/CreateReferralPage';
 import AllReferralsPage from './pages/AllReferralsPage';
 import AIReviewPage from './pages/AIReviewPage';
@@ -39,6 +42,9 @@ export default function App() {
           <Route index element={<DashboardPage />} />
           <Route path="dashboard" element={<Navigate to="/" replace />} />
           <Route path="patients" element={<PatientsPage />} />
+          <Route path="patients/register" element={<PatientRegisterPage />} />
+          <Route path="patients/:patientId" element={<PatientDetailPage />} />
+          <Route path="patients/:patientId/edit" element={<PatientEditPage />} />
           <Route path="create-referral" element={<CreateReferralPage />} />
           <Route path="referrals" element={<AllReferralsPage />} />
           <Route path="ai-review" element={<AIReviewPage />} />
