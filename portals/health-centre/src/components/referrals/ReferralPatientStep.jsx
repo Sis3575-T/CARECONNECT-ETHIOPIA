@@ -193,7 +193,7 @@ export function ReferralPatientStep({ selectedPatient, onSelectPatient, onProcee
           </div>
 
           {searchError && (
-            <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+            <div role="alert" className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{searchError}</span>
             </div>
@@ -205,14 +205,23 @@ export function ReferralPatientStep({ selectedPatient, onSelectPatient, onProcee
               <span className="text-[11px] font-semibold uppercase text-slate-400 block">
                 Matching Patient Records ({searchResults.length}):
               </span>
-              <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+              <div className="divide-y divide-slate-100 dark:divide-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden" role="listbox" aria-label="Patient search results">
                 {searchResults.map((patient) => {
                   const fullName = patient.full_name || `${patient.first_name} ${patient.father_name}`;
                   return (
                     <div
                       key={patient.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Select patient ${fullName}`}
                       onClick={() => handleSelect(patient)}
-                      className="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50/60 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between transition-colors group"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleSelect(patient);
+                        }
+                      }}
+                      className="p-3 bg-white dark:bg-slate-900 hover:bg-sky-50/60 dark:hover:bg-slate-800/80 cursor-pointer flex items-center justify-between transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
                     >
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-semibold text-xs flex items-center justify-center shrink-0">

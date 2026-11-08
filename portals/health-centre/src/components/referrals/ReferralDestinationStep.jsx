@@ -147,7 +147,7 @@ export function ReferralDestinationStep({
       </div>
 
       {validationError && (
-        <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 text-xs flex items-center gap-2">
+        <div role="alert" className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{validationError}</span>
         </div>
@@ -210,8 +210,10 @@ export function ReferralDestinationStep({
                   onClick={() => handleHospitalSelect(hosp)}
                   role="button"
                   tabIndex={0}
+                  aria-selected={isSelected}
+                  aria-label={`Select destination hospital ${hosp.name}`}
                   onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && handleHospitalSelect(hosp)}
-                  className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all ${
+                  className={`p-3.5 rounded-xl border text-left cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
                     isSelected
                       ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-950/40 text-sky-900 dark:text-sky-200 shadow-sm ring-1 ring-sky-500/30'
                       : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'

@@ -140,7 +140,7 @@ export function ReferralClinicalStep({ clinicalData, onChange, onBack, onProceed
           Select the clinical urgency tier according to Ethiopian National Referral Guidelines. Triage decision remains under clinical responsibility.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3" role="radiogroup" aria-label="Clinical Priority Urgency">
           {PRIORITY_LEVELS.map((lvl) => {
             const isSelected = clinicalData.priority === lvl.value;
             return (
@@ -151,7 +151,7 @@ export function ReferralClinicalStep({ clinicalData, onChange, onBack, onProceed
                 aria-checked={isSelected}
                 tabIndex={0}
                 onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && handlePrioritySelect(lvl.value)}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                className={`p-4 rounded-xl border-2 cursor-pointer transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
                   isSelected ? `${lvl.accent} ring-2` : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                 }`}
               >

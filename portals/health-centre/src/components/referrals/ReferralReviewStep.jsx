@@ -55,7 +55,7 @@ export function ReferralReviewStep({
       </div>
 
       {submissionError && (
-        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 text-xs flex items-center gap-2">
+        <div role="alert" className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/40 text-xs flex items-center gap-2">
           <AlertTriangle className="w-5 h-5 shrink-0" />
           <div>
             <p className="font-semibold">Referral Submission Failed</p>
@@ -66,7 +66,7 @@ export function ReferralReviewStep({
 
       {/* Priority Alert Banner */}
       {isEmergency && (
-        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex items-center justify-between gap-4 text-xs">
+        <div role="alert" aria-live="assertive" className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 flex items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2.5 text-rose-800 dark:text-rose-300">
             <Flame className="w-5 h-5 text-rose-600 animate-pulse shrink-0" />
             <div>

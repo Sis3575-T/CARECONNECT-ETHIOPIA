@@ -58,7 +58,7 @@ export function ReferralConfirmationStep({
   return (
     <div className="space-y-6 max-w-3xl mx-auto py-2">
       {/* Success Badge & Reference Banner */}
-      <Card className="p-8 text-center bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+      <Card className="p-8 text-center bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden" role="status" aria-live="polite">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-sky-500" />
 
         <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 ring-8 ring-emerald-50 dark:ring-emerald-950/30">
@@ -88,8 +88,8 @@ export function ReferralConfirmationStep({
             variant="outline"
             size="sm"
             onClick={handleCopy}
-            className="shrink-0 h-9 px-3 text-xs flex items-center gap-1.5 border-slate-300 dark:border-slate-600 hover:bg-slate-100"
-            aria-label="Copy referral reference code"
+            className="shrink-0 h-9 px-3 text-xs flex items-center gap-1.5 border-slate-300 dark:border-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
+            aria-label={copied ? "Referral reference code copied" : "Copy referral reference code"}
           >
             {copied ? (
               <>
