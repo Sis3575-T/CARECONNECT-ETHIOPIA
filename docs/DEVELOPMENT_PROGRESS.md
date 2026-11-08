@@ -357,6 +357,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 18 OF 50: HEALTH CENTRE PATIENT MANAGEMENT INTERFACE, PATIENT REGISTRATION, PATIENT SEARCH AND PATIENT PROFILES
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 18 of 50 | Commits 137–144  
+**Last Updated:** 2026-11-08T19:20:00.000Z  
+
+### Part 18 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **137** | `frontend: establish health centre patient management architecture` | ✅ COMMITTED | `1174681` | Established route structure in `App.jsx`, created `patientService.js`, `PatientLoadingSkeleton.jsx`, `PatientErrorState.jsx`, and modular page stubs. | None |
+| **138** | `frontend: implement health centre patient management workspace` | ✅ COMMITTED | `eaa25bb` | Implemented primary workspace in `PatientsPage.jsx`, `PatientTable.jsx`, and `PatientStatusBadge.jsx` with mobile card fallback and facility tenancy indicators. | None |
+| **139** | `frontend: implement secure patient registration form` | ✅ COMMITTED | `97eff53` | Built `PatientRegistrationForm.jsx` and `PatientRegisterPage.jsx` with patronymic fields, Ethiopian DOB/age logic, Fayda ID validation, and pre-registration duplicate detection. | None |
+| **140** | `frontend: implement patient search filtering and pagination` | ✅ COMMITTED | `2590b9f` | Implemented `PatientSearchFilter.jsx` with debounced search, active filter pills, and `PatientPagination.jsx` with 10/20/50 rows-per-page selection. | None |
+| **141** | `frontend: implement patient profile and record overview` | ✅ COMMITTED | `12c0b6a` | Built `PatientDetailPage.jsx`, `PatientOverviewCard.jsx`, `PatientReferralHistory.jsx`, and `PatientAuditHistory.jsx` with 403/404 error handling. | None |
+| **142** | `frontend: implement patient profile editing and duplicate review` | ✅ COMMITTED | `4851a23` | Built `PatientEditPage.jsx`, `PatientEditForm.jsx`, and `PatientDuplicateReviewSection.jsx` with side-by-side duplicate comparison and review outcome recording. | None |
+| **143** | `frontend: improve patient management security accessibility and performance` | ✅ COMMITTED | `86b2274` | Implemented React.lazy route code-splitting, accessible table semantics, WAI-ARIA controls, keyboard navigation, and bundle reduction to 292 kB. | None |
+| **144** | `test: verify health centre patient management workflows` | ✅ COMMITTED | `ccf2a79` | Verified 61 frontend tests (including 9 Part 18 tests), 39 backend patient tests, code standards, and production build of health centre portal. Authored `docs/PART_18_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
