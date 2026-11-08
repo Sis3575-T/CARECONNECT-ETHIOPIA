@@ -24,6 +24,7 @@ import { ReferralPriorityBadge } from '../components/referrals/ReferralPriorityB
 import { ReferralStatusTimeline } from '../components/referrals/ReferralStatusTimeline.jsx';
 import { HospitalResponseCard } from '../components/referrals/HospitalResponseCard.jsx';
 import { ReferralInfoRequestsSection } from '../components/referrals/ReferralInfoRequestsSection.jsx';
+import { ReferralFollowUpSection } from '../components/referrals/ReferralFollowUpSection.jsx';
 import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
 
 export default function ReferralDetailPage() {
@@ -344,8 +345,13 @@ export default function ReferralDetailPage() {
           </Card>
         </div>
 
-        {/* Right Col: Unified Chronological Timeline */}
+        {/* Right Col: Unified Chronological Timeline & Follow-up Tracking */}
         <div className="space-y-6">
+          <ReferralFollowUpSection
+            referralId={referralId}
+            onFollowUpAdded={loadReferralData}
+          />
+
           <ReferralStatusTimeline
             timelineEvents={timeline}
             loading={loadingTimeline}
