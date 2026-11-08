@@ -23,6 +23,7 @@ import { ReferralStatusBadge } from '../components/referrals/ReferralStatusBadge
 import { ReferralPriorityBadge } from '../components/referrals/ReferralPriorityBadge.jsx';
 import { ReferralStatusTimeline } from '../components/referrals/ReferralStatusTimeline.jsx';
 import { HospitalResponseCard } from '../components/referrals/HospitalResponseCard.jsx';
+import { ReferralInfoRequestsSection } from '../components/referrals/ReferralInfoRequestsSection.jsx';
 import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
 
 export default function ReferralDetailPage() {
@@ -149,7 +150,21 @@ export default function ReferralDetailPage() {
         {/* Left 2 Cols: Clinical & Transfer Overview */}
         <div className="lg:col-span-2 space-y-6">
           {/* Hospital Response & Decision Visibility Banner */}
-          <HospitalResponseCard referral={referral} />
+          <HospitalResponseCard
+            referral={referral}
+            onOpenInfoRequest={() => {
+              const el = document.getElementById('info-requests-section');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          />
+
+          {/* Additional Information Requests Section */}
+          <div id="info-requests-section">
+            <ReferralInfoRequestsSection
+              referralId={referralId}
+              onResponseSubmitted={loadReferralData}
+            />
+          </div>
 
           {/* Patient Demographic Summary Card */}
           <Card className="p-5 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
