@@ -416,7 +416,28 @@
 | **157** | `frontend: implement referral information request and response workflow` | ✅ COMMITTED | `2064a91` | Built `ReferralInfoRequestsSection.jsx` supporting pending/responded states, clinician response notes with 5-character validation, supporting document upload, and duplicate submission locking. | None |
 | **158** | `frontend: implement referral follow-up and coordination workspace` | ✅ COMMITTED | `cb7316b` | Built `ReferralFollowUpSection.jsx` supporting communication channels (`PHONE_CALL`, `SMS`, `EMAIL`, `IN_PLATFORM`, `MANUAL`), outcome and notes validation, and operational SLA escalation and delay monitoring. | None |
 | **159** | `frontend: integrate referral tracking notifications and real-time updates` | ✅ COMMITTED | `ca3efb0` | Implemented `useReferralRealtimeTracking.js` hook with missed-events recovery via `/api/v1/realtime/missed-events`, event deduplication, resilient 30-second polling fallback, manual sync trigger, and live connectivity badge. | None |
-| **160** | `test: verify health centre referral tracking and follow-up workflows` | ✅ COMMITTED | `13cf4b7` | Automated test suite in `shared/tests/healthCentreReferralTracking.test.js` (10/10 tests passing), verified standards, and authored `docs/PART_20_REPORT.md`. | None |
+| **160** | `test: verify health centre referral tracking and follow-up workflows` | ✅ COMMITTED | `13334ae` | Automated test suite in `shared/tests/healthCentreReferralTracking.test.js` (10/10 tests passing), verified standards, and authored `docs/PART_20_REPORT.md`. | None |
+
+---
+
+## 50-PART PRODUCTION ROADMAP — PART 21 OF 50: HOSPITAL PORTAL DASHBOARD, NAVIGATION, REFERRAL INBOX AND INCOMING REFERRAL MANAGEMENT
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 21 of 50 | Commits 161–168  
+**Last Updated:** 2026-11-08T20:45:00.000Z  
+
+### Part 21 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **161** | `frontend: establish hospital portal architecture` | ✅ COMMITTED | `f31a8d1` | Established `hospitalService.js` client gateway, status & priority badges (`HospitalStatusBadge.jsx`, `HospitalPriorityBadge.jsx`), skeleton loader, error and empty states, and registered `/referrals/:referralId` and `/incoming/:referralId` routes in `App.jsx`. | None |
+| **162** | `frontend: implement hospital dashboard interface` | ✅ COMMITTED | `e629eb1` | Built `DashboardPage.jsx` with real backend metrics calculation, emergency triage alert banner, recent incoming referrals table, and pending work queue summary. | None |
+| **163** | `frontend: implement hospital portal navigation and layout` | ✅ COMMITTED | `e9daa67` | Built `HospitalLayout.jsx` with server-authoritative context from `useAuth()`, dynamic hospital profile integration, live unread notification badges, and centralized logout. | None |
+| **164** | `frontend: implement hospital incoming referral inbox` | ✅ COMMITTED | `15c5a04` | Built `IncomingReferralsPage.jsx` and `HospitalReferralTable.jsx` supporting debounced search, status and priority filters, "Action Required" toggle, server-side pagination, and dual table/card responsive layouts. | None |
+| **165** | `frontend: implement hospital incoming referral detail interface` | ✅ COMMITTED | `e1fa728` | Built `ReferralDetailPage.jsx` displaying patient demographics, clinical diagnosis narrative, structured physiological vitals table, attached diagnostic documents, and chronological audit timeline. | None |
+| **166** | `frontend: implement hospital referral pending actions workspace` | ✅ COMMITTED | `4e75e8c` | Built `PendingReferralsPage.jsx` supporting action category tabs (Awaiting Intake, In Triage Review, Info Requested), search, and explicit operational SLA guidance vs clinical triage criteria. | None |
+| **167** | `frontend: integrate hospital notifications and real-time dashboard updates` | ✅ COMMITTED | `63fbfc2` | Built `useHospitalRealtime.js` hook with missed-events recovery via `/api/v1/realtime/missed-events`, event deduplication, resilient 30-second polling fallback, and integrated live connectivity indicators. | None |
+| **168** | `test: verify hospital portal dashboard and incoming referral workflows` | ✅ COMMITTED | `2ad25b4` | Automated test suite in `shared/tests/hospitalPortalDashboard.test.js` (10/10 tests passing), verified standards, and authored `docs/PART_21_REPORT.md`. | None |
 
 ---
 
