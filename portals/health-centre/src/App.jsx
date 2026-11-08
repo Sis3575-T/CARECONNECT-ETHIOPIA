@@ -69,6 +69,7 @@ export default function App() {
 
             {/* Other Portal Workspaces */}
             <Route path="create-referral" element={<CreateReferralPage />} />
+            <Route path="referrals/new" element={<Navigate to="/create-referral" replace />} />
             <Route path="referrals" element={<AllReferralsPage />} />
             <Route path="ai-review" element={<AIReviewPage />} />
             <Route path="hospitals" element={<HospitalsPage />} />
