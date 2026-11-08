@@ -27,6 +27,8 @@ import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
 import { DischargeDocumentationModal } from '../components/discharge/DischargeDocumentationModal.jsx';
 import { InterFacilityTransferModal } from '../components/discharge/InterFacilityTransferModal.jsx';
 import { ReturnToReferrerModal } from '../components/discharge/ReturnToReferrerModal.jsx';
+import { PatientOutcomeModal } from '../components/discharge/PatientOutcomeModal.jsx';
+import { PatientOutcomeSection } from '../components/discharge/PatientOutcomeSection.jsx';
 import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 export default function DischargeDetailPage() {
@@ -415,36 +417,11 @@ export default function DischargeDetailPage() {
       )}
 
       {activeTab === 'outcome' && (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Award className="w-4 h-4 text-amber-500" />
-            <span>Documented Patient Outcome & Discharge Summary</span>
-          </h3>
-          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-sm text-slate-700 dark:text-slate-300 space-y-3">
-            <div>
-              <span className="text-xs text-slate-500 uppercase tracking-wide block">Outcome Category</span>
-              <span className="text-base font-bold text-slate-900 dark:text-slate-100">
-                {referral.completion_reason || referral.outcome || 'Pending Official Outcome Documentation'}
-              </span>
-            </div>
-            <div>
-              <span className="text-xs text-slate-500 uppercase tracking-wide block">Clinical Outcome Summary / Instructions</span>
-              <p className="text-sm mt-1 whitespace-pre-wrap">
-                {referral.outcome_notes || referral.counter_referral_instructions || 'No outcome summary recorded yet.'}
-              </p>
-            </div>
-            {referral.counter_referral_instructions && (
-              <div className="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-md">
-                <span className="text-xs font-semibold text-sky-800 dark:text-sky-300 block mb-1">
-                  Counter-Referral Instructions for Health Centre:
-                </span>
-                <p className="text-xs text-sky-900 dark:text-sky-200">
-                  {referral.counter_referral_instructions}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
+        <PatientOutcomeSection
+          referral={referral}
+          followUps={followUps}
+          onOpenOutcomeModal={() => setShowOutcomeModal(true)}
+        />
       )}
 
       {activeTab === 'history' && (
@@ -509,6 +486,32 @@ export default function DischargeDetailPage() {
         onSuccess={(updated) => {
           if (updated) setReferral(prev => ({ ...prev, ...updated, status: 'COMPLETED', completion_reason: 'RETURNED_TO_REFERRING_FACILITY' }));
           setActionSuccess('Counter-referral authorized; patient returned to primary health centre with care plan.');
+          fetchDischargeDetails(true);
+        }}
+      />
+
+      {/* Patient Outcome Modal */}
+      <PatientOutcomeModal
+        isOpen={showOutcomeModal}
+        onClose={() => setShowOutcomeModal(false)}
+        referral={referral}
+        onSuccess={(result, payload) => {
+          setReferral(prev => ({
+            ...prev,
+            outcome: payload.outcome_category,
+            outcome_category: payload.outcome_category,
+            outcome_notes: payload.outcome_notes
+          }));
+          setFollowUps(prev => [
+            {
+              id: Date.now(),
+              outcome: payload.outcome_category,
+              reason_or_notes: payload.outcome_notes,
+              created_at: payload.documented_at
+            },
+            ...prev
+          ]);
+          setActionSuccess(`Standardized outcome documented: ${payload.outcome_category}`);
           fetchDischargeDetails(true);
         }}
       />
