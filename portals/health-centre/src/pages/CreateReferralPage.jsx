@@ -13,6 +13,7 @@ import { referralCreationService } from '../services/referralCreationService.js'
 import { ReferralStepIndicator } from '../components/referrals/ReferralStepIndicator.jsx';
 import { ReferralPatientStep } from '../components/referrals/ReferralPatientStep.jsx';
 import { ReferralClinicalStep } from '../components/referrals/ReferralClinicalStep.jsx';
+import { ReferralDestinationStep } from '../components/referrals/ReferralDestinationStep.jsx';
 import { Card } from '@shared/components/display/Card.jsx';
 import { Spinner } from '@shared/components/feedback/Spinner.jsx';
 
@@ -160,17 +161,28 @@ export default function CreateReferralPage() {
             />
           )}
 
-          {currentStep > 2 && (
+          {currentStep === 3 && (
+            <ReferralDestinationStep
+              destinationData={destinationData}
+              onChange={setDestinationData}
+              onBack={() => setCurrentStep(2)}
+              onProceed={() => {
+                markStepComplete(3);
+                setCurrentStep(4);
+              }}
+            />
+          )}
+
+          {currentStep > 3 && (
             <Card className="p-8 text-center text-xs text-slate-500 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
               <p>Step {currentStep} under configuration...</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentStep(2)}
-                className="mt-3"
+              <button
+                type="button"
+                onClick={() => setCurrentStep(3)}
+                className="mt-3 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50"
               >
-                Back to Clinical Information
-              </Button>
+                Back to Destination Selection
+              </button>
             </Card>
           )}
         </>
