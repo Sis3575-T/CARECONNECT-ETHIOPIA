@@ -124,6 +124,8 @@ export function PatientSearchFilter({
             variant="outline"
             size="sm"
             onClick={() => setShowAdvanced((prev) => !prev)}
+            aria-expanded={showAdvanced}
+            aria-controls="advanced-filters-panel"
             className={`inline-flex items-center gap-1.5 flex-1 sm:flex-initial justify-center ${
               showAdvanced || hasActiveFilters
                 ? 'border-sky-300 dark:border-sky-700 bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300'
@@ -133,7 +135,7 @@ export function PatientSearchFilter({
             <SlidersHorizontal className="w-3.5 h-3.5" />
             <span>Filters</span>
             {hasActiveFilters && (
-              <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" aria-label="Filters active" />
             )}
           </Button>
 
@@ -155,7 +157,7 @@ export function PatientSearchFilter({
 
       {/* Advanced Filter Drawer */}
       {showAdvanced && (
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+        <div id="advanced-filters-panel" className="pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           <Select
             label="Gender"
             value={gender}

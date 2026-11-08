@@ -16,11 +16,19 @@ export function PatientTable({ patients = [], onSelectPatient }) {
     }
   };
 
+  const handleKeyDown = (e, patientId) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleRowClick(patientId);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-        <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+        <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300" aria-label="Health Centre Patient Directory">
+          <caption className="sr-only">List of patients registered at this health centre facility</caption>
           <thead className="bg-slate-50 dark:bg-slate-800/80 text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
             <tr>
               <th scope="col" className="px-6 py-3.5">Patient Details</th>
@@ -30,7 +38,7 @@ export function PatientTable({ patients = [], onSelectPatient }) {
               <th scope="col" className="px-4 py-3.5">Contact</th>
               <th scope="col" className="px-4 py-3.5">Status</th>
               <th scope="col" className="px-4 py-3.5">Registered</th>
-              <th scope="col" className="px-6 py-3.5 text-right">Action</th>
+              <th scope="col" className="px-6 py-3.5 text-right"><span className="sr-only">Actions</span>Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -44,12 +52,16 @@ export function PatientTable({ patients = [], onSelectPatient }) {
               return (
                 <tr
                   key={patient.id}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Open record for patient ${fullName}`}
                   onClick={() => handleRowClick(patient.id)}
-                  className="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
+                  onKeyDown={(e) => handleKeyDown(e, patient.id)}
+                  className="hover:bg-sky-50/50 dark:hover:bg-slate-800/50 focus:bg-sky-50/70 dark:focus:bg-slate-800/70 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500 transition-colors cursor-pointer group"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-9 h-9 rounded-full bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-semibold flex items-center justify-center shrink-0 text-xs">
+                      <div className="w-9 h-9 rounded-full bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-300 font-semibold flex items-center justify-center shrink-0 text-xs" aria-hidden="true">
                         {patient.first_name ? patient.first_name.charAt(0).toUpperCase() : 'P'}
                       </div>
                       <div>
@@ -58,7 +70,7 @@ export function PatientTable({ patients = [], onSelectPatient }) {
                         </div>
                         {patient.national_id && (
                           <div className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-0.5">
-                            <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                            <ShieldCheck className="w-3 h-3 text-emerald-500" aria-hidden="true" />
                             <span>Fayda: {patient.national_id}</span>
                           </div>
                         )}
@@ -78,7 +90,7 @@ export function PatientTable({ patients = [], onSelectPatient }) {
                   </td>
                   <td className="px-4 py-4 text-xs text-slate-600 dark:text-slate-300">
                     <div className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
                       <span className="truncate max-w-[150px]">{locationDisplay}</span>
                     </div>
                     {patient.kebele && (
@@ -90,7 +102,7 @@ export function PatientTable({ patients = [], onSelectPatient }) {
                   <td className="px-4 py-4 text-xs text-slate-600 dark:text-slate-300">
                     {patient.phone_number ? (
                       <div className="flex items-center gap-1">
-                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
                         <span>{formatEthiopianPhone(patient.phone_number)}</span>
                       </div>
                     ) : (
@@ -111,9 +123,10 @@ export function PatientTable({ patients = [], onSelectPatient }) {
                         e.stopPropagation();
                         handleRowClick(patient.id);
                       }}
+                      aria-label={`View full profile for ${fullName}`}
                       className="text-sky-600 dark:text-sky-400 hover:text-sky-700 dark:hover:text-sky-300 hover:bg-sky-50 dark:hover:bg-sky-950/40 inline-flex items-center space-x-1"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-4 h-4" aria-hidden="true" />
                       <span>Profile</span>
                     </Button>
                   </td>
@@ -125,7 +138,7 @@ export function PatientTable({ patients = [], onSelectPatient }) {
       </div>
 
       {/* Mobile Card List View */}
-      <div className="grid grid-cols-1 gap-3 md:hidden">
+      <div className="grid grid-cols-1 gap-3 md:hidden" role="feed" aria-label="Mobile patient records list">
         {patients.map((patient) => {
           const fullName = patient.full_name || [patient.first_name, patient.father_name, patient.grandfather_name].filter(Boolean).join(' ') || 'Unnamed Patient';
           const ageDisplay = patient.age_years !== null && patient.age_years !== undefined
@@ -133,10 +146,14 @@ export function PatientTable({ patients = [], onSelectPatient }) {
             : 'Age —';
 
           return (
-            <div
+            <article
               key={patient.id}
+              tabIndex={0}
+              role="button"
+              aria-label={`Open record for patient ${fullName}`}
               onClick={() => handleRowClick(patient.id)}
-              className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm active:bg-slate-50 dark:active:bg-slate-800/80 transition-colors cursor-pointer"
+              onKeyDown={(e) => handleKeyDown(e, patient.id)}
+              className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm active:bg-slate-50 dark:active:bg-slate-800/80 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors cursor-pointer"
             >
               <div className="flex items-start justify-between mb-2">
                 <div>
@@ -172,10 +189,10 @@ export function PatientTable({ patients = [], onSelectPatient }) {
               <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
                 <span>Reg: {formatClinicalDate(patient.created_at)}</span>
                 <span className="text-sky-600 dark:text-sky-400 font-medium inline-flex items-center gap-1">
-                  View Profile <ChevronRight className="w-3.5 h-3.5" />
+                  View Profile <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
                 </span>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
