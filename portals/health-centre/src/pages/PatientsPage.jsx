@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -6,9 +6,9 @@ import {
   RefreshCw,
   Search,
   Filter,
-  ShieldCheck,
   Building2,
-  AlertCircle
+  SlidersHorizontal,
+  X
 } from 'lucide-react';
 import { Button } from '@shared/components/ui/Button.jsx';
 import { Card } from '@shared/components/display/Card.jsx';
@@ -16,6 +16,8 @@ import { EmptyState } from '@shared/components/display/EmptyState.jsx';
 import { useAuth } from '@shared/context/AuthContext.jsx';
 import { patientService } from '../services/patientService.js';
 import { PatientTable } from '../components/patients/PatientTable.jsx';
+import { PatientSearchFilter } from '../components/patients/PatientSearchFilter.jsx';
+import { PatientPagination } from '../components/patients/PatientPagination.jsx';
 import { PatientLoadingSkeleton } from '../components/patients/PatientLoadingSkeleton.jsx';
 import { PatientErrorState } from '../components/patients/PatientErrorState.jsx';
 
@@ -28,7 +30,7 @@ export default function PatientsPage() {
   const [error, setError] = useState(null);
   const [isRetrying, setIsRetrying] = useState(false);
 
-  // Pagination & Filtering state
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
@@ -38,11 +40,19 @@ export default function PatientsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterGender, setFilterGender] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterRegion, setFilterRegion] = useState('ALL');
+  const [filterWoreda, setFilterWoreda] = useState('');
 
   const facilityName = user?.facilityName || 'Assigned Health Centre';
-  const facilityId = user?.facilityId || 'Tenant Facility';
+  const abortControllerRef = useRef(null);
 
   const loadPatients = useCallback(async (isRetry = false) => {
+    // Abort previous in-flight request if user is typing
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
     if (isRetry) {
       setIsRetrying(true);
     } else {
@@ -51,32 +61,90 @@ export default function PatientsPage() {
     setError(null);
 
     try {
-      const response = await patientService.getPatients({
-        page: currentPage,
-        limit: pageSize,
-        search: searchTerm,
-        gender: filterGender,
-        status: filterStatus
-      });
+      const response = await patientService.getPatients(
+        {
+          page: currentPage,
+          limit: pageSize,
+          search: searchTerm,
+          gender: filterGender,
+          status: filterStatus,
+          region: filterRegion !== 'ALL' ? filterRegion : undefined,
+          woreda: filterWoreda.trim() || undefined
+        },
+        abortControllerRef.current.signal
+      );
 
       setPatients(response.data || []);
       setTotalCount(response.pagination?.total || 0);
       setTotalPages(response.pagination?.totalPages || 1);
     } catch (err) {
+      if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
+        return; // Ignore canceled requests
+      }
       setError(err?.message || 'Unable to retrieve patient records. Please check facility network connectivity.');
     } finally {
       setLoading(false);
       setIsRetrying(false);
     }
-  }, [currentPage, pageSize, searchTerm, filterGender, filterStatus]);
+  }, [currentPage, pageSize, searchTerm, filterGender, filterStatus, filterRegion, filterWoreda]);
 
   useEffect(() => {
     loadPatients();
+    return () => {
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
   }, [loadPatients]);
 
-  const handleRefresh = () => {
-    loadPatients(true);
+  const handleSearchChange = (term) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
   };
+
+  const handleGenderChange = (val) => {
+    setFilterGender(val);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (val) => {
+    setFilterStatus(val);
+    setCurrentPage(1);
+  };
+
+  const handleRegionChange = (val) => {
+    setFilterRegion(val);
+    setCurrentPage(1);
+  };
+
+  const handleWoredaChange = (val) => {
+    setFilterWoreda(val);
+    setCurrentPage(1);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setFilterGender('ALL');
+    setFilterStatus('ALL');
+    setFilterRegion('ALL');
+    setFilterWoreda('');
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePageSizeChange = (newSize) => {
+    setPageSize(newSize);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters =
+    Boolean(searchTerm) ||
+    filterGender !== 'ALL' ||
+    filterStatus !== 'ALL' ||
+    filterRegion !== 'ALL' ||
+    Boolean(filterWoreda);
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 py-6">
@@ -96,7 +164,7 @@ export default function PatientsPage() {
             )}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Access, register, and manage healthcare records strictly within your authorized facility boundary
+            Access, search, filter, and register patient medical records under your health centre authority
           </p>
         </div>
 
@@ -105,7 +173,7 @@ export default function PatientsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={handleRefresh}
+            onClick={() => loadPatients(true)}
             disabled={loading || isRetrying}
             className="inline-flex items-center gap-1.5"
             aria-label="Refresh patient records"
@@ -126,6 +194,23 @@ export default function PatientsPage() {
         </div>
       </div>
 
+      {/* Server-Side Search & Filters */}
+      <PatientSearchFilter
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        gender={filterGender}
+        onGenderChange={handleGenderChange}
+        status={filterStatus}
+        onStatusChange={handleStatusChange}
+        region={filterRegion}
+        onRegionChange={handleRegionChange}
+        woreda={filterWoreda}
+        onWoredaChange={handleWoredaChange}
+        onReset={handleResetFilters}
+        totalResults={totalCount}
+        isLoading={loading}
+      />
+
       {/* Main Workspace Content Area */}
       {loading && !isRetrying ? (
         <PatientLoadingSkeleton rows={6} />
@@ -133,29 +218,41 @@ export default function PatientsPage() {
         <PatientErrorState
           title="Facility Patient Directory Unavailable"
           message={error}
-          onRetry={handleRefresh}
+          onRetry={() => loadPatients(true)}
           isRetrying={isRetrying}
         />
       ) : patients.length === 0 ? (
         <Card className="p-8 text-center bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
           <EmptyState
             icon={Users}
-            title="No Patient Records Found"
+            title={hasActiveFilters ? "No Matching Patients Found" : "No Patient Records Found"}
             description={
-              searchTerm || filterGender !== 'ALL' || filterStatus !== 'ALL'
-                ? "No patient records match the applied criteria at this health centre."
+              hasActiveFilters
+                ? `No patient records at ${facilityName} matched your search criteria. Try modifying or clearing your filters.`
                 : `No patients have been registered yet under ${facilityName}. Begin by adding the first patient.`
             }
             action={
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => navigate('/patients/register')}
-                className="inline-flex items-center gap-1.5 mt-2 bg-sky-600 hover:bg-sky-700 text-white"
-              >
-                <UserPlus className="w-4 h-4" />
-                <span>Register Patient</span>
-              </Button>
+              hasActiveFilters ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetFilters}
+                  className="mt-3 inline-flex items-center gap-1.5"
+                >
+                  <X className="w-4 h-4" />
+                  <span>Clear All Filters</span>
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => navigate('/patients/register')}
+                  className="inline-flex items-center gap-1.5 mt-3 bg-sky-600 hover:bg-sky-700 text-white"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Register Patient</span>
+                </Button>
+              )
             }
           />
         </Card>
@@ -163,31 +260,16 @@ export default function PatientsPage() {
         <div className="space-y-4">
           <PatientTable patients={patients} />
 
-          {/* Simple Pagination Bar for Workspace */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
-            <div>
-              Showing page <span className="font-semibold text-slate-900 dark:text-white">{currentPage}</span> of{' '}
-              <span className="font-semibold text-slate-900 dark:text-white">{totalPages}</span> ({totalCount} total)
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage <= 1 || loading}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage >= totalPages || loading}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
+          {/* Full Server-Side Pagination Bar */}
+          <PatientPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalCount}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            isLoading={loading}
+          />
         </div>
       )}
     </div>
