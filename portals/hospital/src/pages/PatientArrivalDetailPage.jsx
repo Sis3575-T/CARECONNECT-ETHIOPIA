@@ -24,6 +24,7 @@ import ArrivalStatusBadge from '../components/arrival/ArrivalStatusBadge.jsx';
 import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import ArrivalSkeleton from '../components/arrival/ArrivalSkeleton.jsx';
 import PatientIdentityVerification from '../components/arrival/PatientIdentityVerification.jsx';
+import PatientHandoverSection from '../components/arrival/PatientHandoverSection.jsx';
 import PatientArrivalModal from '../components/arrival/PatientArrivalModal.jsx';
 
 export default function PatientArrivalDetailPage() {
@@ -317,6 +318,13 @@ export default function PatientArrivalDetailPage() {
           onVerificationChange={setVerificationState}
           isVerified={verificationState.isVerified}
           mismatchReported={verificationState.hasMismatch}
+        />
+
+        {/* Step 2: Patient Handover & Transfer Documentation */}
+        <PatientHandoverSection
+          referral={referral}
+          onHandoverRecorded={() => fetchArrivalDossier(true)}
+          isLocked={verificationState.hasMismatch}
         />
       </div>
 
