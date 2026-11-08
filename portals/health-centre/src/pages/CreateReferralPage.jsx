@@ -16,6 +16,7 @@ import { ReferralClinicalStep } from '../components/referrals/ReferralClinicalSt
 import { ReferralDestinationStep } from '../components/referrals/ReferralDestinationStep.jsx';
 import { ReferralDocumentsStep } from '../components/referrals/ReferralDocumentsStep.jsx';
 import { ReferralReviewStep } from '../components/referrals/ReferralReviewStep.jsx';
+import { ReferralConfirmationStep } from '../components/referrals/ReferralConfirmationStep.jsx';
 import { Card } from '@shared/components/display/Card.jsx';
 import { Spinner } from '@shared/components/feedback/Spinner.jsx';
 
@@ -149,6 +150,34 @@ export default function CreateReferralPage() {
     }
   };
 
+  const handleReset = () => {
+    setSelectedPatient(null);
+    setClinicalData({
+      priority: 'ROUTINE',
+      primary_diagnosis: '',
+      reason_for_referral: '',
+      clinical_summary: '',
+      vitals_blood_pressure: '',
+      vitals_pulse_rate: '',
+      vitals_respiratory_rate: '',
+      vitals_temperature: '',
+      vitals_spo2: '',
+      provisional_treatment_given: '',
+      transport_required: false,
+      transport_notes: ''
+    });
+    setDestinationData({
+      destination_facility_id: '',
+      destination_facility_name: '',
+      required_specialty: ''
+    });
+    setAttachedFiles([]);
+    setCreatedReferral(null);
+    setCompletedSteps([]);
+    setCurrentStep(1);
+    setSubmissionError(null);
+  };
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto px-4 sm:px-6 py-6">
       {/* Header */}
@@ -175,90 +204,103 @@ export default function CreateReferralPage() {
         </div>
       </div>
 
-      {/* Step Indicator */}
-      <ReferralStepIndicator
-        currentStep={currentStep}
-        completedSteps={completedSteps}
-        onStepClick={(stepId) => setCurrentStep(stepId)}
-      />
-
-      {/* Step Content */}
-      {loadingInitialPatient ? (
-        <Card className="p-8 text-center bg-white dark:bg-slate-900">
-          <Spinner size="lg" className="mx-auto mb-2 text-sky-600" />
-          <p className="text-xs text-slate-500">Loading pre-selected patient details...</p>
-        </Card>
+      {createdReferral ? (
+        <ReferralConfirmationStep
+          referral={createdReferral}
+          patient={selectedPatient}
+          destinationData={destinationData}
+          clinicalData={clinicalData}
+          attachedFilesCount={attachedFiles.length}
+          onReset={handleReset}
+        />
       ) : (
         <>
-          {currentStep === 1 && (
-            <ReferralPatientStep
-              selectedPatient={selectedPatient}
-              onSelectPatient={(patient) => {
-                setSelectedPatient(patient);
-                if (patient) {
-                  markStepComplete(1);
-                } else {
-                  setCompletedSteps((prev) => prev.filter((s) => s !== 1));
-                }
-              }}
-              onProceed={() => {
-                if (selectedPatient) {
-                  markStepComplete(1);
-                  setCurrentStep(2);
-                }
-              }}
-            />
-          )}
+          {/* Step Indicator */}
+          <ReferralStepIndicator
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+            onStepClick={(stepId) => setCurrentStep(stepId)}
+          />
 
-          {currentStep === 2 && (
-            <ReferralClinicalStep
-              clinicalData={clinicalData}
-              onChange={setClinicalData}
-              onBack={() => setCurrentStep(1)}
-              onProceed={() => {
-                markStepComplete(2);
-                setCurrentStep(3);
-              }}
-            />
-          )}
+          {/* Step Content */}
+          {loadingInitialPatient ? (
+            <Card className="p-8 text-center bg-white dark:bg-slate-900">
+              <Spinner size="lg" className="mx-auto mb-2 text-sky-600" />
+              <p className="text-xs text-slate-500">Loading pre-selected patient details...</p>
+            </Card>
+          ) : (
+            <>
+              {currentStep === 1 && (
+                <ReferralPatientStep
+                  selectedPatient={selectedPatient}
+                  onSelectPatient={(patient) => {
+                    setSelectedPatient(patient);
+                    if (patient) {
+                      markStepComplete(1);
+                    } else {
+                      setCompletedSteps((prev) => prev.filter((s) => s !== 1));
+                    }
+                  }}
+                  onProceed={() => {
+                    if (selectedPatient) {
+                      markStepComplete(1);
+                      setCurrentStep(2);
+                    }
+                  }}
+                />
+              )}
 
-          {currentStep === 3 && (
-            <ReferralDestinationStep
-              destinationData={destinationData}
-              onChange={setDestinationData}
-              onBack={() => setCurrentStep(2)}
-              onProceed={() => {
-                markStepComplete(3);
-                setCurrentStep(4);
-              }}
-            />
-          )}
+              {currentStep === 2 && (
+                <ReferralClinicalStep
+                  clinicalData={clinicalData}
+                  onChange={setClinicalData}
+                  onBack={() => setCurrentStep(1)}
+                  onProceed={() => {
+                    markStepComplete(2);
+                    setCurrentStep(3);
+                  }}
+                />
+              )}
 
-          {currentStep === 4 && (
-            <ReferralDocumentsStep
-              attachedFiles={attachedFiles}
-              onChangeFiles={setAttachedFiles}
-              onBack={() => setCurrentStep(3)}
-              onProceed={() => {
-                markStepComplete(4);
-                setCurrentStep(5);
-              }}
-            />
-          )}
+              {currentStep === 3 && (
+                <ReferralDestinationStep
+                  destinationData={destinationData}
+                  onChange={setDestinationData}
+                  onBack={() => setCurrentStep(2)}
+                  onProceed={() => {
+                    markStepComplete(3);
+                    setCurrentStep(4);
+                  }}
+                />
+              )}
 
-          {currentStep === 5 && (
-            <ReferralReviewStep
-              patient={selectedPatient}
-              clinicalData={clinicalData}
-              destinationData={destinationData}
-              attachedFiles={attachedFiles}
-              facilityName={facilityName}
-              submitting={isSubmitting}
-              submissionError={submissionError}
-              onBack={() => setCurrentStep(4)}
-              onJumpToStep={(stepId) => setCurrentStep(stepId)}
-              onSubmit={handleSubmitReferral}
-            />
+              {currentStep === 4 && (
+                <ReferralDocumentsStep
+                  attachedFiles={attachedFiles}
+                  onChangeFiles={setAttachedFiles}
+                  onBack={() => setCurrentStep(3)}
+                  onProceed={() => {
+                    markStepComplete(4);
+                    setCurrentStep(5);
+                  }}
+                />
+              )}
+
+              {currentStep === 5 && (
+                <ReferralReviewStep
+                  patient={selectedPatient}
+                  clinicalData={clinicalData}
+                  destinationData={destinationData}
+                  attachedFiles={attachedFiles}
+                  facilityName={facilityName}
+                  submitting={isSubmitting}
+                  submissionError={submissionError}
+                  onBack={() => setCurrentStep(4)}
+                  onJumpToStep={(stepId) => setCurrentStep(stepId)}
+                  onSubmit={handleSubmitReferral}
+                />
+              )}
+            </>
           )}
         </>
       )}
