@@ -24,6 +24,7 @@ import { hospitalService } from '../services/hospitalService.js';
 import { DischargeStatusBadge } from '../components/discharge/DischargeStatusBadge.jsx';
 import { DischargeSkeleton } from '../components/discharge/DischargeSkeleton.jsx';
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
+import { DischargeDocumentationModal } from '../components/discharge/DischargeDocumentationModal.jsx';
 import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 export default function DischargeDetailPage() {
@@ -473,6 +474,18 @@ export default function DischargeDetailPage() {
           )}
         </div>
       )}
+
+      {/* Discharge Documentation Modal */}
+      <DischargeDocumentationModal
+        isOpen={showDischargeModal}
+        onClose={() => setShowDischargeModal(false)}
+        referral={referral}
+        onSuccess={(updated) => {
+          if (updated) setReferral(prev => ({ ...prev, ...updated, status: 'COMPLETED' }));
+          setActionSuccess('Discharge documentation authorized and patient successfully discharged.');
+          fetchDischargeDetails(true);
+        }}
+      />
     </div>
   );
 }
