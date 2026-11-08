@@ -12,6 +12,7 @@ import { patientService } from '../services/patientService.js';
 import { referralCreationService } from '../services/referralCreationService.js';
 import { ReferralStepIndicator } from '../components/referrals/ReferralStepIndicator.jsx';
 import { ReferralPatientStep } from '../components/referrals/ReferralPatientStep.jsx';
+import { ReferralClinicalStep } from '../components/referrals/ReferralClinicalStep.jsx';
 import { Card } from '@shared/components/display/Card.jsx';
 import { Spinner } from '@shared/components/feedback/Spinner.jsx';
 
@@ -147,16 +148,28 @@ export default function CreateReferralPage() {
             />
           )}
 
-          {currentStep > 1 && (
+          {currentStep === 2 && (
+            <ReferralClinicalStep
+              clinicalData={clinicalData}
+              onChange={setClinicalData}
+              onBack={() => setCurrentStep(1)}
+              onProceed={() => {
+                markStepComplete(2);
+                setCurrentStep(3);
+              }}
+            />
+          )}
+
+          {currentStep > 2 && (
             <Card className="p-8 text-center text-xs text-slate-500 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
               <p>Step {currentStep} under configuration...</p>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentStep(1)}
+                onClick={() => setCurrentStep(2)}
                 className="mt-3"
               >
-                Back to Patient Selection
+                Back to Clinical Information
               </Button>
             </Card>
           )}
