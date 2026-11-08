@@ -32,6 +32,7 @@ import ReviewNotesSection from '../components/review/ReviewNotesSection.jsx';
 import ReferralAcceptModal from '../components/review/ReferralAcceptModal.jsx';
 import ReferralRejectModal from '../components/review/ReferralRejectModal.jsx';
 import ReferralRequestInfoModal from '../components/review/ReferralRequestInfoModal.jsx';
+import ReferralDecisionHistory from '../components/review/ReferralDecisionHistory.jsx';
 
 export default function ReferralReviewPage() {
   const { referralId } = useParams();
@@ -260,6 +261,7 @@ export default function ReferralReviewPage() {
       <div id="referral-review-dossier" className="space-y-6">
         <ClinicalReviewSummary referral={referral} documents={documents} />
         <ReviewNotesSection referral={referral} />
+        <ReferralDecisionHistory timeline={timeline} historyData={historyData} referral={referral} />
       </div>
 
       {/* Decision Modals */}
