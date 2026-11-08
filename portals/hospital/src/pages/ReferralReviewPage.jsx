@@ -28,6 +28,7 @@ import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
 import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import HospitalDashboardSkeleton from '../components/HospitalDashboardSkeleton.jsx';
 import ClinicalReviewSummary from '../components/review/ClinicalReviewSummary.jsx';
+import ReviewNotesSection from '../components/review/ReviewNotesSection.jsx';
 
 export default function ReferralReviewPage() {
   const { referralId } = useParams();
@@ -255,6 +256,7 @@ export default function ReferralReviewPage() {
       {/* Review Dossier Content Layout */}
       <div id="referral-review-dossier" className="space-y-6">
         <ClinicalReviewSummary referral={referral} documents={documents} />
+        <ReviewNotesSection referral={referral} />
       </div>
     </div>
   );
