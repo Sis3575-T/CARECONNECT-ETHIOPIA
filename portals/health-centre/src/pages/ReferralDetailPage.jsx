@@ -25,6 +25,7 @@ import { ReferralStatusTimeline } from '../components/referrals/ReferralStatusTi
 import { HospitalResponseCard } from '../components/referrals/HospitalResponseCard.jsx';
 import { ReferralInfoRequestsSection } from '../components/referrals/ReferralInfoRequestsSection.jsx';
 import { ReferralFollowUpSection } from '../components/referrals/ReferralFollowUpSection.jsx';
+import { useReferralRealtimeTracking } from '../hooks/useReferralRealtimeTracking.js';
 import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
 
 export default function ReferralDetailPage() {
@@ -60,6 +61,15 @@ export default function ReferralDetailPage() {
       setLoading(false);
     }
   };
+
+  const { isLiveConnected, isSyncing, triggerSync } = useReferralRealtimeTracking({
+    referralId,
+    onEventReceived: () => {
+      loadReferralData();
+    },
+    pollingIntervalMs: 30000,
+    enabled: Boolean(referralId)
+  });
 
   useEffect(() => {
     loadReferralData();
@@ -118,7 +128,12 @@ export default function ReferralDetailPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+            <span className={`w-2 h-2 rounded-full ${isLiveConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <span>{isLiveConnected ? 'Live Real-time Sync' : 'Periodic Polling'}</span>
+          </div>
+
           {referral.patient_id && (
             <Button
               type="button"
@@ -136,12 +151,13 @@ export default function ReferralDetailPage() {
             type="button"
             variant="outline"
             size="sm"
-            onClick={loadReferralData}
+            onClick={triggerSync}
+            disabled={isSyncing}
             className="text-xs inline-flex items-center gap-1.5"
-            aria-label="Refresh referral data"
+            aria-label="Synchronize referral updates"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Refresh</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>Sync</span>
           </Button>
         </div>
       </div>
