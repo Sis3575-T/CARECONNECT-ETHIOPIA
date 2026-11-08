@@ -71,7 +71,8 @@ export const getIncomingReferrals = asyncHandler(async (req, res) => {
     limit,
     offset,
     priority: req.query.priority,
-    status: req.query.status
+    status: req.query.status,
+    search: req.query.search
   });
 
   return paginatedResponse(
