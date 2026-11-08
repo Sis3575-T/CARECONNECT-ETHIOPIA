@@ -25,6 +25,8 @@ import { AdmissionSkeleton } from '../components/admission/AdmissionSkeleton.jsx
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
 import { DepartmentAssignmentModal } from '../components/admission/DepartmentAssignmentModal.jsx';
 import { AdmissionRecordCard } from '../components/admission/AdmissionRecordCard.jsx';
+import { ProgressUpdateModal } from '../components/admission/ProgressUpdateModal.jsx';
+import { CareProgressWorkspace } from '../components/admission/CareProgressWorkspace.jsx';
 
 export default function AdmissionDetailPage() {
   const { referralId, id } = useParams();
@@ -397,47 +399,13 @@ export default function AdmissionDetailPage() {
 
       {/* Progress & Follow-ups Tab */}
       {activeTab === 'progress' && (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-              Care Progress Events & Coordination Notes
-            </h2>
-            {(isInProgress || isArrived) && (
-              <button
-                type="button"
-                onClick={() => setShowProgressModal(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Add Note</span>
-              </button>
-            )}
-          </div>
-
-          {followUps.length === 0 ? (
-            <div className="text-center py-10 text-slate-500 text-sm">
-              No additional care progress events recorded yet. Click "Add Note" to log an operational milestone or consult update.
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {followUps.map((item, idx) => (
-                <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700/50">
-                  <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-semibold text-slate-900 dark:text-slate-100">
-                      {item.outcome || item.interaction_type || 'Care Update'}
-                    </span>
-                    <span className="text-slate-400">
-                      {item.created_at ? formatRelativeTime(item.created_at) : 'Just now'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-slate-700 dark:text-slate-300">
-                    {item.reason_or_notes || item.notes || 'Progress recorded'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <CareProgressWorkspace
+          referral={referral}
+          followUps={followUps}
+          onOpenProgressModal={() => setShowProgressModal(true)}
+          onOpenAssignModal={() => setShowAssignModal(true)}
+          disabled={refreshing}
+        />
       )}
 
       {/* Audit History Tab */}
@@ -477,6 +445,20 @@ export default function AdmissionDetailPage() {
           referral={referral}
           onSuccess={(updated, msg) => {
             setActionSuccess(msg || 'Department assigned successfully.');
+            fetchReferralDetails(true);
+            setTimeout(() => setActionSuccess(null), 5000);
+          }}
+        />
+      )}
+
+      {/* Care Progress Modal */}
+      {showProgressModal && (
+        <ProgressUpdateModal
+          isOpen={showProgressModal}
+          onClose={() => setShowProgressModal(false)}
+          referral={referral}
+          onSuccess={(updated, msg) => {
+            setActionSuccess(msg || 'Care progress update recorded successfully.');
             fetchReferralDetails(true);
             setTimeout(() => setActionSuccess(null), 5000);
           }}
