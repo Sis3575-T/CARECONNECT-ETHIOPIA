@@ -24,6 +24,7 @@ import ArrivalStatusBadge from '../components/arrival/ArrivalStatusBadge.jsx';
 import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import ArrivalSkeleton from '../components/arrival/ArrivalSkeleton.jsx';
 import PatientIdentityVerification from '../components/arrival/PatientIdentityVerification.jsx';
+import PatientArrivalModal from '../components/arrival/PatientArrivalModal.jsx';
 
 export default function PatientArrivalDetailPage() {
   const { referralId } = useParams();
@@ -318,6 +319,15 @@ export default function PatientArrivalDetailPage() {
           mismatchReported={verificationState.hasMismatch}
         />
       </div>
+
+      {/* Arrival Action Modals */}
+      <PatientArrivalModal
+        isOpen={activeModal === 'ARRIVE'}
+        onClose={() => setActiveModal(null)}
+        referral={referral}
+        isVerified={verificationState.isVerified}
+        onSuccess={(_, msg) => handleActionComplete(msg)}
+      />
     </div>
   );
 }
