@@ -31,6 +31,7 @@ import ClinicalReviewSummary from '../components/review/ClinicalReviewSummary.js
 import ReviewNotesSection from '../components/review/ReviewNotesSection.jsx';
 import ReferralAcceptModal from '../components/review/ReferralAcceptModal.jsx';
 import ReferralRejectModal from '../components/review/ReferralRejectModal.jsx';
+import ReferralRequestInfoModal from '../components/review/ReferralRequestInfoModal.jsx';
 
 export default function ReferralReviewPage() {
   const { referralId } = useParams();
@@ -271,6 +272,13 @@ export default function ReferralReviewPage() {
 
       <ReferralRejectModal
         isOpen={activeModal === 'REJECT'}
+        onClose={() => setActiveModal(null)}
+        referral={referral}
+        onSuccess={(_, msg) => handleDecisionComplete(msg)}
+      />
+
+      <ReferralRequestInfoModal
+        isOpen={activeModal === 'REQUEST_INFO'}
         onClose={() => setActiveModal(null)}
         referral={referral}
         onSuccess={(_, msg) => handleDecisionComplete(msg)}
