@@ -27,6 +27,7 @@ import HospitalStatusBadge from '../components/HospitalStatusBadge.jsx';
 import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
 import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import HospitalDashboardSkeleton from '../components/HospitalDashboardSkeleton.jsx';
+import ClinicalReviewSummary from '../components/review/ClinicalReviewSummary.jsx';
 
 export default function ReferralReviewPage() {
   const { referralId } = useParams();
@@ -253,39 +254,7 @@ export default function ReferralReviewPage() {
 
       {/* Review Dossier Content Layout */}
       <div id="referral-review-dossier" className="space-y-6">
-        {/* Placeholders / dynamic containers that will be populated by review components */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs p-5">
-          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
-            <div className="flex items-center gap-2">
-              <Stethoscope className="w-4 h-4 text-emerald-600" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Clinical Triage Evaluation Dossier</h2>
-            </div>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">
-              Department: <strong className="text-slate-800 dark:text-slate-200">{referral?.service_category || 'Inpatient Specialty'}</strong>
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 text-xs">
-            <div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Patient Identifier & Demographics</span>
-              <p className="font-bold text-slate-900 dark:text-white mt-0.5">
-                {referral?.patient_name || referral?.patientName || 'Unnamed Patient'}
-              </p>
-              <p className="text-slate-500 dark:text-slate-400 text-[11px]">
-                {referral?.patient_gender || '—'}, {referral?.patient_age ? `${referral.patient_age} yrs` : 'Age N/A'} &bull; Woreda: {referral?.patient_woreda || 'Not specified'}
-              </p>
-            </div>
-            <div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Primary Admission Indication</span>
-              <p className="font-bold text-slate-900 dark:text-white mt-0.5">
-                {referral?.primary_diagnosis || 'Unspecified Clinical Condition'}
-              </p>
-              <p className="text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">
-                {referral?.reason_for_referral || referral?.clinical_summary || 'No narrative provided'}
-              </p>
-            </div>
-          </div>
-        </div>
+        <ClinicalReviewSummary referral={referral} documents={documents} />
       </div>
     </div>
   );
