@@ -1,55 +1,154 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
   Filter,
   Download,
-  ArrowRight,
-  Eye,
-  CheckCircle2,
-  Clock,
   PlusCircle,
-  FileText,
+  RefreshCw,
+  RotateCcw,
   Building2,
-  X,
-  AlertCircle
+  FileText,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
-import { useCareConnectData } from '@shared/hooks/useCareConnectData';
+import { useAuth } from '@shared/context/AuthContext.jsx';
+import { referralTrackingService } from '../services/referralTrackingService.js';
+import { ReferralTrackingTable } from '../components/referrals/ReferralTrackingTable.jsx';
+import { ReferralTrackingSkeleton } from '../components/referrals/ReferralTrackingSkeleton.jsx';
+import { ReferralTrackingErrorState } from '../components/referrals/ReferralTrackingErrorState.jsx';
+import { ReferralTrackingEmptyState } from '../components/referrals/ReferralTrackingEmptyState.jsx';
+import { Button } from '@shared/components/ui/Button.jsx';
+import { Card } from '@shared/components/display/Card.jsx';
+
+const STATUS_FILTER_OPTIONS = [
+  { value: 'ALL', label: 'All Statuses' },
+  { value: 'SUBMITTED', label: 'Submitted / Pending Triage' },
+  { value: 'ACKNOWLEDGED', label: 'Acknowledged' },
+  { value: 'ACCEPTED', label: 'Accepted by Hospital' },
+  { value: 'REJECTED', label: 'Rejected' },
+  { value: 'INFO_REQUESTED', label: 'Info Requested' },
+  { value: 'IN_TRANSIT', label: 'In Transit' },
+  { value: 'ARRIVED', label: 'Patient Arrived' },
+  { value: 'COMPLETED', label: 'Completed' },
+  { value: 'CANCELLED', label: 'Cancelled' }
+];
+
+const PRIORITY_FILTER_OPTIONS = [
+  { value: 'ALL', label: 'All Urgencies' },
+  { value: 'EMERGENCY', label: 'Emergency Priority' },
+  { value: 'URGENT', label: 'Urgent Priority' },
+  { value: 'ROUTINE', label: 'Routine Priority' }
+];
 
 export default function AllReferralsPage() {
   const navigate = useNavigate();
-  const { referrals } = useCareConnectData();
+  const { user } = useAuth();
+  const facilityName = user?.facilityName || 'Assigned Health Centre';
 
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [filterUrgency, setFilterUrgency] = useState('All');
-  const [search, setSearch] = useState('');
-  const [selectedRef, setSelectedRef] = useState(null);
+  // Server Query State
+  const [referrals, setReferrals] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const filtered = referrals.filter(r => {
-    const matchesStatus = filterStatus === 'All' || r.status === filterStatus;
-    const matchesUrgency = filterUrgency === 'All' || r.urgency === filterUrgency;
-    const matchesSearch =
-      r.patientName.toLowerCase().includes(search.toLowerCase()) ||
-      r.id.toLowerCase().includes(search.toLowerCase()) ||
-      r.service.toLowerCase().includes(search.toLowerCase()) ||
-      (r.receivingFacility && r.receivingFacility.toLowerCase().includes(search.toLowerCase()));
-    return matchesStatus && matchesUrgency && matchesSearch;
-  });
+  // Filters
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [actionOnly, setActionOnly] = useState(false);
+
+  // Request State
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
+  const [statusCode, setStatusCode] = useState(null);
+
+  const debounceTimerRef = useRef(null);
+
+  // Debounce search input
+  useEffect(() => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+      setPage(1);
+    }, 350);
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, [searchTerm]);
+
+  const fetchReferrals = async (isManualRefresh = false) => {
+    if (isManualRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError(null);
+
+    try {
+      const params = {
+        page,
+        limit,
+        search: debouncedSearch || undefined,
+        status: statusFilter !== 'ALL' ? statusFilter : undefined,
+        priority: priorityFilter !== 'ALL' ? priorityFilter : undefined
+      };
+
+      const res = await referralTrackingService.getReferrals(params);
+
+      const items = res?.data?.referrals || res?.data?.items || res?.referrals || res?.items || (Array.isArray(res?.data) ? res.data : []);
+      const total = res?.data?.total || res?.total || items.length;
+
+      let filteredItems = items;
+      if (actionOnly) {
+        filteredItems = filteredItems.filter(
+          (r) => r.status === 'INFO_REQUESTED' || r.has_pending_info_request || r.priority === 'EMERGENCY'
+        );
+      }
+
+      setReferrals(filteredItems);
+      setTotalCount(total);
+      setTotalPages(Math.max(1, Math.ceil(total / limit)));
+    } catch (err) {
+      setError(err.message || 'Failed to retrieve referral records.');
+      setStatusCode(err.status || err.statusCode || 500);
+      setReferrals([]);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchReferrals();
+  }, [page, limit, debouncedSearch, statusFilter, priorityFilter, actionOnly]);
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setDebouncedSearch('');
+    setStatusFilter('ALL');
+    setPriorityFilter('ALL');
+    setActionOnly(false);
+    setPage(1);
+  };
 
   const handleExportCSV = () => {
-    const headers = ['Referral ID', 'Patient Name', 'Age', 'Gender', 'Service', 'Receiving Hospital', 'Urgency', 'Status', 'Date'];
-    const rows = filtered.map(r => [
-      r.id,
-      `"${r.patientName}"`,
-      r.age,
-      r.gender,
-      `"${r.service}"`,
-      `"${r.receivingFacility}"`,
-      r.urgency,
-      r.status,
-      r.date
+    if (referrals.length === 0) return;
+    const headers = ['Referral Reference', 'Patient Name', 'Gender', 'Age', 'Destination Hospital', 'Specialty', 'Priority', 'Status', 'Date'];
+    const rows = referrals.map((r) => [
+      `"${r.reference_number || r.id}"`,
+      `"${r.patient_name || r.patient_full_name || 'Patient'}"`,
+      `"${r.patient_gender || ''}"`,
+      r.patient_age || '',
+      `"${r.destination_facility_name || r.receivingFacility || ''}"`,
+      `"${r.required_specialty || r.service || ''}"`,
+      r.priority || 'ROUTINE',
+      r.status || 'SUBMITTED',
+      r.created_at || new Date().toISOString()
     ]);
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -59,245 +158,229 @@ export default function AllReferralsPage() {
     document.body.removeChild(link);
   };
 
+  const hasActiveFilters = Boolean(
+    debouncedSearch || statusFilter !== 'ALL' || priorityFilter !== 'ALL' || actionOnly
+  );
+
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5 max-w-7xl mx-auto px-4 py-4">
+      {/* Workspace Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">All Outgoing Referrals</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Official ledger of digital referrals transmitted from Yeka Health Centre ({referrals.length} Total)
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            <span>Referrals Tracking & Follow-up Workspace</span>
+          </h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Monitor hospital triage outcomes, clinical timelines, and coordination requests for{' '}
+            <strong className="text-slate-700 dark:text-slate-300">{facilityName}</strong>
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <button
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fetchReferrals(true)}
+            disabled={loading || refreshing}
+            className="text-xs inline-flex items-center gap-1.5"
+            aria-label="Refresh referral data"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
             onClick={handleExportCSV}
-            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer shadow-xs"
+            disabled={referrals.length === 0}
+            className="text-xs inline-flex items-center gap-1.5"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
-          </button>
-          <button
+          </Button>
+
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
             onClick={() => navigate('/create-referral')}
-            className="px-4 py-2 bg-[#0284c7] hover:bg-[#0369a1] text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-pointer"
+            className="text-xs inline-flex items-center gap-1.5 bg-sky-600 hover:bg-sky-700 text-white"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Create New Referral</span>
-          </button>
+            <span>New Referral</span>
+          </Button>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by ID, patient, hospital, or specialty..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
-          />
-        </div>
+      {/* Filter and Search Panel */}
+      <Card className="p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          {/* Search Box */}
+          <div className="relative sm:col-span-2 lg:col-span-1">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search reference, patient, hospital..."
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/80 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+              aria-label="Search referrals"
+            />
+          </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {['All', 'Pending', 'Accepted', 'In Transit', 'Arrived', 'Completed', 'Rejected'].map((st) => (
+          {/* Status Filter */}
+          <div>
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+              aria-label="Filter by referral status"
+            >
+              {STATUS_FILTER_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Priority Filter */}
+          <div>
+            <select
+              value={priorityFilter}
+              onChange={(e) => {
+                setPriorityFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/80 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500/30"
+              aria-label="Filter by clinical priority"
+            >
+              {PRIORITY_FILTER_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Action Required Toggle / Reset Button */}
+          <div className="flex items-center gap-2">
             <button
-              key={st}
-              onClick={() => setFilterStatus(st)}
-              className={`px-3 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
-                filterStatus === st
-                  ? 'bg-[#0284c7] text-white shadow-xs'
-                  : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+              type="button"
+              onClick={() => {
+                setActionOnly(!actionOnly);
+                setPage(1);
+              }}
+              className={`flex-1 px-3 py-2 rounded-xl text-xs font-semibold border text-center transition-colors ${
+                actionOnly
+                  ? 'border-amber-400 bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300'
+                  : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 text-slate-600 dark:text-slate-300'
               }`}
             >
-              {st}
+              ⚠️ Needs Action Only
             </button>
-          ))}
 
-          <select
-            value={filterUrgency}
-            onChange={(e) => setFilterUrgency(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 font-semibold text-slate-700 dark:text-slate-200"
-          >
-            <option value="All">All Urgencies</option>
-            <option value="Emergency">Emergency</option>
-            <option value="Urgent">Urgent</option>
-            <option value="Routine">Routine</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Referrals Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 dark:bg-slate-900/60 text-slate-500 uppercase text-[10px] font-bold tracking-wider">
-              <tr>
-                <th className="py-3 px-4">Referral ID</th>
-                <th className="py-3 px-4">Patient Demographics</th>
-                <th className="py-3 px-4">Service & Clinical Reason</th>
-                <th className="py-3 px-4">Receiving Hospital</th>
-                <th className="py-3 px-4">Urgency</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4">Date</th>
-                <th className="py-3 px-4 text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-              {filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-400">
-                    No referrals match your current search and filter criteria.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((r) => (
-                  <tr key={r.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/20 transition-all">
-                    <td className="py-3.5 px-4 font-mono font-bold text-sky-600 dark:text-sky-400">
-                      {r.id}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="font-bold text-slate-900 dark:text-white block">{r.patientName}</span>
-                      <span className="text-[10px] text-slate-500">{r.age} yrs • {r.gender} • {r.patientId}</span>
-                    </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <span className="font-semibold text-slate-800 dark:text-slate-200 block">{r.service}</span>
-                      <span className="text-[11px] text-slate-500 truncate block">{r.clinicalSummary}</span>
-                    </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-700 dark:text-slate-300">
-                      {r.receivingFacility}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        r.urgency === 'Emergency' ? 'bg-rose-100 text-rose-700' :
-                        r.urgency === 'Urgent' ? 'bg-amber-100 text-amber-700' :
-                        'bg-emerald-100 text-emerald-700'
-                      }`}>
-                        {r.urgency}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        r.status === 'Accepted' ? 'bg-emerald-100 text-emerald-700' :
-                        r.status === 'In Transit' ? 'bg-violet-100 text-violet-700' :
-                        r.status === 'Rejected' ? 'bg-rose-100 text-rose-700' :
-                        r.status === 'Completed' || r.status === 'Arrived' ? 'bg-blue-100 text-blue-700' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>
-                        {r.status}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-500 text-[11px]">
-                      {r.date}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <button
-                        onClick={() => setSelectedRef(r)}
-                        className="px-2.5 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-sky-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 hover:text-sky-600 rounded-lg font-bold flex items-center gap-1 ml-auto cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Details</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Referral Detail Modal */}
-      {selectedRef && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 max-h-[90vh] overflow-y-auto text-xs">
-            <div className="flex items-center justify-between border-b pb-3 border-slate-100 dark:border-slate-700">
-              <div>
-                <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 block">{selectedRef.id}</span>
-                <h3 className="font-bold text-base text-slate-900 dark:text-white">{selectedRef.patientName}</h3>
-              </div>
-              <button onClick={() => setSelectedRef(null)} className="text-slate-400 hover:text-slate-600">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-700/60">
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Receiving Hospital</span>
-                <span className="font-bold text-slate-900 dark:text-white">{selectedRef.receivingFacility}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Requested Specialty</span>
-                <span className="font-bold text-sky-600">{selectedRef.service}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Current Status</span>
-                <span className="font-bold">{selectedRef.status}</span>
-              </div>
-              <div>
-                <span className="text-[10px] text-slate-400 uppercase font-semibold block">Transport Mode</span>
-                <span className="font-bold">{selectedRef.transportRequired ? 'Ambulance Required' : 'Self Transport'}</span>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <span className="font-bold text-slate-900 dark:text-white">Clinical Summary</span>
-              <p className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-300 leading-relaxed">
-                {selectedRef.clinicalSummary}
-              </p>
-            </div>
-
-            {selectedRef.rejectionReason && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 space-y-1">
-                <span className="font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>Mandatory Rejection Justification (FR-22)</span>
-                </span>
-                <p className="text-rose-800 dark:text-rose-300 text-[11px]">
-                  {selectedRef.rejectionReason}
-                </p>
-              </div>
-            )}
-
-            {selectedRef.timeline && selectedRef.timeline.length > 0 && (
-              <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <span className="font-bold text-slate-900 dark:text-white block">Status Progression Timeline</span>
-                <div className="space-y-2">
-                  {selectedRef.timeline.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0 ${
-                        item.done ? 'bg-sky-500' : 'bg-slate-300 dark:bg-slate-700'
-                      }`} />
-                      <span className={`font-semibold flex-1 ${item.done ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
-                        {item.step} {item.by && <span className="text-[10px] text-slate-400 font-normal">({item.by})</span>}
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">{item.timestamp}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-700">
-              <button
-                onClick={() => {
-                  setSelectedRef(null);
-                  navigate('/tracking');
-                }}
-                className="text-sky-600 dark:text-sky-400 font-bold hover:underline"
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleResetFilters}
+                className="text-xs text-slate-400 hover:text-slate-700 h-9 px-2"
+                title="Reset all filters"
+                aria-label="Reset all filters"
               >
-                Open Full Tracking Page →
-              </button>
-              <button
-                onClick={() => setSelectedRef(null)}
-                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-800 dark:text-white font-bold rounded-xl"
-              >
-                Close
-              </button>
-            </div>
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            )}
           </div>
         </div>
+      </Card>
+
+      {/* Main Content Area */}
+      {loading ? (
+        <ReferralTrackingSkeleton rows={limit} />
+      ) : error ? (
+        <ReferralTrackingErrorState
+          error={error}
+          statusCode={statusCode}
+          onRetry={() => fetchReferrals()}
+        />
+      ) : referrals.length === 0 ? (
+        <ReferralTrackingEmptyState
+          hasFilters={hasActiveFilters}
+          onResetFilters={handleResetFilters}
+        />
+      ) : (
+        <>
+          <ReferralTrackingTable
+            referrals={referrals}
+            onSelectReferral={(r) => navigate(`/referrals/${r.id}`)}
+          />
+
+          {/* Pagination Controls */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-slate-500">
+            <div>
+              Showing <span className="font-semibold text-slate-800 dark:text-slate-200">{referrals.length}</span> of{' '}
+              <span className="font-semibold text-slate-800 dark:text-slate-200">{totalCount}</span> referrals
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span>Rows per page:</span>
+                <select
+                  value={limit}
+                  onChange={(e) => {
+                    setLimit(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200"
+                  aria-label="Rows per page"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="h-8 px-2"
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+
+                <span className="px-2 font-medium">
+                  Page {page} of {totalPages}
+                </span>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="h-8 px-2"
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
