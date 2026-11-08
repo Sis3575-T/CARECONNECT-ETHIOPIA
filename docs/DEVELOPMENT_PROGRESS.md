@@ -378,6 +378,27 @@
 
 ---
 
+## 50-PART PRODUCTION ROADMAP — PART 19 OF 50: HEALTH CENTRE DIGITAL REFERRAL CREATION, CLINICAL INFORMATION CAPTURE, HOSPITAL SELECTION AND SECURE REFERRAL SUBMISSION
+
+**Status:** ✅ COMPLETED (8 / 8 COMMITS COMMITTED)  
+**Roadmap Scope:** Part 19 of 50 | Commits 145–152  
+**Last Updated:** 2026-11-08T19:48:00.000Z  
+
+### Part 19 Commit Log (8 Commits)
+
+| Commit # | Message | Status | Commit Hash | Verification & Tests | Issues |
+|---|---|---|---|---|---|
+| **145** | `frontend: establish health centre referral creation architecture` | ✅ COMMITTED | `0a238f1` | Created `referralCreationService.js` API client, `ReferralStepIndicator.jsx` 5-step wizard navigation, and mounted `/referrals/new` and `/create-referral` routes in `App.jsx`. | None |
+| **146** | `frontend: implement patient selection and referral initiation` | ✅ COMMITTED | `1da8aa8` | Implemented `ReferralPatientStep.jsx` with debounced directory search, pre-selection via `?patientId=` query param, patient demographic card, and link to registration. | None |
+| **147** | `frontend: implement structured clinical referral information form` | ✅ COMMITTED | `c20c0e5` | Built `ReferralClinicalStep.jsx` with priority urgency tiers (ROUTINE, URGENT, EMERGENCY), chief complaint, structured vitals range rules matching backend schema, and transport requirement toggle. | None |
+| **148** | `frontend: implement hospital and service destination selection` | ✅ COMMITTED | `a3a959a` | Implemented `ReferralDestinationStep.jsx` with destination hospital query, regional filtering across all Ethiopian regions, target clinical department/specialty selection, and validation. | None |
+| **149** | `frontend: implement referral document attachment and review` | ✅ COMMITTED | `ed0324a` | Built `ReferralDocumentsStep.jsx` with drag-and-drop, 10MB size enforcement, allowed MIME types (PDF, JPEG, PNG), and `ReferralReviewStep.jsx` comprehensive clinical verification with section jumps. | None |
+| **150** | `frontend: implement referral submission and confirmation` | ✅ COMMITTED | `3d66f85` | Implemented atomic submission in `CreateReferralPage.jsx`, duplicate submission prevention lock, multi-file attachment upload, and `ReferralConfirmationStep.jsx` with official reference code, copy, and print actions. | None |
+| **151** | `frontend: improve referral creation security accessibility and usability` | ✅ COMMITTED | `94c80cf` | Enhanced ARIA attributes (`aria-current="step"`, `role="alert"`, `role="radiogroup"`), focus-visible outlines, mobile responsive grid layouts, zero localStorage persistence, and zero PII console logging. | None |
+| **152** | `test: verify health centre referral creation and submission workflows` | ✅ COMMITTED | `de74b3a` | Automated test suite in `shared/tests/healthCentreReferralCreation.test.js` (9 comprehensive tests passing), verified standards, and authored `docs/PART_19_REPORT.md`. | None |
+
+---
+
 ## LEGACY PHASE LOG (REFERENCE PRESERVED)
 
 **Total Tasks / Commits Planned:** 220  
