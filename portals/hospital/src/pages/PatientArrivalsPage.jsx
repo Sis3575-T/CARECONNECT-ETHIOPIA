@@ -13,7 +13,11 @@ import {
   Filter,
   Flame,
   Bed,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  SlidersHorizontal
 } from 'lucide-react';
 import { hospitalService } from '../services/hospitalService.js';
 import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
@@ -41,6 +45,17 @@ export default function PatientArrivalsPage() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('ALL');
+
+  // Additional workspace filters
+  const [selectedFacility, setSelectedFacility] = useState('ALL');
+  const [selectedPriority, setSelectedPriority] = useState('ALL');
+  const [selectedDepartment, setSelectedDepartment] = useState('ALL');
+  const [sortBy, setSortBy] = useState('NEWEST'); // 'NEWEST' | 'OLDEST' | 'PRIORITY' | 'PATIENT_NAME'
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
 
   const loadArrivalQueue = useCallback(async (isSilent = false) => {
     if (!isSilent) setLoading(true);
@@ -72,10 +87,32 @@ export default function PatientArrivalsPage() {
     enabled: true
   });
 
-  // Filter referrals by active tab and search query
+  // Unique filter choices extracted from loaded referrals
+  const facilityOptions = useMemo(() => {
+    const facs = new Set();
+    referrals.forEach(r => {
+      const name = r.origin_facility_name || r.referringFacility;
+      if (name) facs.add(name);
+    });
+    return Array.from(facs).sort();
+  }, [referrals]);
+
+  const departmentOptions = useMemo(() => {
+    const depts = new Set();
+    referrals.forEach(r => {
+      const d = r.allocated_ward_department || r.service_category;
+      if (d) depts.add(d);
+    });
+    return Array.from(depts).sort();
+  }, [referrals]);
+
+  // Filter and sort referrals
   const filteredReferrals = useMemo(() => {
-    return referrals.filter(r => {
+    let result = referrals.filter(r => {
       const statusUpper = (r.status || '').toUpperCase();
+      const priorityUpper = (r.priority || '').toUpperCase();
+      const originName = r.origin_facility_name || r.referringFacility || '';
+      const deptName = r.allocated_ward_department || r.service_category || '';
 
       // Tab filter
       if (activeTab === 'AWAITING_ARRIVAL' && statusUpper !== 'ACCEPTED') return false;
@@ -83,12 +120,21 @@ export default function PatientArrivalsPage() {
       if (activeTab === 'ARRIVED' && !['PATIENT_ARRIVED', 'ARRIVED'].includes(statusUpper)) return false;
       if (activeTab === 'ADMITTED' && statusUpper !== 'IN_PROGRESS') return false;
 
+      // Facility filter
+      if (selectedFacility !== 'ALL' && originName !== selectedFacility) return false;
+
+      // Priority filter
+      if (selectedPriority !== 'ALL' && priorityUpper !== selectedPriority) return false;
+
+      // Department filter
+      if (selectedDepartment !== 'ALL' && deptName !== selectedDepartment) return false;
+
       // Search query filter (reference, patient name, origin, service, Fayda ID)
       if (search.trim()) {
         const query = search.toLowerCase();
         const refCode = (r.reference_number || r.id || '').toLowerCase();
         const pName = (r.patient_name || r.patientName || '').toLowerCase();
-        const origin = (r.origin_facility_name || r.referringFacility || '').toLowerCase();
+        const origin = originName.toLowerCase();
         const service = (r.service_category || r.service || '').toLowerCase();
         const fayda = (r.patient_fayda_id || '').toLowerCase();
 
@@ -103,7 +149,34 @@ export default function PatientArrivalsPage() {
 
       return true;
     });
-  }, [referrals, activeTab, search]);
+
+    // Sorting
+    result.sort((a, b) => {
+      if (sortBy === 'PRIORITY') {
+        const prioScore = (p) => (p === 'EMERGENCY' ? 3 : p === 'URGENT' ? 2 : 1);
+        return prioScore((b.priority || '').toUpperCase()) - prioScore((a.priority || '').toUpperCase());
+      }
+      if (sortBy === 'PATIENT_NAME') {
+        const nameA = a.patient_name || a.patientName || '';
+        const nameB = b.patient_name || b.patientName || '';
+        return nameA.localeCompare(nameB);
+      }
+      if (sortBy === 'OLDEST') {
+        return new Date(a.submitted_at || 0) - new Date(b.submitted_at || 0);
+      }
+      // Default: NEWEST
+      return new Date(b.submitted_at || 0) - new Date(a.submitted_at || 0);
+    });
+
+    return result;
+  }, [referrals, activeTab, selectedFacility, selectedPriority, selectedDepartment, search, sortBy]);
+
+  // Paginated subset
+  const totalPages = Math.ceil(filteredReferrals.length / pageSize) || 1;
+  const paginatedReferrals = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredReferrals.slice(start, start + pageSize);
+  }, [filteredReferrals, currentPage]);
 
   // Operational metrics
   const metrics = useMemo(() => {
@@ -243,7 +316,10 @@ export default function PatientArrivalsPage() {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setCurrentPage(1);
+                }}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                   isActive
                     ? 'bg-emerald-600 text-white shadow-xs'
@@ -261,42 +337,138 @@ export default function PatientArrivalsPage() {
           })}
         </div>
 
-        {/* Search Input */}
-        <div className="relative max-w-md">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by patient name, referral reference, or Fayda ID..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-hidden transition-all"
-          />
+        {/* Search & Filter Controls */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
+              placeholder="Search by patient name, referral reference, or Fayda ID..."
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-hidden transition-all"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`px-3.5 py-2.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                showFilters || selectedFacility !== 'ALL' || selectedPriority !== 'ALL' || selectedDepartment !== 'ALL'
+                  ? 'border-emerald-600 text-emerald-700 dark:text-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/30'
+                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300'
+              }`}
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              <span>Filters</span>
+              {(selectedFacility !== 'ALL' || selectedPriority !== 'ALL' || selectedDepartment !== 'ALL') && (
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              )}
+            </button>
+
+            {/* Sort Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 text-xs font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-hidden"
+            >
+              <option value="NEWEST">Newest First</option>
+              <option value="OLDEST">Oldest First</option>
+              <option value="PRIORITY">Emergency / Urgent First</option>
+              <option value="PATIENT_NAME">Patient Name (A-Z)</option>
+            </select>
+          </div>
         </div>
+
+        {/* Expandable Advanced Filters Panel */}
+        {showFilters && (
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-700/60 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs animate-in fade-in duration-150">
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Referring Health Centre</label>
+              <select
+                value={selectedFacility}
+                onChange={(e) => {
+                  setSelectedFacility(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs"
+              >
+                <option value="ALL">All Referring Health Centres</option>
+                {facilityOptions.map((fac) => (
+                  <option key={fac} value={fac}>{fac}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Clinical Priority</label>
+              <select
+                value={selectedPriority}
+                onChange={(e) => {
+                  setSelectedPriority(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs"
+              >
+                <option value="ALL">All Priorities</option>
+                <option value="EMERGENCY">Emergency (Immediate)</option>
+                <option value="URGENT">Urgent (&lt; 24h)</option>
+                <option value="ROUTINE">Routine Elective</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Receiving Ward / Department</label>
+              <select
+                value={selectedDepartment}
+                onChange={(e) => {
+                  setSelectedDepartment(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 text-xs"
+              >
+                <option value="ALL">All Wards / Departments</option>
+                {departmentOptions.map((dept) => (
+                  <option key={dept} value={dept}>{dept}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Referrals Queue Presentation */}
       {filteredReferrals.length === 0 ? (
         <ArrivalEmptyState
-          title={search ? 'No matching patient records found' : 'No patients currently in this arrival queue'}
+          title={search || selectedFacility !== 'ALL' || selectedPriority !== 'ALL' ? 'No matching patient records found' : 'No patients currently in this arrival queue'}
           message={
-            search
-              ? 'Try searching with different terms or select a different category filter tab.'
+            search || selectedFacility !== 'ALL' || selectedPriority !== 'ALL'
+              ? 'Try resetting your filter parameters or search with different keywords.'
               : 'There are no accepted patient referrals matching this operational receiving stage.'
           }
           action={
-            search ? (
+            (search || selectedFacility !== 'ALL' || selectedPriority !== 'ALL' || selectedDepartment !== 'ALL') ? (
               <button
-                onClick={() => setSearch('')}
+                onClick={() => {
+                  setSearch('');
+                  setSelectedFacility('ALL');
+                  setSelectedPriority('ALL');
+                  setSelectedDepartment('ALL');
+                  setCurrentPage(1);
+                }}
                 className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
               >
-                Clear Search
+                Reset All Filters
               </button>
             ) : null
           }
         />
       ) : (
         <div className="space-y-3">
-          {filteredReferrals.map((r) => {
+          {paginatedReferrals.map((r) => {
             const refCode = r.reference_number || r.id?.slice(0, 8);
             const patientName = r.patient_name || r.patientName || 'Unnamed Patient';
             const originFacility = r.origin_facility_name || r.referringFacility || 'Health Centre';
@@ -373,6 +545,34 @@ export default function PatientArrivalsPage() {
               </div>
             );
           })}
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
+              <span className="text-slate-500 dark:text-slate-400">
+                Showing page <strong className="text-slate-800 dark:text-slate-200">{currentPage}</strong> of <strong className="text-slate-800 dark:text-slate-200">{totalPages}</strong> ({filteredReferrals.length} total referrals)
+              </span>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 font-bold transition-all flex items-center gap-1"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Previous</span>
+                </button>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 font-bold transition-all flex items-center gap-1"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
