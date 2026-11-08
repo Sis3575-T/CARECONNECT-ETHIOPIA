@@ -12,6 +12,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage'));
 // Referral Triage & Inbox Pages
 const IncomingReferralsPage = lazy(() => import('./pages/IncomingReferralsPage'));
 const ReferralDetailPage = lazy(() => import('./pages/ReferralDetailPage'));
+const ReferralReviewPage = lazy(() => import('./pages/ReferralReviewPage'));
 const PendingReferralsPage = lazy(() => import('./pages/PendingReferralsPage'));
 const AcceptedReferralsPage = lazy(() => import('./pages/AcceptedReferralsPage'));
 const RejectedReferralsPage = lazy(() => import('./pages/RejectedReferralsPage'));
@@ -65,7 +66,9 @@ export default function App() {
             <Route path="incoming" element={<IncomingReferralsPage />} />
             <Route path="referrals" element={<Navigate to="/incoming" replace />} />
             <Route path="referrals/:referralId" element={<ReferralDetailPage />} />
+            <Route path="referrals/:referralId/review" element={<ReferralReviewPage />} />
             <Route path="incoming/:referralId" element={<ReferralDetailPage />} />
+            <Route path="incoming/:referralId/review" element={<ReferralReviewPage />} />
 
             {/* Pending Triage & Status Queues */}
             <Route path="pending" element={<PendingReferralsPage />} />

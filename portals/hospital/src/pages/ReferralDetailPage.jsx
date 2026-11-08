@@ -146,6 +146,14 @@ export default function ReferralDetailPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            to={`/referrals/${referralId}/review`}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+          >
+            <Stethoscope className="w-3.5 h-3.5" />
+            <span>Clinical Review & Decisions</span>
+          </Link>
+
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
             isLiveConnected
               ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'

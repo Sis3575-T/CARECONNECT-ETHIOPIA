@@ -280,5 +280,49 @@ export const hospitalService = {
       console.warn('[HospitalService] Missed events endpoint fallback:', err?.message);
       return [];
     }
+  },
+
+  /**
+   * Clinician acknowledges incoming referral, marking it as received and under review
+   */
+  async acknowledgeReferral(referralId, notes = '') {
+    if (!referralId) throw new Error('Referral ID required');
+    const res = await apiClient.post(`/referrals/${referralId}/acknowledge`, { notes });
+    return res.data?.data?.referral || res.data?.data || res.data;
+  },
+
+  /**
+   * Hospital clinician accepts referral, committing inpatient ward bed or specialist slot
+   */
+  async acceptReferral(referralId, { decision_notes, assigned_bed_type, allocated_ward_department } = {}) {
+    if (!referralId) throw new Error('Referral ID required');
+    const res = await apiClient.post(`/referrals/${referralId}/accept`, {
+      decision_notes,
+      assigned_bed_type,
+      allocated_ward_department
+    });
+    return res.data?.data?.referral || res.data?.data || res.data;
+  },
+
+  /**
+   * Hospital clinician rejects referral with mandatory justification and reason code
+   */
+  async rejectReferral(referralId, { reason, rejection_reason_code, recommended_alternative_facility_id } = {}) {
+    if (!referralId) throw new Error('Referral ID required');
+    const res = await apiClient.post(`/referrals/${referralId}/reject`, {
+      reason,
+      rejection_reason_code,
+      recommended_alternative_facility_id
+    });
+    return res.data?.data?.referral || res.data?.data || res.data;
+  },
+
+  /**
+   * Hospital clinician requests clinical clarifications or missing diagnostics from health centre
+   */
+  async requestInformation(referralId, { notes } = {}) {
+    if (!referralId) throw new Error('Referral ID required');
+    const res = await apiClient.post(`/referrals/${referralId}/request-information`, { notes });
+    return res.data?.data?.referral || res.data?.data || res.data;
   }
 };
