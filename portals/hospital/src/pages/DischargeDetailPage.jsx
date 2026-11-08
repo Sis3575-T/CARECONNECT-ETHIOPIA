@@ -25,6 +25,7 @@ import { DischargeStatusBadge } from '../components/discharge/DischargeStatusBad
 import { DischargeSkeleton } from '../components/discharge/DischargeSkeleton.jsx';
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
 import { DischargeDocumentationModal } from '../components/discharge/DischargeDocumentationModal.jsx';
+import { InterFacilityTransferModal } from '../components/discharge/InterFacilityTransferModal.jsx';
 import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 export default function DischargeDetailPage() {
@@ -483,6 +484,18 @@ export default function DischargeDetailPage() {
         onSuccess={(updated) => {
           if (updated) setReferral(prev => ({ ...prev, ...updated, status: 'COMPLETED' }));
           setActionSuccess('Discharge documentation authorized and patient successfully discharged.');
+          fetchDischargeDetails(true);
+        }}
+      />
+
+      {/* Inter-Facility Transfer Modal */}
+      <InterFacilityTransferModal
+        isOpen={showTransferModal}
+        onClose={() => setShowTransferModal(false)}
+        referral={referral}
+        onSuccess={(updated) => {
+          if (updated) setReferral(prev => ({ ...prev, ...updated, status: 'TRANSFERRED' }));
+          setActionSuccess('Inter-facility transfer authorized and initiated successfully.');
           fetchDischargeDetails(true);
         }}
       />
