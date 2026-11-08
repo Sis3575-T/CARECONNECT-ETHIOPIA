@@ -22,7 +22,7 @@ const PRIORITY_CONFIG = {
   }
 };
 
-export default function HospitalPriorityBadge({ priority, className = '' }) {
+export function HospitalPriorityBadge({ priority, className = '' }) {
   const normKey = (priority || 'ROUTINE').toUpperCase();
   const config = PRIORITY_CONFIG[normKey] || PRIORITY_CONFIG.ROUTINE;
   const IconComponent = config.icon;
@@ -38,3 +38,5 @@ export default function HospitalPriorityBadge({ priority, className = '' }) {
     </span>
   );
 }
+
+export default HospitalPriorityBadge;

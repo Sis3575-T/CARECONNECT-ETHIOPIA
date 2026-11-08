@@ -20,6 +20,8 @@ const RejectedReferralsPage = lazy(() => import('./pages/RejectedReferralsPage')
 // Hospital Operations & Capacity
 const PatientArrivalsPage = lazy(() => import('./pages/PatientArrivalsPage'));
 const PatientArrivalDetailPage = lazy(() => import('./pages/PatientArrivalDetailPage'));
+const AdmissionsWorkspacePage = lazy(() => import('./pages/AdmissionsWorkspacePage'));
+const AdmissionDetailPage = lazy(() => import('./pages/AdmissionDetailPage'));
 const FacilityServicesPage = lazy(() => import('./pages/FacilityServicesPage'));
 const CapacityManagementPage = lazy(() => import('./pages/CapacityManagementPage'));
 const FeedbackPage = lazy(() => import('./pages/FeedbackPage'));
@@ -81,6 +83,12 @@ export default function App() {
             <Route path="arrivals/:referralId" element={<PatientArrivalDetailPage />} />
             <Route path="referrals/:referralId/receiving" element={<PatientArrivalDetailPage />} />
             <Route path="incoming/:referralId/receiving" element={<PatientArrivalDetailPage />} />
+
+            <Route path="admissions" element={<AdmissionsWorkspacePage />} />
+            <Route path="admissions/:referralId" element={<AdmissionDetailPage />} />
+            <Route path="referrals/:referralId/progress" element={<AdmissionDetailPage />} />
+            <Route path="referrals/:referralId/admission" element={<AdmissionDetailPage />} />
+
             <Route path="services" element={<FacilityServicesPage />} />
             <Route path="capacity" element={<CapacityManagementPage />} />
             <Route path="feedback" element={<FeedbackPage />} />

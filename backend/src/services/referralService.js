@@ -763,7 +763,19 @@ export class ReferralService {
     }
 
     const notes = payload.progress_notes || payload.current_progress_notes || 'Treatment ongoing in assigned ward';
-    await referralRepository.update(referralId, { current_progress_notes: notes });
+    const fieldUpdates = { current_progress_notes: notes };
+
+    if (payload.allocated_ward_department || payload.department || payload.department_name) {
+      fieldUpdates.allocated_ward_department = payload.allocated_ward_department || payload.department || payload.department_name;
+    }
+    if (payload.assigned_bed_type || payload.admitted_bed) {
+      fieldUpdates.assigned_bed_type = payload.assigned_bed_type || payload.admitted_bed;
+    }
+    if (payload.receiving_clinician_id || payload.assigned_clinician_id) {
+      fieldUpdates.receiving_clinician_id = Number(payload.receiving_clinician_id || payload.assigned_clinician_id);
+    }
+
+    await referralRepository.update(referralId, fieldUpdates);
 
     let updated = referral;
     if (referral.status === 'PATIENT_ARRIVED' || referral.status === 'ARRIVED') {
@@ -795,6 +807,13 @@ export class ReferralService {
     const referral = await referralRepository.findById(referralId);
     if (!referral) {
       throw new NotFoundError(`Referral [${referralId}] not found`);
+    }
+
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && referral.destination_facility_id !== userFacilityId) {
+      throw new ForbiddenError('You can only complete referrals assigned to your hospital');
     }
 
     this.assertValidTransition(referral.status, 'COMPLETED');
@@ -836,6 +855,13 @@ export class ReferralService {
     const referral = await referralRepository.findById(referralId);
     if (!referral) {
       throw new NotFoundError(`Referral [${referralId}] not found`);
+    }
+
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && referral.destination_facility_id !== userFacilityId) {
+      throw new ForbiddenError('You can only close referrals assigned to your hospital');
     }
 
     this.assertValidTransition(referral.status, 'CLOSED');
