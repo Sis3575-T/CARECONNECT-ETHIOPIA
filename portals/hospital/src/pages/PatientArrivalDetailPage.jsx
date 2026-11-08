@@ -26,6 +26,7 @@ import ArrivalSkeleton from '../components/arrival/ArrivalSkeleton.jsx';
 import PatientIdentityVerification from '../components/arrival/PatientIdentityVerification.jsx';
 import PatientHandoverSection from '../components/arrival/PatientHandoverSection.jsx';
 import PatientArrivalModal from '../components/arrival/PatientArrivalModal.jsx';
+import ReceivingConfirmationModal from '../components/arrival/ReceivingConfirmationModal.jsx';
 
 export default function PatientArrivalDetailPage() {
   const { referralId } = useParams();
@@ -331,6 +332,14 @@ export default function PatientArrivalDetailPage() {
       {/* Arrival Action Modals */}
       <PatientArrivalModal
         isOpen={activeModal === 'ARRIVE'}
+        onClose={() => setActiveModal(null)}
+        referral={referral}
+        isVerified={verificationState.isVerified}
+        onSuccess={(_, msg) => handleActionComplete(msg)}
+      />
+
+      <ReceivingConfirmationModal
+        isOpen={activeModal === 'CONFIRM_RECEIPT'}
         onClose={() => setActiveModal(null)}
         referral={referral}
         isVerified={verificationState.isVerified}
