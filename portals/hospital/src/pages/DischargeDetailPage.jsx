@@ -29,6 +29,7 @@ import { InterFacilityTransferModal } from '../components/discharge/InterFacilit
 import { ReturnToReferrerModal } from '../components/discharge/ReturnToReferrerModal.jsx';
 import { PatientOutcomeModal } from '../components/discharge/PatientOutcomeModal.jsx';
 import { PatientOutcomeSection } from '../components/discharge/PatientOutcomeSection.jsx';
+import { DischargeHistoryTimeline } from '../components/discharge/DischargeHistoryTimeline.jsx';
 import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 export default function DischargeDetailPage() {
@@ -425,33 +426,11 @@ export default function DischargeDetailPage() {
       )}
 
       {activeTab === 'history' && (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-emerald-600" />
-            <span>Chronological Audit Trail</span>
-          </h3>
-          {followUps.length === 0 && reassignments.length === 0 ? (
-            <p className="text-sm text-slate-500 dark:text-slate-400 py-4 text-center">
-              No historical coordination or transfer events logged yet.
-            </p>
-          ) : (
-            <div className="space-y-4 divide-y divide-slate-100 dark:divide-slate-800">
-              {followUps.map((fu, idx) => (
-                <div key={idx} className="pt-3 first:pt-0 flex items-start justify-between gap-4">
-                  <div className="space-y-1">
-                    <span className="inline-block text-xs font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {fu.outcome || 'EVENT'}
-                    </span>
-                    <p className="text-sm text-slate-800 dark:text-slate-200">{fu.reason_or_notes || fu.notes}</p>
-                  </div>
-                  <span className="text-xs text-slate-500 whitespace-nowrap">
-                    {formatClinicalDate(fu.created_at)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <DischargeHistoryTimeline
+          referral={referral}
+          followUps={followUps}
+          reassignments={reassignments}
+        />
       )}
 
       {/* Discharge Documentation Modal */}
