@@ -18,6 +18,7 @@ const PatientEditPage = lazy(() => import('./pages/PatientEditPage'));
 // Additional Health Centre Portal Pages
 const CreateReferralPage = lazy(() => import('./pages/CreateReferralPage'));
 const AllReferralsPage = lazy(() => import('./pages/AllReferralsPage'));
+const ReferralDetailPage = lazy(() => import('./pages/ReferralDetailPage'));
 const AIReviewPage = lazy(() => import('./pages/AIReviewPage'));
 const HospitalsPage = lazy(() => import('./pages/HospitalsPage'));
 const TrackingPage = lazy(() => import('./pages/TrackingPage'));
@@ -67,13 +68,15 @@ export default function App() {
             <Route path="patients/:patientId" element={<PatientDetailPage />} />
             <Route path="patients/:patientId/edit" element={<PatientEditPage />} />
 
-            {/* Other Portal Workspaces */}
+            {/* Referral Management & Tracking Hierarchy */}
             <Route path="create-referral" element={<CreateReferralPage />} />
             <Route path="referrals/new" element={<Navigate to="/create-referral" replace />} />
             <Route path="referrals" element={<AllReferralsPage />} />
+            <Route path="referrals/:referralId" element={<ReferralDetailPage />} />
             <Route path="ai-review" element={<AIReviewPage />} />
             <Route path="hospitals" element={<HospitalsPage />} />
             <Route path="tracking" element={<TrackingPage />} />
+            <Route path="tracking/:referralId" element={<ReferralDetailPage />} />
             <Route path="reports" element={<ReportsPage />} />
             <Route path="ai-assistant" element={<AIAssistantPage />} />
             <Route path="settings" element={<SettingsPage />} />
