@@ -14,6 +14,8 @@ import { ReferralStepIndicator } from '../components/referrals/ReferralStepIndic
 import { ReferralPatientStep } from '../components/referrals/ReferralPatientStep.jsx';
 import { ReferralClinicalStep } from '../components/referrals/ReferralClinicalStep.jsx';
 import { ReferralDestinationStep } from '../components/referrals/ReferralDestinationStep.jsx';
+import { ReferralDocumentsStep } from '../components/referrals/ReferralDocumentsStep.jsx';
+import { ReferralReviewStep } from '../components/referrals/ReferralReviewStep.jsx';
 import { Card } from '@shared/components/display/Card.jsx';
 import { Spinner } from '@shared/components/feedback/Spinner.jsx';
 
@@ -54,6 +56,8 @@ export default function CreateReferralPage() {
 
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [createdReferral, setCreatedReferral] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState(null);
 
   const facilityName = user?.facilityName || 'Assigned Health Centre';
 
@@ -86,6 +90,63 @@ export default function CreateReferralPage() {
 
   const markStepComplete = (stepId) => {
     setCompletedSteps((prev) => (prev.includes(stepId) ? prev : [...prev, stepId]));
+  };
+
+  const handleSubmitReferral = async () => {
+    if (!selectedPatient?.id) {
+      setSubmissionError('Please select a valid patient before submitting');
+      return;
+    }
+    if (!destinationData.destination_facility_id) {
+      setSubmissionError('Please select an authorized destination hospital');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmissionError(null);
+
+    try {
+      const payload = {
+        patient_id: selectedPatient.id,
+        priority: clinicalData.priority,
+        primary_diagnosis: clinicalData.primary_diagnosis,
+        reason_for_referral: clinicalData.reason_for_referral,
+        clinical_summary: clinicalData.clinical_summary,
+        destination_facility_id: destinationData.destination_facility_id,
+        required_specialty: destinationData.required_specialty || undefined,
+        vitals_blood_pressure: clinicalData.vitals_blood_pressure || undefined,
+        vitals_pulse_rate: clinicalData.vitals_pulse_rate ? Number(clinicalData.vitals_pulse_rate) : undefined,
+        vitals_respiratory_rate: clinicalData.vitals_respiratory_rate ? Number(clinicalData.vitals_respiratory_rate) : undefined,
+        vitals_temperature: clinicalData.vitals_temperature ? Number(clinicalData.vitals_temperature) : undefined,
+        vitals_spo2: clinicalData.vitals_spo2 ? Number(clinicalData.vitals_spo2) : undefined,
+        provisional_treatment_given: clinicalData.provisional_treatment_given || undefined,
+        transport_required: Boolean(clinicalData.transport_required),
+        status: 'SUBMITTED'
+      };
+
+      const referral = await referralCreationService.createReferral(payload);
+
+      // Upload attached documents if any
+      if (attachedFiles.length > 0 && referral?.id) {
+        for (const item of attachedFiles) {
+          try {
+            await referralCreationService.uploadReferralDocument(referral.id, item.file, {
+              title: item.description || item.fileName,
+              documentType: item.documentType
+            });
+          } catch (uploadErr) {
+            // Log without sensitive patient info
+          }
+        }
+      }
+
+      setCreatedReferral(referral);
+      markStepComplete(5);
+    } catch (err) {
+      setSubmissionError(err.message || 'Failed to submit referral. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -173,17 +234,31 @@ export default function CreateReferralPage() {
             />
           )}
 
-          {currentStep > 3 && (
-            <Card className="p-8 text-center text-xs text-slate-500 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-              <p>Step {currentStep} under configuration...</p>
-              <button
-                type="button"
-                onClick={() => setCurrentStep(3)}
-                className="mt-3 px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50"
-              >
-                Back to Destination Selection
-              </button>
-            </Card>
+          {currentStep === 4 && (
+            <ReferralDocumentsStep
+              attachedFiles={attachedFiles}
+              onChangeFiles={setAttachedFiles}
+              onBack={() => setCurrentStep(3)}
+              onProceed={() => {
+                markStepComplete(4);
+                setCurrentStep(5);
+              }}
+            />
+          )}
+
+          {currentStep === 5 && (
+            <ReferralReviewStep
+              patient={selectedPatient}
+              clinicalData={clinicalData}
+              destinationData={destinationData}
+              attachedFiles={attachedFiles}
+              facilityName={facilityName}
+              submitting={isSubmitting}
+              submissionError={submissionError}
+              onBack={() => setCurrentStep(4)}
+              onJumpToStep={(stepId) => setCurrentStep(stepId)}
+              onSubmit={handleSubmitReferral}
+            />
           )}
         </>
       )}
