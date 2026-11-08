@@ -29,6 +29,7 @@ import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import HospitalDashboardSkeleton from '../components/HospitalDashboardSkeleton.jsx';
 import ClinicalReviewSummary from '../components/review/ClinicalReviewSummary.jsx';
 import ReviewNotesSection from '../components/review/ReviewNotesSection.jsx';
+import ReferralAcceptModal from '../components/review/ReferralAcceptModal.jsx';
 
 export default function ReferralReviewPage() {
   const { referralId } = useParams();
@@ -258,6 +259,14 @@ export default function ReferralReviewPage() {
         <ClinicalReviewSummary referral={referral} documents={documents} />
         <ReviewNotesSection referral={referral} />
       </div>
+
+      {/* Decision Modals */}
+      <ReferralAcceptModal
+        isOpen={activeModal === 'ACCEPT'}
+        onClose={() => setActiveModal(null)}
+        referral={referral}
+        onSuccess={(_, msg) => handleDecisionComplete(msg)}
+      />
     </div>
   );
 }
