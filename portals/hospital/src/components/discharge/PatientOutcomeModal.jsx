@@ -12,52 +12,9 @@ import {
   FileCheck
 } from 'lucide-react';
 import { useAuth } from '@shared/context/AuthContext.jsx';
-import { hospitalService } from '../../services/hospitalService.js';
+import { hospitalService, OUTCOME_CATEGORIES } from '../../services/hospitalService.js';
 
-export const OUTCOME_CATEGORIES = [
-  {
-    value: 'CLINICALLY_IMPROVED',
-    label: 'Clinically Improved',
-    desc: 'Patient showed clear clinical and symptom improvement under hospital management.',
-    badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300'
-  },
-  {
-    value: 'SPECIALIST_OBJECTIVE_RESOLVED',
-    label: 'Specialist Objective Resolved',
-    desc: 'The specific specialized consultation, surgery, or diagnostic procedure was completed.',
-    badgeClass: 'bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/40 dark:text-teal-300'
-  },
-  {
-    value: 'STABILIZED',
-    label: 'Stabilized Condition',
-    desc: 'Acute phase stabilized; ongoing chronic or long-term management required.',
-    badgeClass: 'bg-indigo-50 text-indigo-800 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300'
-  },
-  {
-    value: 'UNCHANGED',
-    label: 'Unchanged Baseline',
-    desc: 'Patient remains at baseline chronic state with no clinical progression.',
-    badgeClass: 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-800 dark:text-slate-300'
-  },
-  {
-    value: 'TRANSFERRED_SUPER_SPECIALTY',
-    label: 'Transferred to Higher Care',
-    desc: 'Patient transferred onward to national institute or super-specialty hospital.',
-    badgeClass: 'bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300'
-  },
-  {
-    value: 'SELF_DISCHARGED',
-    label: 'Discharged Against Advice (AMA)',
-    desc: 'Patient or family requested early departure against medical recommendations.',
-    badgeClass: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300'
-  },
-  {
-    value: 'DECEASED',
-    label: 'Deceased During Stay',
-    desc: 'Patient expired during inpatient hospital hospitalization.',
-    badgeClass: 'bg-rose-50 text-rose-800 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300'
-  }
-];
+export { OUTCOME_CATEGORIES };
 
 export function PatientOutcomeModal({
   isOpen,
