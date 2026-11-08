@@ -324,5 +324,102 @@ export const hospitalService = {
     if (!referralId) throw new Error('Referral ID required');
     const res = await apiClient.post(`/referrals/${referralId}/request-information`, { notes });
     return res.data?.data?.referral || res.data?.data || res.data;
+  },
+
+  /**
+   * Retrieve accepted referrals eligible for patient arrival, handover, and receiving
+   */
+  async getArrivalQueue(params = {}) {
+    try {
+      const res = await apiClient.get('/referrals/incoming', {
+        params: {
+          limit: params.limit || 50,
+          page: params.page || 1,
+          search: params.search || undefined,
+          priority: params.priority || undefined,
+          status: params.status || undefined
+        }
+      });
+      const payload = res.data || {};
+      const allItems = Array.isArray(payload.data)
+        ? payload.data
+        : Array.isArray(payload.referrals)
+        ? payload.referrals
+        : [];
+
+      // Filter referrals that are accepted, en-route, arrived, or admitted
+      const arrivalEligible = allItems.filter(r => {
+        const s = (r.status || '').toUpperCase();
+        return ['ACCEPTED', 'TRANSPORT_ASSIGNED', 'IN_TRANSIT', 'PATIENT_ARRIVED', 'ARRIVED', 'IN_PROGRESS'].includes(s);
+      });
+
+      return {
+        referrals: arrivalEligible,
+        total: arrivalEligible.length,
+        page: payload.pagination?.page || params.page || 1,
+        limit: payload.pagination?.limit || params.limit || 50
+      };
+    } catch (err) {
+      console.error('[HospitalService] Failed to load arrival queue:', err);
+      throw err;
+    }
+  },
+
+  /**
+   * Hospital triage/receiving staff confirms physical arrival of patient
+   */
+  async confirmPatientArrival(referralId, payload = {}) {
+    if (!referralId) throw new Error('Referral ID required');
+    const res = await apiClient.post(`/referrals/${referralId}/arrival`, {
+      arrival_notes: payload.arrival_notes || payload.notes || 'Physical patient arrival confirmed at hospital triage',
+      actual_arrival_time: payload.actual_arrival_time || new Date().toISOString(),
+      receiving_department: payload.receiving_department,
+      receiving_staff_name: payload.receiving_staff_name,
+      verification_confirmed: payload.verification_confirmed !== false
+    });
+    return res.data?.data?.referral || res.data?.data || res.data;
+  },
+
+  /**
+   * Record structured patient handover from referring facility / ambulance crew
+   */
+  async recordPatientHandover(referralId, payload = {}) {
+    if (!referralId) throw new Error('Referral ID required');
+    try {
+      const res = await apiClient.post(`/referrals/${referralId}/follow-ups`, {
+        interaction_type: 'HANDOVER_DOCUMENTATION',
+        notes: payload.handover_notes || 'Patient handover completed with escort team',
+        details: {
+          handoverGiverName: payload.handover_giver_name,
+          handoverGiverRole: payload.handover_giver_role,
+          receivingStaffName: payload.receiving_staff_name,
+          documentsReceived: payload.documents_received || [],
+          belongingsReceived: payload.belongings_received,
+          conditionSummary: payload.physical_condition_summary,
+          handoverTime: payload.handover_time || new Date().toISOString()
+        }
+      });
+      return res.data?.data || res.data;
+    } catch (err) {
+      // Fallback to progress endpoint if follow-ups is unavailable
+      const fallbackRes = await apiClient.post(`/referrals/${referralId}/progress`, {
+        progress_notes: `Patient Handover: ${payload.handover_notes || 'Handover completed with escort team'}`
+      });
+      return fallbackRes.data?.data?.referral || fallbackRes.data?.data || fallbackRes.data;
+    }
+  },
+
+  /**
+   * Hospital confirms official receipt and operational admission into receiving ward
+   */
+  async confirmReceivingAdmission(referralId, payload = {}) {
+    if (!referralId) throw new Error('Referral ID required');
+    const res = await apiClient.post(`/referrals/${referralId}/progress`, {
+      progress_notes: payload.progress_notes || payload.admission_notes || 'Patient admitted into ward care and active treatment initiated',
+      admitted_ward: payload.admitted_ward || payload.allocated_ward_department,
+      admitted_bed: payload.admitted_bed || payload.assigned_bed_type,
+      receiving_staff_name: payload.receiving_staff_name
+    });
+    return res.data?.data?.referral || res.data?.data || res.data;
   }
 };

@@ -705,13 +705,26 @@ export class ReferralService {
     }
 
     const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && referral.destination_facility_id !== userFacilityId) {
+      throw new ForbiddenError('You can only confirm arrival for referrals assigned to your hospital');
+    }
+
     this.assertValidTransition(referral.status, 'PATIENT_ARRIVED');
 
+    const arrivalReason = payload.arrival_notes || payload.reason || 'Physical patient arrival confirmed at hospital triage';
     const updated = await referralRepository.updateStatus(referralId, 'PATIENT_ARRIVED', {
       userId: userContext.id,
       facilityId: userFacilityId || referral.destination_facility_id,
-      reason: payload.arrival_notes || 'Physical patient arrival confirmed at hospital triage'
+      reason: arrivalReason
     });
+
+    if (payload.receiving_department || payload.actual_arrival_time) {
+      await referralRepository.update(referralId, {
+        allocated_ward_department: payload.receiving_department || referral.allocated_ward_department
+      });
+    }
 
     await securityAuditService.recordEvent({
       eventName: 'REFERRAL_ARRIVAL_CONFIRMED',
@@ -721,10 +734,16 @@ export class ReferralService {
       action: 'REFERRAL_ARRIVAL_CONFIRMED',
       resourceType: 'referral',
       resourceId: referralId,
-      details: { referralId, referenceNumber: updated.reference_number }
+      details: {
+        referralId,
+        referenceNumber: updated.reference_number,
+        actualArrivalTime: payload.actual_arrival_time || null,
+        receivingDepartment: payload.receiving_department || null,
+        receivingStaffName: payload.receiving_staff_name || null
+      }
     });
 
-    return this.sanitizeReferral(updated, userContext);
+    return this.sanitizeReferral(await referralRepository.findById(referralId), userContext);
   }
 
   /**
@@ -736,6 +755,13 @@ export class ReferralService {
       throw new NotFoundError(`Referral [${referralId}] not found`);
     }
 
+    const userFacilityId = userContext.facilityId || userContext.facility_id;
+    const userRoleId = Number(userContext.roleId || userContext.role_id || 0);
+
+    if ((userRoleId === 2 || userRoleId === 3) && userFacilityId && referral.destination_facility_id !== userFacilityId) {
+      throw new ForbiddenError('You can only update progress or confirm receiving admission for referrals assigned to your hospital');
+    }
+
     const notes = payload.progress_notes || payload.current_progress_notes || 'Treatment ongoing in assigned ward';
     await referralRepository.update(referralId, { current_progress_notes: notes });
 
@@ -743,7 +769,7 @@ export class ReferralService {
     if (referral.status === 'PATIENT_ARRIVED' || referral.status === 'ARRIVED') {
       updated = await referralRepository.updateStatus(referralId, 'IN_PROGRESS', {
         userId: userContext.id,
-        facilityId: userContext.facilityId || referral.destination_facility_id,
+        facilityId: userFacilityId || referral.destination_facility_id,
         reason: notes
       });
     }
@@ -752,7 +778,7 @@ export class ReferralService {
       eventName: 'REFERRAL_PROGRESS_UPDATED',
       category: 'REFERRAL_MANAGEMENT',
       userId: userContext.id || null,
-      facilityId: userContext.facilityId || referral.destination_facility_id,
+      facilityId: userFacilityId || referral.destination_facility_id,
       action: 'REFERRAL_PROGRESS_UPDATED',
       resourceType: 'referral',
       resourceId: referralId,

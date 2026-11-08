@@ -1,106 +1,380 @@
-import React, { useState } from 'react';
-import { Bed, CheckCircle2, Clock, Truck, UserCheck, Search, ShieldCheck } from 'lucide-react';
-import { useCareConnectData } from '@shared/hooks/useCareConnectData';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Truck,
+  CheckCircle2,
+  Clock,
+  UserCheck,
+  Search,
+  RefreshCw,
+  Building,
+  User,
+  ArrowRight,
+  Filter,
+  Flame,
+  Bed,
+  ShieldCheck
+} from 'lucide-react';
+import { hospitalService } from '../services/hospitalService.js';
+import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
+import { formatClinicalDate, formatRelativeTime } from '@shared/utils/formatters.js';
+import HospitalPriorityBadge from '../components/HospitalPriorityBadge.jsx';
+import ArrivalStatusBadge from '../components/arrival/ArrivalStatusBadge.jsx';
+import ArrivalSkeleton from '../components/arrival/ArrivalSkeleton.jsx';
+import ArrivalEmptyState from '../components/arrival/ArrivalEmptyState.jsx';
+import HospitalErrorState from '../components/HospitalErrorState.jsx';
+
+const ARRIVAL_TABS = [
+  { id: 'ALL', label: 'All Active Arrivals' },
+  { id: 'AWAITING_ARRIVAL', label: 'Accepted — Awaiting Arrival', statusHint: 'ACCEPTED' },
+  { id: 'EN_ROUTE', label: 'En Route to Hospital', statusHint: 'IN_TRANSIT' },
+  { id: 'ARRIVED', label: 'Arrived — Pending Handover', statusHint: 'PATIENT_ARRIVED' },
+  { id: 'ADMITTED', label: 'Admitted to Ward', statusHint: 'IN_PROGRESS' }
+];
 
 export default function PatientArrivalsPage() {
-  const { referrals, updateReferralStatus } = useCareConnectData();
+  const navigate = useNavigate();
+
+  const [referrals, setReferrals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState('ALL');
 
-  // Accepted, In Transit, Arrived, or Completed referrals
-  const arrivalReferrals = referrals.filter(r =>
-    (r.status === 'Accepted' || r.status === 'In Transit' || r.status === 'Arrived') &&
-    (r.patientName.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()))
-  );
+  const loadArrivalQueue = useCallback(async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
+    else setRefreshing(true);
+    setError(null);
 
-  const handleConfirmArrival = async (id) => {
-    await updateReferralStatus(id, 'Arrived', 'Patient admitted to Ward. Triage handoff complete.', {
-      actorName: 'Triage Nurse Selamawit',
-      actorRole: 'Hospital Staff',
-      actorFacility: 'Tikur Anbessa Hospital'
+    try {
+      const data = await hospitalService.getArrivalQueue({ limit: 100 });
+      setReferrals(data.referrals || []);
+    } catch (err) {
+      console.error('[HospitalPatientArrivals] Fetch error:', err);
+      setError(err?.message || 'Failed to retrieve arrival queue from server');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadArrivalQueue();
+  }, [loadArrivalQueue]);
+
+  // Real-time synchronization
+  const { isLiveConnected, triggerSync: triggerLiveSync } = useHospitalRealtime({
+    onEventReceived: () => {
+      loadArrivalQueue(true);
+    },
+    pollingIntervalMs: 25000,
+    enabled: true
+  });
+
+  // Filter referrals by active tab and search query
+  const filteredReferrals = useMemo(() => {
+    return referrals.filter(r => {
+      const statusUpper = (r.status || '').toUpperCase();
+
+      // Tab filter
+      if (activeTab === 'AWAITING_ARRIVAL' && statusUpper !== 'ACCEPTED') return false;
+      if (activeTab === 'EN_ROUTE' && !['TRANSPORT_ASSIGNED', 'IN_TRANSIT', 'DISPATCHED'].includes(statusUpper)) return false;
+      if (activeTab === 'ARRIVED' && !['PATIENT_ARRIVED', 'ARRIVED'].includes(statusUpper)) return false;
+      if (activeTab === 'ADMITTED' && statusUpper !== 'IN_PROGRESS') return false;
+
+      // Search query filter (reference, patient name, origin, service, Fayda ID)
+      if (search.trim()) {
+        const query = search.toLowerCase();
+        const refCode = (r.reference_number || r.id || '').toLowerCase();
+        const pName = (r.patient_name || r.patientName || '').toLowerCase();
+        const origin = (r.origin_facility_name || r.referringFacility || '').toLowerCase();
+        const service = (r.service_category || r.service || '').toLowerCase();
+        const fayda = (r.patient_fayda_id || '').toLowerCase();
+
+        return (
+          refCode.includes(query) ||
+          pName.includes(query) ||
+          origin.includes(query) ||
+          service.includes(query) ||
+          fayda.includes(query)
+        );
+      }
+
+      return true;
     });
-  };
+  }, [referrals, activeTab, search]);
+
+  // Operational metrics
+  const metrics = useMemo(() => {
+    let awaitingCount = 0;
+    let enRouteCount = 0;
+    let arrivedCount = 0;
+    let admittedCount = 0;
+
+    for (const r of referrals) {
+      const s = (r.status || '').toUpperCase();
+      if (s === 'ACCEPTED') awaitingCount++;
+      else if (['TRANSPORT_ASSIGNED', 'IN_TRANSIT', 'DISPATCHED'].includes(s)) enRouteCount++;
+      else if (s === 'PATIENT_ARRIVED' || s === 'ARRIVED') arrivedCount++;
+      else if (s === 'IN_PROGRESS') admittedCount++;
+    }
+
+    return {
+      total: referrals.length,
+      awaitingCount,
+      enRouteCount,
+      arrivedCount,
+      admittedCount
+    };
+  }, [referrals]);
+
+  if (loading) {
+    return <ArrivalSkeleton />;
+  }
+
+  if (error && referrals.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto py-12">
+        <HospitalErrorState
+          title="Arrival queue unavailable"
+          message={error || 'Unable to connect to hospital arrival records.'}
+          onRetry={() => loadArrivalQueue()}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-5 text-xs">
-      <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Patient Admissions & Arrival Progress</h1>
-        <p className="text-slate-500 dark:text-slate-400">
-          Track expected patient arrivals, confirm hospital arrival, and record ward admission handoffs
-        </p>
+    <div className="space-y-6 max-w-7xl mx-auto text-xs pb-16">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <Truck className="w-5 h-5 text-emerald-600" />
+            <span>Patient Arrivals & Hospital Receiving</span>
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-xs mt-0.5">
+            Verify arriving patient identities, record physical arrivals, document handovers, and confirm ward admissions
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+            isLiveConnected
+              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+          }`}>
+            <span className={`w-2 h-2 rounded-full ${isLiveConnected ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <span>{isLiveConnected ? 'Live Updates' : 'Polling'}</span>
+          </span>
+
+          <button
+            onClick={() => triggerLiveSync(true)}
+            disabled={refreshing}
+            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-emerald-600' : ''}`} />
+            <span>{refreshing ? 'Updating...' : 'Sync'}</span>
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs">
+      {/* Operational Arrival Metrics Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="font-bold text-[11px]">Awaiting Departure</span>
+            <Clock className="w-4 h-4 text-amber-500" />
+          </div>
+          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
+            {metrics.awaitingCount}
+          </p>
+          <span className="text-[10px] text-slate-400">Accepted by triage team</span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="font-bold text-[11px]">En Route / Dispatched</span>
+            <Truck className="w-4 h-4 text-violet-500" />
+          </div>
+          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
+            {metrics.enRouteCount}
+          </p>
+          <span className="text-[10px] text-slate-400">Ambulance in transit</span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="font-bold text-[11px]">Arrived — Pending Handover</span>
+            <UserCheck className="w-4 h-4 text-blue-500" />
+          </div>
+          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
+            {metrics.arrivedCount}
+          </p>
+          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">Ready for reception</span>
+        </div>
+
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span className="font-bold text-[11px]">Admitted to Ward</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          </div>
+          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1.5">
+            {metrics.admittedCount}
+          </p>
+          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">Inpatient care active</span>
+        </div>
+      </div>
+
+      {/* Filter Tabs and Search Bar */}
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs space-y-4">
+        {/* Category Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-slate-100 dark:border-slate-700/60 scrollbar-none">
+          {ARRIVAL_TABS.map((tab) => {
+            const count =
+              tab.id === 'ALL' ? metrics.total :
+              tab.id === 'AWAITING_ARRIVAL' ? metrics.awaitingCount :
+              tab.id === 'EN_ROUTE' ? metrics.enRouteCount :
+              tab.id === 'ARRIVED' ? metrics.arrivedCount :
+              metrics.admittedCount;
+
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                  isActive
+                    ? 'bg-emerald-600 text-white shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                  isActive ? 'bg-emerald-700 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Search Input */}
         <div className="relative max-w-md">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search arriving patients..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white"
+            placeholder="Search by patient name, referral reference, or Fayda ID..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-hidden transition-all"
           />
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700 shadow-xs overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
-            <tr>
-              <th className="py-3 px-4">Patient Name</th>
-              <th className="py-3 px-4">Referral ID</th>
-              <th className="py-3 px-4">Origin Facility</th>
-              <th className="py-3 px-4">Specialty Service</th>
-              <th className="py-3 px-4">Transport / Arrival Status</th>
-              <th className="py-3 px-4 text-right">Admission Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60">
-            {arrivalReferrals.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="py-8 text-center text-slate-400">
-                  No arriving patients scheduled currently.
-                </td>
-              </tr>
-            ) : (
-              arrivalReferrals.map((r) => (
-                <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30">
-                  <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
-                    {r.patientName}
-                    <span className="text-[10px] text-slate-400 block font-normal">{r.age}yo • {r.gender}</span>
-                  </td>
-                  <td className="py-3.5 px-4 font-mono font-bold text-emerald-600 dark:text-emerald-400">{r.id}</td>
-                  <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">{r.referringFacility}</td>
-                  <td className="py-3.5 px-4 font-semibold text-slate-800 dark:text-slate-200">{r.service}</td>
-                  <td className="py-3.5 px-4">
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      r.status === 'Arrived' ? 'bg-blue-100 text-blue-700' :
-                      r.status === 'In Transit' ? 'bg-violet-100 text-violet-700' :
-                      'bg-emerald-100 text-emerald-700'
-                    }`}>
-                      {r.status === 'Arrived' ? '✓ Handoff Complete' : r.status === 'In Transit' ? '● En-Route to Hospital' : 'Awaiting Transport'}
+      {/* Referrals Queue Presentation */}
+      {filteredReferrals.length === 0 ? (
+        <ArrivalEmptyState
+          title={search ? 'No matching patient records found' : 'No patients currently in this arrival queue'}
+          message={
+            search
+              ? 'Try searching with different terms or select a different category filter tab.'
+              : 'There are no accepted patient referrals matching this operational receiving stage.'
+          }
+          action={
+            search ? (
+              <button
+                onClick={() => setSearch('')}
+                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-xl text-xs font-bold transition-all cursor-pointer"
+              >
+                Clear Search
+              </button>
+            ) : null
+          }
+        />
+      ) : (
+        <div className="space-y-3">
+          {filteredReferrals.map((r) => {
+            const refCode = r.reference_number || r.id?.slice(0, 8);
+            const patientName = r.patient_name || r.patientName || 'Unnamed Patient';
+            const originFacility = r.origin_facility_name || r.referringFacility || 'Health Centre';
+            const serviceRequested = r.service_category || r.service || 'General Inpatient';
+            const isEmergency = (r.priority || '').toUpperCase() === 'EMERGENCY';
+
+            return (
+              <div
+                key={r.id}
+                onClick={() => navigate(`/arrivals/${r.id}`)}
+                className={`bg-white dark:bg-slate-800 rounded-2xl border p-4.5 shadow-xs transition-all hover:border-emerald-500 dark:hover:border-emerald-500 cursor-pointer space-y-3 ${
+                  isEmergency
+                    ? 'border-rose-300 dark:border-rose-800 bg-rose-50/20 dark:bg-rose-950/10'
+                    : 'border-slate-200/80 dark:border-slate-700'
+                }`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="font-mono font-bold text-slate-900 dark:text-white text-sm">
+                      {refCode}
                     </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-right">
-                    {r.status === 'Arrived' ? (
-                      <span className="text-emerald-600 font-bold flex items-center justify-end gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" /> Admitted
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleConfirmArrival(r.id)}
-                        className="px-3 py-1.5 bg-[#059669] hover:bg-[#047857] text-white font-bold rounded-xl shadow-xs cursor-pointer flex items-center gap-1 ml-auto"
-                      >
-                        <UserCheck className="w-3.5 h-3.5" />
-                        <span>Confirm Handoff</span>
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                    <HospitalPriorityBadge priority={r.priority} />
+                    <ArrivalStatusBadge status={r.status} />
+                  </div>
+
+                  <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-[11px]">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>
+                      {r.arrived_at
+                        ? `Arrived ${formatClinicalDate(r.arrived_at)}`
+                        : r.submitted_at
+                        ? `Submitted ${formatRelativeTime(r.submitted_at)}`
+                        : 'Active case'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">Patient</span>
+                    <p className="font-bold text-slate-900 dark:text-white mt-0.5">{patientName}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {r.patient_gender || r.gender || '—'}, {r.patient_age ? `${r.patient_age} yrs` : 'Age N/A'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">Origin & Specialty</span>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 truncate">{originFacility}</p>
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">{serviceRequested}</p>
+                  </div>
+
+                  <div>
+                    <span className="text-[11px] text-slate-500 dark:text-slate-400">Assigned Ward / Bed</span>
+                    <p className="font-bold text-slate-900 dark:text-white mt-0.5">
+                      {r.allocated_ward_department || 'General Inpatient Ward'}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Bed: <strong className="font-semibold text-slate-700 dark:text-slate-300">{r.assigned_bed_type || 'STANDARD'}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px]">
+                  <span className="text-slate-500 dark:text-slate-400">
+                    Admission diagnosis: <strong className="text-slate-800 dark:text-slate-200 font-medium">{r.primary_diagnosis || 'Referral condition'}</strong>
+                  </span>
+
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                    <span>Manage Receiving & Handover</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
