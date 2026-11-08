@@ -23,6 +23,7 @@ import { hospitalService } from '../services/hospitalService.js';
 import { AdmissionStatusBadge } from '../components/admission/AdmissionStatusBadge.jsx';
 import { AdmissionSkeleton } from '../components/admission/AdmissionSkeleton.jsx';
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
+import { DepartmentAssignmentModal } from '../components/admission/DepartmentAssignmentModal.jsx';
 
 export default function AdmissionDetailPage() {
   const { referralId, id } = useParams();
@@ -513,6 +514,20 @@ export default function AdmissionDetailPage() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* Department Assignment Modal */}
+      {showAssignModal && (
+        <DepartmentAssignmentModal
+          isOpen={showAssignModal}
+          onClose={() => setShowAssignModal(false)}
+          referral={referral}
+          onSuccess={(updated, msg) => {
+            setActionSuccess(msg || 'Department assigned successfully.');
+            fetchReferralDetails(true);
+            setTimeout(() => setActionSuccess(null), 5000);
+          }}
+        />
       )}
     </div>
   );
