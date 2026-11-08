@@ -25,6 +25,7 @@ import HospitalErrorState from '../components/HospitalErrorState.jsx';
 import ArrivalSkeleton from '../components/arrival/ArrivalSkeleton.jsx';
 import PatientIdentityVerification from '../components/arrival/PatientIdentityVerification.jsx';
 import PatientHandoverSection from '../components/arrival/PatientHandoverSection.jsx';
+import ReceivingHistoryTimeline from '../components/arrival/ReceivingHistoryTimeline.jsx';
 import PatientArrivalModal from '../components/arrival/PatientArrivalModal.jsx';
 import ReceivingConfirmationModal from '../components/arrival/ReceivingConfirmationModal.jsx';
 
@@ -326,6 +327,13 @@ export default function PatientArrivalDetailPage() {
           referral={referral}
           onHandoverRecorded={() => fetchArrivalDossier(true)}
           isLocked={verificationState.hasMismatch}
+        />
+
+        {/* Step 3: Receiving History & Chronological Audit Trail */}
+        <ReceivingHistoryTimeline
+          timeline={timeline}
+          historyData={historyData}
+          referral={referral}
         />
       </div>
 
