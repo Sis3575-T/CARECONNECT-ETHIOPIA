@@ -28,6 +28,7 @@ import { AdmissionStatusBadge } from '../components/admission/AdmissionStatusBad
 import { AdmissionSkeleton } from '../components/admission/AdmissionSkeleton.jsx';
 import { AdmissionEmptyState } from '../components/admission/AdmissionEmptyState.jsx';
 import { HospitalPriorityBadge } from '../components/HospitalPriorityBadge.jsx';
+import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 const STAGE_TABS = [
   { key: 'ALL', label: 'All Inpatients' },
@@ -97,6 +98,12 @@ export default function AdmissionsWorkspacePage() {
   useEffect(() => {
     loadAdmissionsData();
   }, [loadAdmissionsData]);
+
+  // Real-time telemetry: auto-refresh workspace on incoming hospital updates
+  useHospitalRealtime({
+    onReferralUpdated: () => loadAdmissionsData(true),
+    onNotificationReceived: () => loadAdmissionsData(true)
+  });
 
   // Operational metrics
   const metrics = useMemo(() => calculateAdmissionMetrics(referrals), [referrals]);

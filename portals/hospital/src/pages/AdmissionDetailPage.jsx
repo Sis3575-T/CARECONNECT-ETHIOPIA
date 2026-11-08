@@ -28,6 +28,8 @@ import { AdmissionRecordCard } from '../components/admission/AdmissionRecordCard
 import { ProgressUpdateModal } from '../components/admission/ProgressUpdateModal.jsx';
 import { CareProgressWorkspace } from '../components/admission/CareProgressWorkspace.jsx';
 import { ReferralCompletionModal } from '../components/admission/ReferralCompletionModal.jsx';
+import { AdmissionHistoryTimeline } from '../components/admission/AdmissionHistoryTimeline.jsx';
+import { useHospitalRealtime } from '../hooks/useHospitalRealtime.js';
 
 export default function AdmissionDetailPage() {
   const { referralId, id } = useParams();
@@ -86,6 +88,15 @@ export default function AdmissionDetailPage() {
   useEffect(() => {
     fetchReferralDetails();
   }, [fetchReferralDetails]);
+
+  // Real-time telemetry: auto-refresh when referral status changes
+  useHospitalRealtime({
+    onReferralUpdated: (evt) => {
+      if (evt?.referralId === effectiveId || evt?.id === effectiveId) {
+        fetchReferralDetails(true);
+      }
+    }
+  });
 
   // Operational Ward Admission transition (from PATIENT_ARRIVED to IN_PROGRESS)
   const handleQuickAdmit = async () => {
@@ -411,31 +422,10 @@ export default function AdmissionDetailPage() {
 
       {/* Audit History Tab */}
       {activeTab === 'history' && (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-4">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-2">
-            Referral Operational Status Transitions
-          </h2>
-          <div className="space-y-3">
-            {(referral.status_history || []).map((step, idx) => (
-              <div key={idx} className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-100 dark:border-slate-700/50 text-xs">
-                <Clock className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">
-                      Transitioned to: {step.to_status}
-                    </span>
-                    <span className="text-slate-400">
-                      {step.created_at ? formatClinicalDate(step.created_at) : ''}
-                    </span>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400 mt-1">
-                    {step.reason_text || 'Status updated'}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <AdmissionHistoryTimeline
+          referral={referral}
+          followUps={followUps}
+        />
       )}
 
       {/* Department Assignment Modal */}
